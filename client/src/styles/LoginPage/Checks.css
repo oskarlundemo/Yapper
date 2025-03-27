@@ -1,0 +1,65 @@
+
+
+.checks {
+    opacity: 0;
+    transition: opacity var(--default-transition);
+    color: var(--error-color);
+
+
+    svg {
+        fill: var(--error-color);
+    }
+}
+
+
+.show {
+    opacity: 1;
+}
+
+
+.checks {
+    display: flex;
+    flex-direction: column;
+
+    > div {
+        display: flex;
+        align-items: center;
+
+        p {
+            margin: 0.5rem;
+        }
+
+        > div {
+            display: flex;
+            align-items: center;
+
+            p {
+                margin: 0.5rem;
+            }
+        }
+    }
+
+    > div:last-of-type {
+        margin-bottom: 1rem;
+    }
+}
+
+
+.error-msg {
+    color: var(--error-color);
+    svg {
+        fill: var(--error-color) !important;
+    }
+}
+
+
+.approved {
+    color: var(--approved-color);
+    svg {
+        fill: var(--approved-color) !important;
+    }
+}
+
+.approved svg {
+    fill: var(--approved-color) !important;
+}

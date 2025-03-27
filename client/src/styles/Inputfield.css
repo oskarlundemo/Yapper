@@ -1,0 +1,48 @@
+
+
+
+
+
+.input-field {
+
+    fieldset {
+        text-align: left;
+        border-radius: var(--border-radius);
+        transition: var(--default-transition);
+    }
+
+    fieldset:has(input:focus-within) {
+        border: 2px solid var(--accent-color);
+        color: var(--accent-color);
+
+        input {
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        svg {
+            transition: var(--default-transition);
+            fill: var(--accent-color);
+        }
+    }
+
+    input:focus {
+        outline: none;
+
+    }
+
+    .input-card {
+        display: flex;
+        justify-content: center;
+        gap: 0.2rem;
+    }
+
+    input {
+        width: 100%;
+        border: none;
+        background-color: transparent;
+        border-bottom: 2px solid lightgray
+    }
+
+
+}
+
