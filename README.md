@@ -1,3 +1,3 @@
-#Yapper 
+# Yapper 
 
-A discord / slack clone, in progress! ✌️
+A discord / slack clone, part of The Odin Project curriculum, in progress! ✌️
