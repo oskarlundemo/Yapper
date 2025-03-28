@@ -4,9 +4,13 @@ import '../../styles/LoginPage/CreateUserBox.css'
 import {PasswordChecks} from "./PasswordChecks.jsx";
 import {EmailCheck} from "./EmailCheck.jsx";
 import {UsernameCheck} from "./UsernameCheck.jsx";
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext.jsx";
 
 export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
 
+    const navigate = useNavigate(); // Use to navigate
+    const { login } = useAuth(); // Login user with authContext
 
     const [isPasswordFocused, setPasswordFocused] = useState(false);
     const [isUsernameFocused, setUsernameFocused] = useState(false);
@@ -58,7 +62,8 @@ export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
             if (!response.ok && result.errors.length > 0) {
                 setErrors(result.errors);
             } else {
-                // Login, go to homepage
+                login(result.token);
+                navigate('/dashboard');
             }
 
         } catch (err) {

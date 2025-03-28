@@ -1,9 +1,13 @@
 import {Inputfield} from "../Inputfield.jsx";
 import {useEffect, useState} from "react";
 import '../../styles/LoginPage/LoginBox.css'
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext.jsx";
 
 export const LoginBox = ({showLogin, toggleLogin, URL}) => {
 
+    const navigate = useNavigate(); // Use to navigate
+    const { login } = useAuth(); // Login user with authContext
 
     const [errors, setErrors] = useState([]);
     const [isDisabled, setIsDisabled] = useState(true);
@@ -47,8 +51,8 @@ export const LoginBox = ({showLogin, toggleLogin, URL}) => {
                 console.log(result.errors || result.error); // This will print any error message returned from the backend
                 setErrors(result.errors || result.error); // Assuming result.errors is an array or result.error is a string
             } else {
-                // Handle successful login
-                // Redirect to homepage or perform further actions
+                login(result.token);
+                navigate('/dashboard');
             }
         } catch (err) {
             console.error(err);

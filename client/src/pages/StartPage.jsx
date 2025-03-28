@@ -3,7 +3,7 @@ import "../styles/LoginPage/LoginPage.css";
 import {CreateUserBox} from "../components/LoginPageComponents/CreateUserBox.jsx";
 import {useState} from "react";
 
-export const LoginPage = ({URL}) => {
+export const StartPage = ({URL}) => {
 
     const [showLogin, setShowLogin] = useState(false);
     const [showCreateUser, setShowCreateUser] = useState(true);
