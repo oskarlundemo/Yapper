@@ -9,6 +9,7 @@
         text-align: left;
         border-radius: var(--border-radius);
         transition: var(--default-transition);
+        border: 2px solid lightgrey;
     }
 
     fieldset:has(input:focus-within) {

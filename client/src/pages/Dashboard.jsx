@@ -1,7 +1,8 @@
 
 
-
-
+import '../styles/Dashboard/Dashboard.css'
+import {DashboardHeader} from "../components/DashboardComponents/DashboardHeader.jsx";
+import {DashboardMain} from "../components/DashboardComponents/DashboardMain.jsx";
 
 export const Dashboard = () => {
 
@@ -10,18 +11,8 @@ export const Dashboard = () => {
 
         <div className={'dashboard-wrapper'}>
 
-            <header>
-                <h1>Dashboard</h1>
-            </header>
-
-            <main className={'dashboard-main'}>
-
-                <aside className={'dashboard-aside'}></aside>
-
-                <section className={'message-section'}></section>
-
-                <section className={'dashboard-section'}></section>
-            </main>
+            <DashboardHeader/>
+            <DashboardMain/>
 
         </div>
     )

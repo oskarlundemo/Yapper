@@ -1,0 +1,50 @@
+
+
+
+.dashboard-message-content {
+    background: var(--color-secondary);
+}
+
+
+
+.dashboard-message-input {
+    display: flex;
+    height: 100%;
+}
+
+
+
+.message-fieldset {
+    border: none;
+}
+
+.message-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.message-card-body {
+    display: flex;
+    width: 50%;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    background: hsl(234, 76%, 66%);
+    gap: 1rem;
+
+
+    input {
+        flex-grow: 1;
+        background-color: transparent;
+        border: none;
+        color: var(--text-color);
+    }
+}
+
+.message-area-icons {
+    display: flex;
+    justify-content: center;
+}
