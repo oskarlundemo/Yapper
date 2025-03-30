@@ -3,16 +3,13 @@ import {DashboardConversations} from "./DashboardConversations.jsx";
 import {DashboardChatWindow} from "./DashboardChatWindow.jsx";
 
 
-export const DashboardMain = () => {
-
+export const DashboardMain = ({showProfile, setShowProfile}) => {
 
     return (
         <main className={'dashboard-main'}>
-
-            <DashboardNavigation/>
+            <DashboardNavigation toggleProfile={setShowProfile} />
             <DashboardConversations/>
-            <DashboardChatWindow/>
-
+            <DashboardChatWindow showProfile={showProfile}/>
         </main>
     )
 }

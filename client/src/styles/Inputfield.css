@@ -4,7 +4,6 @@
 
 
 .input-field {
-
     fieldset {
         text-align: left;
         border-radius: var(--border-radius);
@@ -41,9 +40,8 @@
         width: 100%;
         border: none;
         background-color: transparent;
-        border-bottom: 2px solid lightgray
+        border-bottom: 2px solid lightgray;
+        color: var(--text-color);
     }
-
-
 }
 

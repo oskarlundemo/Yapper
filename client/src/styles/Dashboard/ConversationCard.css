@@ -1,0 +1,41 @@
+
+
+
+
+
+.conversation-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0.2rem;
+    height: fit-content;
+
+    img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
+}
+
+.conversation-card-avatar {
+    display: flex;
+    align-items: center;
+}
+
+
+.conversation-contact {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin: 0;
+
+    span {
+        opacity: 0.5;
+    }
+}
+
+.conversation-content {
+    margin: 0;
+    text-align: left;
+    opacity: 0.5;
+}

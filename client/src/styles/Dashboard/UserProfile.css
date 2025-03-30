@@ -1,0 +1,27 @@
+
+
+
+
+
+
+
+.user-profile-container {
+    height: 100%;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    display: flex;
+    background-color: var(--background-color);
+    flex-direction: column;
+    grid-row: 1 / -1;
+
+}
+
+
+.user-profile-info {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row;
+    align-self: flex-start;
+    gap: 2rem;
+}

@@ -1,0 +1,81 @@
+
+
+
+.dashboard-header {
+    background-color: var(--background-color);
+    padding: 0 1rem;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-company-logo {
+    img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
+}
+
+
+.header-user-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    p {
+        margin-right: 1rem;
+    }
+
+    img {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+    }
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    background-color: var(--background-color);
+    box-shadow: var(--soft-boxshadow);
+    z-index: 10;
+}
+
+.header-user-container:hover .dropdown-menu {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.header-user-container:hover {
+    svg {
+        transform: rotate(90deg);
+    }
+}
+
+.dropdown {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0.2rem;
+}
+
+.dropdown li {
+    padding: 10px;
+    cursor: pointer;
+    text-wrap: nowrap;
+}
+
+
+.dropdown li:hover {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.dropdown li:hover {
+    background-color: var(--background-color); /* Change background on hover */
+}

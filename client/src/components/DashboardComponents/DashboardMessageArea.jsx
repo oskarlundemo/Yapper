@@ -1,17 +1,14 @@
 import {useState} from "react";
+import {useAuth} from "../../context/AuthContext.jsx";
 
 
 export const DashboardMessageArea = () => {
-
-
     const [message, setMessage] = useState('');
 
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
     }
-
-
 
 
     return (
@@ -25,7 +22,7 @@ export const DashboardMessageArea = () => {
                             name="message"
                             onChange={handleInputChange}
                             value={message}
-                            placeholder="Add a comment..."
+                            placeholder="Aa"
                         />
 
                         <div className={'message-area-icons'}>
