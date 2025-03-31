@@ -2,9 +2,7 @@
 
 
 
-export const DashboardNavigation = () => {
-
-
+export const DashboardNavigation = ({}) => {
 
     return (
         <nav className={'dashboard-navigation'}>

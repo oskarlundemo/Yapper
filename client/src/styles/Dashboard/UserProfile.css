@@ -5,6 +5,7 @@
 
 
 
+
 .user-profile-container {
     height: 100%;
     width: 100%;
@@ -14,7 +15,7 @@
     background-color: var(--background-color);
     flex-direction: column;
     grid-row: 1 / -1;
-
+    padding: 1rem;
 }
 
 
@@ -24,4 +25,51 @@
     flex-direction: row;
     align-self: flex-start;
     gap: 2rem;
+}
+
+
+.user-avatar {
+    align-self: flex-start;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--soft-boxshadow);
+}
+
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+
+    textarea {
+        resize: none;
+        border: none;
+        outline: none;
+        font-family: inherit;
+    }
+}
+
+.textarea-field:has(textarea:focus-within) {
+
+    fieldset {
+        border: 2px solid var(--accent-color);
+    }
+
+    legend {
+        color: var(--accent-color);
+    }
+
+    textarea {
+        resize: none;
+        outline: none;
+        font-family: inherit;
+    }
+}
+
+
+.hidden {
+    display: none;
 }

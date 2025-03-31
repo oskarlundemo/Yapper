@@ -1,10 +1,24 @@
 
-
+.dashboard-message-container {
+    background: var(--background-color);
+}
 
 .dashboard-message-content {
     background: var(--background-color);
     display: grid;
     grid-template-rows: repeat(10, auto);
+    height: 600px;
+    overflow-y: scroll;
+}
+
+
+.conversation-header {
+    h2 {
+        text-align: left;
+        margin: 0;
+        padding: 1rem;
+        border-bottom: 1px solid var(--secondary-color);
+    }
 }
 
 
@@ -58,7 +72,6 @@
 
 
 .dashboard-chat-window {
-    height: 100%;
     display: grid;
     grid-template-rows: 2fr 0.2fr;
     margin: 0.5rem;
@@ -112,4 +125,36 @@
     padding: 1rem 2rem;
     border-radius: 10px;
     text-align: left;
+    color: var(--text-color);
+
+    p {
+        color: white;
+    }
+}
+
+
+.dashboard-message-body.other {
+    background-color: var(--secondary-color);
+    justify-self: flex-start;
+
+    p {
+        color: var(--text-color);
+    }
+}
+
+
+.dashboard-message-header.other {
+    align-items: flex-start;
+    justify-self: flex-start;
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    h3:first-of-type {
+        opacity: 0.5;
+    }
+}
+
+.dashboard-message.other {
+    flex-direction: row;
+    justify-self: flex-start;
 }

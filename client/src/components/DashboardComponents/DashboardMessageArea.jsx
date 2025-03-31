@@ -1,13 +1,31 @@
 import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
+import {createClient} from "@supabase/supabase-js";
+const supabase = createClient(import.meta.env.VITE_SUPABASE_ANON_URL, import.meta.env.VITE_SUPABASE_ROLL_KEY)
 
 
 export const DashboardMessageArea = () => {
-    const [message, setMessage] = useState('');
 
+    const {user} = useAuth();
+    const [message, setMessage] = useState('');
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
+    }
+
+    const sendMessage = async (content) => {
+        const { error } = await supabase
+            .from("messages")
+            .insert([{ content, user_id: user.id}]); // Replace with actual user_id
+
+        if (error) console.error("Error sending message:", error.message);
+    };
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        sendMessage(message);
+        setMessage("");
     }
 
 
@@ -15,7 +33,7 @@ export const DashboardMessageArea = () => {
         <div className={'dashboard-message-input'}>
                 <div className="message-card">
 
-                    <div className="message-card-body">
+                    <form onSubmit={handleSubmit} className="message-card-body">
                         <input
                             type="text"
                             id="message"
@@ -29,7 +47,7 @@ export const DashboardMessageArea = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm240-160h60v-240h-60v240Zm-160 0h80q17 0 28.5-11.5T400-400v-80h-60v60h-40v-120h100v-20q0-17-11.5-28.5T360-600h-80q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm280 0h60v-80h80v-60h-80v-40h120v-60H560v240ZM200-200v-560 560Z"/></svg>
                         </div>
-                    </div>
+                    </form>
                 </div>
         </div>
     )

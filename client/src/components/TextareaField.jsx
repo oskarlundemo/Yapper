@@ -15,7 +15,7 @@ export const TextareaField = ({ title, type, id, name, onChange, value, example,
     }, [errors, name]);
 
     return (
-        <div className="input-field">
+        <div className="input-field textarea-field">
             <fieldset className="input-fieldset">
                 <legend>{title}</legend>
                 <div className="input-card">

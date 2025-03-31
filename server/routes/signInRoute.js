@@ -6,10 +6,7 @@
 import {Router} from "express";
 import {login} from "../controllers/signInController.js";
 
-
 const signInRoute = new Router();
-
-
 
 import { body, validationResult } from 'express-validator';
 
@@ -28,9 +25,6 @@ export const validateLogin = [
         .withMessage('Password is required')
         .escape()
 ];
-
-
-
 
 signInRoute.post('/', validateLogin, (req, res, next) => {
 
