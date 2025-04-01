@@ -1,12 +1,9 @@
 import {useEffect, useState} from "react";
-import { createClient } from '@supabase/supabase-js';
 import {useAuth} from "../context/AuthContext.jsx";
+import {supabase} from "../../../server/controllers/supabaseController.js";
 
 
 
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabaseUrl = import.meta.env.VITE_SUPABASE_ANON_URL;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const UserAvatar = ({height, width}) => {
     const [imageSrc, setImageSrc] = useState(null); // Set the src of the img element

@@ -1,7 +1,8 @@
 import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import {createClient} from "@supabase/supabase-js";
-const supabase = createClient(import.meta.env.VITE_SUPABASE_ANON_URL, import.meta.env.VITE_SUPABASE_ROLL_KEY)
+import {supabase} from "../../../../server/controllers/supabaseController.js";
+
+
 
 
 export const DashboardMessageArea = () => {
@@ -14,20 +15,19 @@ export const DashboardMessageArea = () => {
     }
 
     const sendMessage = async (content) => {
+        console.log(user);
+        console.log(content);
         const { error } = await supabase
             .from("messages")
-            .insert([{ content, user_id: user.id}]); // Replace with actual user_id
-
+            .insert([{ content, sender_id: user.id, receiver_id: 1}]); // Replace with actual user_id
         if (error) console.error("Error sending message:", error.message);
     };
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
         sendMessage(message);
         setMessage("");
     }
-
 
     return (
         <div className={'dashboard-message-input'}>

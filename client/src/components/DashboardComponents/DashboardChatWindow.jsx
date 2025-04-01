@@ -3,17 +3,18 @@ import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
 import { DashboardMessage } from "./DashboradMessage.jsx";
 import {UserProfile} from "./UserProfile.jsx";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-const supabase = createClient(import.meta.env.VITE_SUPABASE_ANON_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
+
 
 export const DashboardChatWindow = ({ API_URL, showProfile }) => {
 
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
+        // Function to fetch initial messages
         const fetchMessages = async () => {
             const { data, error } = await supabase
                 .from("messages")
@@ -23,28 +24,30 @@ export const DashboardChatWindow = ({ API_URL, showProfile }) => {
             if (error) {
                 console.error("Error fetching messages:", error.message);
             } else {
-                console.log("Fetched messages:", data); // 🔍 Debugging log
-                setMessages(data);
+                setMessages(data); // Set initial messages in state
             }
         };
 
-        fetchMessages();
+        fetchMessages(); // Fetch messages on component mount
 
+        // Set up real-time subscription
         const channel = supabase
             .channel("realtime-chat")
             .on(
                 "postgres_changes",
-                { event: "INSERT", schema: "public", table: "messages" },
+                { event: "INSERT", schema: "public", table: "messages" },  // Ensure correct table name
                 (payload) => {
-                    setMessages((prev) => [...prev, payload.new]);
+                    console.log("New message received:", payload.new);
+                    setMessages((prevMessages) => [...prevMessages, payload.new]); // Add new message
                 }
             )
             .subscribe();
 
+        // Clean up real-time subscription when component unmounts
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, []);  // Empty dependency array ensures this only runs once on mount
 
 
     return (
@@ -65,7 +68,7 @@ export const DashboardChatWindow = ({ API_URL, showProfile }) => {
                                     message={message}
                                     content={message.content}
                                     time={message.created_at}
-                                    user_id={message.user_id}
+                                    user_id={message.sender_id}
                                 />
                             ))}
                         </div>

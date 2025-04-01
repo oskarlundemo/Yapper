@@ -6,6 +6,8 @@ import {prisma} from '../prisma/index.js';
 
 export const getUsername = async (req, res) => {
     try {
+        console.log(req.params)
+
         const user = await prisma.users.findUnique({
             where: {
                 id: parseInt(req.params.user_id),

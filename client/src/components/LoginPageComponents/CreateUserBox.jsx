@@ -57,7 +57,6 @@ export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
                     "Content-Type": "application/json",
                 }
             })
-
             const result = await response.json();
             if (!response.ok && result.errors.length > 0) {
                 setErrors(result.errors);
@@ -65,7 +64,6 @@ export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
                 login(result.token);
                 navigate('/dashboard');
             }
-
         } catch (err) {
             console.log(err);
         }

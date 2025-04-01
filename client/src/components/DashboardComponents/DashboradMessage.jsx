@@ -20,8 +20,6 @@ export const DashboardMessage = ({API_URL, content, user_id, time}) => {
     }, [])
 
 
-
-
     return (
         <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
 

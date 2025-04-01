@@ -1,10 +1,17 @@
 
 
+
+
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-const supabaseUrl = process.env.VITE_SUPABASE_ANON_URL;
-const supabase = createClient(supabaseUrl, supabaseKey);
+
+const supabase = createClient(
+    import.meta.env.VITE_SUPABASE_ANON_URL,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
+);
+
+export { supabase };
+
 
 
 /**
@@ -17,9 +24,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  * @param res
  * @returns {Promise<*|{message: string}>}
  */
-
-
-
 
 
 
