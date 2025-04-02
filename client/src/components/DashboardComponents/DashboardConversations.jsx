@@ -1,12 +1,29 @@
 import {ConversationCard} from "./ConversationCard.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import '../../styles/Dashboard/DashboardConversation.css'
+import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const DashboardConversations = ({API_URL, showProfile}) => {
+export const DashboardConversations = ({inspectConversation, API_URL, showProfile}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
+    const [conversations, setConversations] = useState([])
+    const {user} = useAuth();
+
+    useEffect(() => {
+        fetch(`${API_URL}/conversations/${user.id}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                setConversations(data)
+            })
+            .catch(error => console.log(error));
+    }, [])
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -14,9 +31,8 @@ export const DashboardConversations = ({API_URL, showProfile}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-             await fetch(`${API_URL}/conversations/${searchQuery}`,
+             await fetch(`${API_URL}/conversations/filter/${searchQuery}/${user.id}`,
                  {
                      method: "GET",
                      headers: {
@@ -33,7 +49,6 @@ export const DashboardConversations = ({API_URL, showProfile}) => {
             console.error(err);
         }
     }
-
 
 
     return (
@@ -53,10 +68,17 @@ export const DashboardConversations = ({API_URL, showProfile}) => {
             </div>
 
             <div className="conversations-container">
-                <ConversationCard/>
-
-                <h2># Server</h2>
-
+                {users.length > 0 ? (
+                    users.map((user) => (
+                        <ConversationCard
+                            inspectConversation={inspectConversation}
+                            username={user.username}
+                            key={user.id}
+                            conversationId={user.id}
+                        />))
+                ) : (
+                    <p>No conversations yet</p>
+                )}
             </div>
 
         </aside>

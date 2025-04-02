@@ -7,7 +7,7 @@
     background: var(--background-color);
     display: grid;
     grid-template-rows: repeat(10, auto);
-    height: 600px;
+    height: 500px;
     overflow-y: scroll;
 }
 
@@ -20,6 +20,8 @@
         border-bottom: 1px solid var(--secondary-color);
     }
 }
+
+
 
 
 .dashboard-message-input {
@@ -147,8 +149,9 @@
     align-items: flex-start;
     justify-self: flex-start;
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 1rem;
+    flex-direction: row-reverse;
     h3:first-of-type {
         opacity: 0.5;
     }

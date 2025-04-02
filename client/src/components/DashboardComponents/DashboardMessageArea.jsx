@@ -5,7 +5,7 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const DashboardMessageArea = () => {
+export const DashboardMessageArea = ({receiver}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
@@ -15,11 +15,9 @@ export const DashboardMessageArea = () => {
     }
 
     const sendMessage = async (content) => {
-        console.log(user);
-        console.log(content);
         const { error } = await supabase
             .from("messages")
-            .insert([{ content, sender_id: user.id, receiver_id: 1}]); // Replace with actual user_id
+            .insert([{ content, sender_id: user.id, receiver_id: receiver}]); // Replace with actual user_id
         if (error) console.error("Error sending message:", error.message);
     };
 

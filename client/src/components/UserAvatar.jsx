@@ -5,9 +5,8 @@ import {supabase} from "../../../server/controllers/supabaseController.js";
 
 
 
-export const UserAvatar = ({height, width}) => {
+export const UserAvatar = ({height, width, user}) => {
     const [imageSrc, setImageSrc] = useState(null); // Set the src of the img element
-    const {user} = useAuth();
 
     useEffect(() => {
         // Fetch the image from supabase

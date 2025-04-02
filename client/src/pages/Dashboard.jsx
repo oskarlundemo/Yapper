@@ -7,15 +7,20 @@ import {useState} from "react";
 
 export const Dashboard = ({API_URL}) => {
     const [showProfile, setShowProfile] = useState(false);
+    const [showRequests, setShowRequests] = useState(false);
+
+    const toggleRequests = () => {
+        setShowRequests(!showRequests);
+    }
+
     const toggleProfile = () => {
         setShowProfile(!showProfile);
     };
 
     return (
         <div className={'dashboard-wrapper'}>
-            <DashboardHeader toggleProfile={toggleProfile} />
-            <DashboardMain API_URL={API_URL} showProfile={showProfile} setShowProfile={setShowProfile} />
+            <DashboardHeader toggleRequests={toggleRequests} toggleProfile={toggleProfile} />
+            <DashboardMain API_URL={API_URL} showProfile={showProfile} showRequests={showRequests} setShowProfile={setShowProfile} />
         </div>
     )
-
 }

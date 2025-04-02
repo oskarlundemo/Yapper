@@ -32,7 +32,6 @@ export const UserProfile = () => {
     return (
         <div className="user-profile-container">
 
-
             <div className="user-profile-info">
 
                 <div className={'user-avatar'}>
