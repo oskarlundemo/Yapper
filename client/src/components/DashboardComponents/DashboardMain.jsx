@@ -6,7 +6,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
-export const DashboardMain = ({API_URL, showRequests, showProfile, setShowProfile}) => {
+export const DashboardMain = ({API_URL, showChatWindow, showRequests, showProfile, setShowProfile}) => {
 
     const [messages, setMessages] = useState([]);
     const [receiver, setReceiver] = useState(null);
@@ -18,8 +18,8 @@ export const DashboardMain = ({API_URL, showRequests, showProfile, setShowProfil
     return (
         <main className={'dashboard-main'}>
             <DashboardNavigation toggleProfile={setShowProfile} />
-            <DashboardConversations inspectConversation={inspectConversation} API_URL={API_URL} showProfile={showProfile} />
-            <DashboardChatWindow receiver={receiver} showRequests={showRequests} messages={messages} API_URL={API_URL} showProfile={showProfile}/>
+            <DashboardConversations showChatWindow={showChatWindow} inspectConversation={inspectConversation} API_URL={API_URL} showProfile={showProfile} />
+            <DashboardChatWindow showChatWindow={showChatWindow} inspectConversation={inspectConversation} receiver={receiver} showRequests={showRequests} messages={messages} API_URL={API_URL} showProfile={showProfile}/>
         </main>
     )
 }

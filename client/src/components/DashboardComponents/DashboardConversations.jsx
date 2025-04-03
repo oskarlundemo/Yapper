@@ -4,7 +4,7 @@ import '../../styles/Dashboard/DashboardConversation.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const DashboardConversations = ({inspectConversation, API_URL, showProfile}) => {
+export const DashboardConversations = ({inspectConversation, showChatWindow, API_URL, showProfile}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
@@ -71,6 +71,7 @@ export const DashboardConversations = ({inspectConversation, API_URL, showProfil
                 {users.length > 0 ? (
                     users.map((user) => (
                         <ConversationCard
+                            showChatWindow={showChatWindow}
                             inspectConversation={inspectConversation}
                             username={user.username}
                             key={user.id}

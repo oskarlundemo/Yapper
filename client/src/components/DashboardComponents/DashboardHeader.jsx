@@ -1,7 +1,6 @@
 
 import '../../styles/Dashboard/Header.css'
 import {useAuth} from "../../context/AuthContext.jsx";
-import {Link} from "react-router-dom";
 import {UserAvatar} from "../UserAvatar.jsx";
 
 

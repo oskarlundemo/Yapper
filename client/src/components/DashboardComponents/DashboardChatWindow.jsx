@@ -9,8 +9,7 @@ import {Notifications} from "./Notifications.jsx";
 
 
 
-export const DashboardChatWindow = ({ API_URL, receiver, showProfile, showRequests}) => {
-
+export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [receiverUsername, setReceiverUsername] = useState("");
     const [messages, setMessages] = useState([]);
@@ -37,8 +36,6 @@ export const DashboardChatWindow = ({ API_URL, receiver, showProfile, showReques
 
     useEffect(() => {
         if (!receiver) return;
-
-        console.log("Fetching messages for receiver:", receiver);
 
         const fetchMessages = async () => {
             const { data, error } = await supabase
@@ -92,16 +89,12 @@ export const DashboardChatWindow = ({ API_URL, receiver, showProfile, showReques
         };
     }, [receiver]);
 
-
-
-
-
     return (
         <section className={'dashboard-chat-window'}>
             {showProfile ? (
                 <UserProfile />
             ) : showRequests ? (
-                <Notifications />
+                <Notifications showChatWindow={showChatWindow} inspectConversation={inspectConversation} API_URL={API_URL} />
             ) : (
                 <>
                     <div className={'dashboard-message-container'}>
@@ -121,7 +114,7 @@ export const DashboardChatWindow = ({ API_URL, receiver, showProfile, showReques
                             ))}
                         </div>
                     </div>
-                    <DashboardMessageArea receiver={receiver} />
+                    <DashboardMessageArea API_URL={API_URL} receiver={receiver} />
                 </>
             )}
         </section>

@@ -5,14 +5,40 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const DashboardMessageArea = ({receiver}) => {
+export const DashboardMessageArea = ({receiver, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
+    const [friend, setFriend] = useState(null);
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
     }
+
+    const checkFriendship = async () => {
+        fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then(res => res.json())
+            .then(data => {setFriend(data);})
+            .catch(err => console.log(err));
+    }
+
+    const sendFriendRequest = async (req, res) => {
+        fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+    }
+
+
+
+
 
     const sendMessage = async (content) => {
         const { error } = await supabase
@@ -23,7 +49,12 @@ export const DashboardMessageArea = ({receiver}) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        checkFriendship();
         sendMessage(message);
+        if (!friend) {
+            sendFriendRequest();
+            // Accept friend request, om inte sender, quit, else acceptera
+        }
         setMessage("");
     }
 

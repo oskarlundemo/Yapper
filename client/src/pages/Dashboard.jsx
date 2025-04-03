@@ -17,10 +17,15 @@ export const Dashboard = ({API_URL}) => {
         setShowProfile(!showProfile);
     };
 
+    const showChatWindow = () => {
+        setShowProfile(false);
+        setShowRequests(false);
+    }
+
     return (
         <div className={'dashboard-wrapper'}>
             <DashboardHeader toggleRequests={toggleRequests} toggleProfile={toggleProfile} />
-            <DashboardMain API_URL={API_URL} showProfile={showProfile} showRequests={showRequests} setShowProfile={setShowProfile} />
+            <DashboardMain showChatWindow={showChatWindow} show API_URL={API_URL} showProfile={showProfile} showRequests={showRequests} setShowProfile={setShowProfile} />
         </div>
     )
 }
