@@ -1,6 +1,6 @@
 import '../../styles/Dashboard/DashBoardChatWindow.css';
 import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
-import { DashboardMessage } from "./DashboradMessage.jsx";
+import { MessageCard } from "./DashboradMessage.jsx";
 import {useEffect, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {supabase} from "../../../../server/controllers/supabaseController.js";
@@ -103,7 +103,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
                         </div>
                         <div className={'dashboard-message-content'}>
                             {messages.length > 0 && messages.map((message) => (
-                                <DashboardMessage
+                                <MessageCard
                                     API_URL={API_URL}
                                     key={message.id}
                                     message={message}

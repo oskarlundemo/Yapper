@@ -21,6 +21,7 @@ export const DashboardConversations = ({inspectConversation, showChatWindow, API
             .then(response => response.json())
             .then(data => {
                 setConversations(data)
+                console.log(data)
             })
             .catch(error => console.log(error));
     }, [])
@@ -42,7 +43,7 @@ export const DashboardConversations = ({inspectConversation, showChatWindow, API
                  .then(response => response.json())
                  .then(data => {
                      console.log(data);
-                     setUsers(data)
+                     setConversations(data)
                  })
                  .catch(err => console.log(err));
         } catch (err) {
@@ -68,14 +69,16 @@ export const DashboardConversations = ({inspectConversation, showChatWindow, API
             </div>
 
             <div className="conversations-container">
-                {users.length > 0 ? (
-                    users.map((user) => (
+                {conversations.length > 0 ? (
+                    conversations.map((conversation) => (
                         <ConversationCard
+                            friend_id={conversation.id}
                             showChatWindow={showChatWindow}
                             inspectConversation={inspectConversation}
-                            username={user.username}
-                            key={user.id}
-                            conversationId={user.id}
+                            username={conversation.username}
+                            key={conversation.id}
+                            conversationId={conversation.id}
+                            latestMessage={conversation.latestMessage}
                         />))
                 ) : (
                     <p>No conversations yet</p>

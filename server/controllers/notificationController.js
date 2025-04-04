@@ -38,7 +38,7 @@ export const loadFriendRequests = async (req, res) => {
 
 export const sendFriendRequest = async (req, res) => {
     try {
-        const existingRequest = await prisma.pendingFriendRequests.findUnique({
+        const existingRequest = await prisma.pendingFriendRequests.findFirst({
             where: {
                 OR: [
                     { sender_id: parseInt(req.params.user_id), receiver_id: parseInt(req.params.receiver_id) },
@@ -58,7 +58,7 @@ export const sendFriendRequest = async (req, res) => {
             }
         });
 
-        console.log('Friend request sent');
+        console.log(`Friend request sent to ${req.params.receiver_id}`);
         res.status(200).json({ message: "Friend request sent successfully" });
     } catch (err) {
         console.error(err);
@@ -69,14 +69,18 @@ export const sendFriendRequest = async (req, res) => {
 
 export const checkFriendship = async (req, res) => {
     try {
-        const friends = await prisma.friends.findUnique({
+
+        console.log('Checking friendship...');
+        console.log(req.params)
+        const friends = await prisma.friends.findFirst({
             where: {
                 OR: [
-                    { user_id: parseInt(req.params.user_id), friend_id: parseInt(req.params.receiver_id) },
-                    { user_id: parseInt(req.params.receiver_id), friend_id: parseInt(req.params.user_id) }
+                    { user_id: parseInt(req.params.sender_id), friend_id: parseInt(req.params.receiver_id) },
+                    { user_id: parseInt(req.params.receiver_id), friend_id: parseInt(req.params.sender_id) }
                 ]
             }
         })
+
         res.status(200).json(friends);
     } catch (err) {
         console.error(err);

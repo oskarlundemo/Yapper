@@ -82,7 +82,7 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
                                 />
                             ))
                         ) : (
-                            <p>No friend request yet</p>
+                            <p>No friend request</p>
                         )}
                     </div>
             </div>
@@ -94,7 +94,7 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
                     {groupRequest.length > 0 ? (
                         <h2>Fake friend request</h2>
                     ) : (
-                        <p>No group request yet</p>
+                        <p>No group request</p>
                     )}
                 </div>
             </div>

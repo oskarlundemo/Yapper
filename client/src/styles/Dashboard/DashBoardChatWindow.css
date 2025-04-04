@@ -22,8 +22,6 @@
 }
 
 
-
-
 .dashboard-message-input {
     display: flex;
     height: 100%;
@@ -37,10 +35,11 @@
 
 .message-card {
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     width: 100%;
+    margin: 1rem;
 }
 
 .message-card-body {
@@ -114,8 +113,6 @@
         opacity: 0.5;
     }
 }
-
-
 
 .dashboard-message-text-container {
     display: flex;

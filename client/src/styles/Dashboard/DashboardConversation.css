@@ -1,14 +1,13 @@
 
 
 
-
 .conversation-search-area {
     width: 100%;
 }
 
 
 .conversations-container {
-    grid-template-rows: repeat(10, auto);
+    grid-template-rows: repeat(10, 1fr);
     display: grid;
     height: 100%;
 }
