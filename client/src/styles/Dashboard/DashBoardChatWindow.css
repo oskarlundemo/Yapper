@@ -1,14 +1,18 @@
 
 .dashboard-message-container {
     background: var(--background-color);
+    display: grid;
+    grid-template-rows: 0.1fr 2fr;
+    flex: 1;
+    min-height: 0; /* important for proper scroll behavior in nested grids/flex */
 }
 
 .dashboard-message-content {
     background: var(--background-color);
     display: grid;
     grid-template-rows: repeat(10, auto);
-    height: 500px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    min-height: 0; /* important! */
 }
 
 
@@ -75,10 +79,11 @@
 .dashboard-chat-window {
     display: grid;
     grid-template-rows: 2fr 0.2fr;
-    margin: 0.5rem;
     border-radius: var(--border-radius);
     overflow: hidden;
+    margin: 0.75rem;
 }
+
 
 
 .dashboard-message {
@@ -101,6 +106,10 @@
     }
 }
 
+
+.conversation-header {
+    height: fit-content;
+}
 
 .dashboard-message-header {
     align-items: flex-end;

@@ -1,7 +1,7 @@
 import '../../styles/Dashboard/DashBoardChatWindow.css';
 import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
-import { MessageCard } from "./DashboradMessage.jsx";
-import {useEffect, useState} from "react";
+import { MessageCard } from "./MessageCard.jsx";
+import {useEffect, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
@@ -40,7 +40,11 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
         const fetchMessages = async () => {
             const { data, error } = await supabase
                 .from("messages")
-                .select("*")
+                .select(`*,
+                   sender:sender_id (
+                      id,
+                        username)
+                         `)
                 .or(
                     `and(sender_id.eq.${user.id},receiver_id.eq.${receiver}), and(sender_id.eq.${receiver},receiver_id.eq.${user.id})`
                 )
@@ -50,6 +54,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
                 console.error("Error fetching messages:", error.message);
             } else {
                 setMessages(data);
+                console.log(data);
             }
         };
 
@@ -89,6 +94,13 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
         };
     }, [receiver]);
 
+
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // or 'smooth'
+    }, [messages]); // Scroll when messages update
+
     return (
         <section className={'dashboard-chat-window'}>
             {showProfile ? (
@@ -110,8 +122,10 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
                                     content={message.content}
                                     time={message.created_at}
                                     user_id={message.sender_id}
+                                    sender={message.sender}
                                 />
                             ))}
+                            <div ref={messagesEndRef} /> {/* 👈 This keeps us at the bottom */}
                         </div>
                     </div>
                     <DashboardMessageArea API_URL={API_URL} receiver={receiver} />

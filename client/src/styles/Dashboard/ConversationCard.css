@@ -11,18 +11,16 @@
     flex-grow: 1;
     padding: 0.5rem;
     transition: var(--default-transition);
-
-    img {
-        height: 40px;
-        width: 40px;
-        border-radius: 50%;
-    }
+    border-radius: var(--border-radius);
 }
 
 
 .conversation-card:hover {
     cursor: pointer;
-    box-shadow: var(--soft-boxshadow);
+
+    h3:first-of-type {
+        color: var(--accent-color);
+    }
 }
 
 .conversation-card-avatar {

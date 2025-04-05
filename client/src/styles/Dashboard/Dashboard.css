@@ -1,25 +1,32 @@
 
-.dashboard-wrapper{
+
+html, body, #root {
     height: 100%;
-    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+.dashboard-wrapper {
+    height: 100vh;
     display: grid;
-    grid-template-rows: 0.2fr 2fr;
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+    grid-template-rows: 0.1fr auto;
 }
 
 .dashboard-main {
     display: grid;
     grid-template-columns: 0.1fr 0.5fr 2fr;
     background-color: var(--secondary-color);
+    height: 100%;        /* Take full height of its grid row */
+    min-height: 0;       /* Allow it to shrink if needed */
+    overflow: hidden;    /* Prevent internal overflow from pushing it */
 }
-
-
 
 .dashboard-header{
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
     h1 {
         margin: 0;
         text-align: center;
@@ -44,14 +51,11 @@
 
 .dashboard-conversation {
     border-radius: var(--border-radius);
-    padding: 1rem;
-    margin: 0.5rem;
     background-color: var(--background-color);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     box-shadow: var(--soft-boxshadow);
+    margin: 0.75rem 0 0.75rem 0.75rem;
 }
-
-
 

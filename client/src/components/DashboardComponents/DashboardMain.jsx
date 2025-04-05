@@ -18,6 +18,7 @@ export const DashboardMain = ({API_URL, showChatWindow, showRequests, showProfil
     return (
         <main className={'dashboard-main'}>
             <DashboardNavigation toggleProfile={setShowProfile} />
+
             <DashboardConversations showChatWindow={showChatWindow} inspectConversation={inspectConversation} API_URL={API_URL} showProfile={showProfile} />
             <DashboardChatWindow showChatWindow={showChatWindow} inspectConversation={inspectConversation} receiver={receiver} showRequests={showRequests} messages={messages} API_URL={API_URL} showProfile={showProfile}/>
         </main>

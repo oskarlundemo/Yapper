@@ -16,6 +16,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
     const [testLatest, setTestLatest] = useState('');
     const [channel, setChannel] = useState(null);
     const [latestSender, setLatestSender] = useState(0);
+    const [latestTimestamp, setLatestTimestamp] = useState('');
 
     useEffect(() => {
         if (!user?.id || !friend_id) return;
@@ -34,6 +35,8 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
                 console.error("Error fetching messages:", error.message);
             } else if (data && data.length > 0) {
                 setTestLatest(data[0].content);
+                setLatestTimestamp(data[0].created_at); // Set timestamp on fetch
+                setLatestSender(data[0].sender_id); // Set timestamp on fetch
             }
         };
 
@@ -58,7 +61,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
                     ) {
                         setTestLatest(message.content);
                         setLatestSender(message.sender_id);
-                        console.log(message)
+                        setLatestTimestamp(message.created_at);
                     }
                 }
             )
@@ -77,6 +80,15 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
     }, [user.id, friend_id]);
 
 
+    const parseLatestMessage = (content) => {
+        if (content.length > 20) {
+            const subString = content.substring(0, 20);
+            const lastSpace = subString.lastIndexOf(' ');
+            return content.substring(0, lastSpace) + '...';
+        }
+        return content;
+    }
+
 
     return (
         <div onClick={() => {
@@ -88,10 +100,13 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
             </div>
 
             <div className="conversation-card-content">
-                <h3 className={'conversation-contact'}>{username}<span>{moment(latestMessage.created_at).format("h:mm A")}</span></h3>
+                <h3 className={'conversation-contact'}>{username}
+                    <span>
+                        {moment(latestTimestamp || latestMessage?.created_at).format("h:mm A")}
+                    </span></h3>
                 <p className={'conversation-content'}>
                     {user.id === latestSender && <span>You: </span>}
-                    {testLatest || latestMessage.content}
+                    { parseLatestMessage(testLatest) || parseLatestMessage(latestMessage.content)}
                 </p>
             </div>
         </div>
