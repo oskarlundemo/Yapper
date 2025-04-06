@@ -1,5 +1,16 @@
 
 
+.conversation-search-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    svg:hover{
+        fill: var(--accent-color);
+        cursor: pointer;
+    }
+}
 
 .conversation-search-area {
    padding: 1rem;
