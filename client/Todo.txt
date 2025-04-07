@@ -1,0 +1,11 @@
+
+
+Prio 1
+[] Gruppchatar
+[] Skicka bilder
+[] Skicka gifs
+
+
+Prio 2
+[] Sortera chattar efter senast aktivitet
+[] Server, så om man loggar in så visas alla meddelanden på servern

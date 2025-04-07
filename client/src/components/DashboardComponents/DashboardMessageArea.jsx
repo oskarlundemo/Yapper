@@ -31,7 +31,6 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
     }, [receiver])
 
 
-
     const sendFriendRequest = async (req, res) => {
         fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
             method: "POST",
@@ -41,7 +40,6 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
         })
     }
 
-
     const acceptFriendRequest = async (req, res) => {
         fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
             method: "GET",
@@ -50,7 +48,6 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
             }
         })
     }
-
 
     const sendMessage = async (content) => {
         const { error } = await supabase

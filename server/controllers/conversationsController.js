@@ -89,9 +89,6 @@ export const getUserConversations = async (req, res) => {
                 };
             })
         );
-
-        console.log(formattedConversations);
-
         res.status(200).json(formattedConversations);
     } catch (err) {
         console.error(err);

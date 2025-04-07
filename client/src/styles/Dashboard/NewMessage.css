@@ -1,0 +1,87 @@
+
+
+.new-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 0.5rem;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+
+    input {
+        height: fit-content;
+        border: none;
+        font-size: inherit;
+        font-family: inherit;
+    }
+
+    input:focus {
+        outline: none;
+    }
+}
+
+.username-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+.new-message-input-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    input {
+    position: relative;
+    z-index: 2;
+    }
+}
+
+.new-message-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    z-index: 1;
+    border-radius: 5px;
+    box-shadow: var(--soft-boxshadow)
+}
+
+
+.contact-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem;
+}
+
+.contact-card:hover {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.group-member-receiver  {
+    background-color: var(--secondary-color);
+    padding: 5px;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    p {
+        margin: 0;
+    }
+
+    svg {
+        fill: black;
+    }
+
+    svg:hover {
+        fill: var(--error-color);
+        cursor: pointer;
+    }
+}

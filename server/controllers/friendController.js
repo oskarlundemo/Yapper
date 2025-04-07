@@ -3,8 +3,48 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const acceptRequest = async (req, res) => {
+export const getFriendsList = async (req, res) => {
 
+    try {
+
+        const friendsList = await prisma.friends.findMany({
+            where: {
+                OR: [
+                    { user_id: parseInt(req.params.user_id) },
+                    { friend_id: parseInt(req.params.user_id) },
+                ],
+            },
+            include: {
+                User: true,
+                Friend: true,
+            }
+        });
+
+        const formatedFriends = await Promise.all(
+            friendsList.map(async (contact) => {
+                const isUser = contact.user_id === parseInt(req.params.user_id);
+                const friendId = isUser ? contact.friend_id : contact.user_id;
+                const friend = isUser ? contact.Friend : contact.User
+
+                return {
+                    id: friendId,
+                    username: friend.username,
+                    friend
+                }
+            })
+        )
+
+        console.log(formatedFriends);
+        res.status(200).json(formatedFriends);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('Not Found');
+    }
+}
+
+
+
+export const acceptRequest = async (req, res) => {
     try {
         const request = await prisma.pendingFriendRequests.findUnique({
             where: {

@@ -6,10 +6,11 @@ import {UserProfile} from "./UserProfile.jsx";
 import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {Notifications} from "./Notifications.jsx";
+import {NewMessage} from "./NewMessage.jsx";
 
 
 
-export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [receiverUsername, setReceiverUsername] = useState("");
     const [messages, setMessages] = useState([]);
@@ -60,7 +61,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
 
         fetchMessages();
 
-        // Remove previous subscription before setting a new one
+
         const newChannel = supabase
             .channel(`realtime-chat-${receiver}`)
             .on(
@@ -84,22 +85,21 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
 
         setChannel((prevChannel) => {
             if (prevChannel) {
-                supabase.removeChannel(prevChannel); // Ensure old channel is removed
+                supabase.removeChannel(prevChannel);
             }
-            return newChannel; // Store the latest channel in state
+            return newChannel;
         });
 
         return () => {
-            supabase.removeChannel(newChannel); // Cleanup function with latest channel reference
+            supabase.removeChannel(newChannel);
         };
     }, [receiver]);
-
 
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // or 'smooth'
-    }, [messages]); // Scroll when messages update
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
     return (
         <section className={'dashboard-chat-window'}>
@@ -110,22 +110,35 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, inspectConversatio
             ) : (
                 <>
                     <div className={'dashboard-message-container'}>
-                        <div className={'conversation-header'}>
-                            <h2>{receiverUsername}</h2>
-                        </div>
-                        <div className={'dashboard-message-content'}>
-                            {messages.length > 0 && messages.map((message) => (
-                                <MessageCard
-                                    API_URL={API_URL}
-                                    key={message.id}
-                                    message={message}
-                                    content={message.content}
-                                    time={message.created_at}
-                                    user_id={message.sender_id}
-                                    sender={message.sender}
-                                />
-                            ))}
-                            <div ref={messagesEndRef} /> {/* 👈 This keeps us at the bottom */}
+
+                        {showMessage ? (
+                            <NewMessage API_URL={API_URL} />
+                        ) : (
+                            <div className={'conversation-header'}>
+                                <h2>{receiverUsername}</h2>
+                            </div>
+                        )}
+
+                        <div className="dashboard-message-content">
+                            {showMessage ? (
+                                <p>Test</p>
+                            ) : (
+                                <>
+                                    {messages.length > 0 &&
+                                        messages.map((message) => (
+                                            <MessageCard
+                                                API_URL={API_URL}
+                                                key={message.id}
+                                                message={message}
+                                                content={message.content}
+                                                time={message.created_at}
+                                                user_id={message.sender_id}
+                                                sender={message.sender}
+                                            />
+                                        ))}
+                                    <div ref={messagesEndRef} />
+                                </>
+                            )}
                         </div>
                     </div>
                     <DashboardMessageArea API_URL={API_URL} receiver={receiver} />

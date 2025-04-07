@@ -8,6 +8,7 @@ import {useState} from "react";
 export const Dashboard = ({API_URL}) => {
     const [showProfile, setShowProfile] = useState(false);
     const [showRequests, setShowRequests] = useState(false);
+    const [showNewMessage, setShowNewMessage] = useState(true);
 
     const toggleRequests = () => {
         setShowRequests(!showRequests);
@@ -17,6 +18,10 @@ export const Dashboard = ({API_URL}) => {
         setShowProfile(!showProfile);
     };
 
+    const toggleNewMessage = () => {
+        setShowNewMessage(!showNewMessage);
+    }
+
     const showChatWindow = () => {
         setShowProfile(false);
         setShowRequests(false);
@@ -25,7 +30,7 @@ export const Dashboard = ({API_URL}) => {
     return (
         <div className={'dashboard-wrapper'}>
             <DashboardHeader toggleRequests={toggleRequests} toggleProfile={toggleProfile} />
-            <DashboardMain showChatWindow={showChatWindow} show API_URL={API_URL} showProfile={showProfile} showRequests={showRequests} setShowProfile={setShowProfile} />
+            <DashboardMain toggleShowNewMessage={setShowNewMessage} toggleShowMessage={toggleNewMessage} showMessage={showNewMessage} showChatWindow={showChatWindow} show API_URL={API_URL} showProfile={showProfile} showRequests={showRequests} setShowProfile={setShowProfile} />
         </div>
     )
 }
