@@ -38,6 +38,9 @@ export const loadFriendRequests = async (req, res) => {
 
 export const sendFriendRequest = async (req, res) => {
     try {
+
+        console.log(req.params);
+
         const existingRequest = await prisma.pendingFriendRequests.findFirst({
             where: {
                 OR: [
@@ -69,21 +72,25 @@ export const sendFriendRequest = async (req, res) => {
 
 export const checkFriendship = async (req, res) => {
     try {
+        const senderId = parseInt(req.params.sender_id);
+        const receiverId = parseInt(req.params.receiver_id);
 
-        console.log('Checking friendship...');
-        console.log(req.params)
+        if (isNaN(senderId) || isNaN(receiverId)) {
+            return res.status(400).json({ error: "Invalid sender or receiver ID." });
+        }
+
         const friends = await prisma.friends.findFirst({
             where: {
                 OR: [
-                    { user_id: parseInt(req.params.sender_id), friend_id: parseInt(req.params.receiver_id) },
-                    { user_id: parseInt(req.params.receiver_id), friend_id: parseInt(req.params.sender_id) }
+                    { user_id: senderId, friend_id: receiverId },
+                    { user_id: receiverId, friend_id: senderId }
                 ]
             }
-        })
+        });
 
         res.status(200).json(friends);
     } catch (err) {
-        console.error(err);
-        res.status(500).json(`Error: ${err}`);
+        console.error("Error checking friendship:", err);
+        res.status(500).json({ error: "Server error" });
     }
-}
+};

@@ -5,34 +5,33 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const DashboardMessageArea = ({receiver, API_URL}) => {
+export const DashboardMessageArea = ({receiver, setReceivers, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
     const [friend, setFriend] = useState(null);
 
-    const handleInputChange = (e) => {
-        setMessage(e.target.value);
-    }
 
     useEffect(() => {
-        const checkFriendship = async () => {
-            fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-                .then(res => res.json())
-                .then(data => {setFriend(data);})
-                .catch(err => console.log(err));
-        }
-        checkFriendship();
+            const checkFriendship = async () => {
+                fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        setFriend(data);
+                    })
+                    .catch(err => console.log(err));
+            }
+            checkFriendship();
     }, [receiver])
 
 
     const sendFriendRequest = async (req, res) => {
-        fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
+        await fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -41,7 +40,7 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
     }
 
     const acceptFriendRequest = async (req, res) => {
-        fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
+        await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -49,22 +48,25 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
         })
     }
 
-    const sendMessage = async (content) => {
-        const { error } = await supabase
-            .from("messages")
-            .insert([{ content, sender_id: user.id, receiver_id: receiver}]); // Replace with actual user_id
-        if (error) console.error("Error sending message:", error.message);
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        sendMessage(message);
+
+        await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({message, receivers})
+        })
+
         if (!friend) {
-            sendFriendRequest();
-            acceptFriendRequest();
+            sendFriendRequest(req, res);
+            acceptFriendRequest(req, res);
         }
+
         setMessage("");
-    }
+        setReceivers([]);
+    };
 
     return (
         <div className={'dashboard-message-input'}>
@@ -82,7 +84,7 @@ export const DashboardMessageArea = ({receiver, API_URL}) => {
                         type="text"
                         id="message"
                         name="message"
-                        onChange={handleInputChange}
+                        onChange={e => setMessage(e.target.value)}
                         value={message}
                         placeholder="Aa"
                     />

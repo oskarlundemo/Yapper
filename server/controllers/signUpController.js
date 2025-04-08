@@ -1,5 +1,6 @@
 import {prisma} from '../prisma/index.js';
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 
 
@@ -59,11 +60,10 @@ export async function uniqueEmail (email) {
 
 
 export const signUpUser = async(req, res) => {
-
     try {
         const { username, password, email} = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
-        await prisma.users.create({
+        const user  = await prisma.users.create({
             data: {
                 username: username,
                 password: hashedPassword,
@@ -71,7 +71,13 @@ export const signUpUser = async(req, res) => {
             }
         });
 
-        res.status(201).json({ message: "Successfully registered" });
+        const token = jwt.sign(
+            { id: user.id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '30min' }
+        );
+
+        res.status(201).json({ message: "Successfully registered", token});
 
     } catch (e) {
         console.error(`Error while signing up user: ${e}`);

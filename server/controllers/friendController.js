@@ -6,7 +6,6 @@ import {prisma} from "../prisma/index.js";
 export const getFriendsList = async (req, res) => {
 
     try {
-
         const friendsList = await prisma.friends.findMany({
             where: {
                 OR: [
@@ -33,8 +32,6 @@ export const getFriendsList = async (req, res) => {
                 }
             })
         )
-
-        console.log(formatedFriends);
         res.status(200).json(formatedFriends);
     } catch (e) {
         console.error(e);

@@ -57,14 +57,13 @@ export const getUserConversations = async (req, res) => {
             }
         });
 
-
         const formattedConversations = await Promise.all(
             conversations.map(async (conversation) => {
                 const isUser = conversation.user_id === user_id;
                 const friendId = isUser ? conversation.friend_id : conversation.user_id;
                 const friend = isUser ? conversation.Friend : conversation.User;
 
-                // Fetch the latest message
+
                 const latestMessage = await prisma.messages.findFirst({
                     where: {
                         OR: [

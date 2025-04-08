@@ -81,7 +81,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
 
 
     const parseLatestMessage = (content) => {
-        if (content.length > 20) {
+        if (content.length > 20 && content) {
             const subString = content.substring(0, 20);
             const lastSpace = subString.lastIndexOf(' ');
             return content.substring(0, lastSpace) + '...';
@@ -106,7 +106,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
                     </span></h3>
                 <p className={'conversation-content'}>
                     {user.id === latestSender && <span>You: </span>}
-                    { parseLatestMessage(testLatest) || parseLatestMessage(latestMessage.content)}
+                    {parseLatestMessage(testLatest)}
                 </p>
             </div>
         </div>

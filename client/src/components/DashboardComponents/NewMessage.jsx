@@ -1,14 +1,11 @@
-import {Inputfield} from "../Inputfield.jsx";
-import {use, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import '../../styles/Dashboard/NewMessage.css'
 import {useAuth} from "../../context/AuthContext.jsx";
-import {ConversationCard} from "./ConversationCard.jsx";
 import {ContactCard} from "./ContactCard.jsx";
 
-export const NewMessage = ({API_URL}) => {
+export const NewMessage = ({API_URL, receivers, setReceivers}) => {
 
     const [userSearchString, setUserSearchString] = useState("");
-    const [receivers, setReceivers] = useState([]);
     const [inputFocused, setInputFocused] = useState(false);
     const [filteredContacts, setFilteredContacts] = useState([]);
 
@@ -39,6 +36,10 @@ export const NewMessage = ({API_URL}) => {
         setFilteredContacts(filtered);
     }, [userSearchString, userFriends]);
 
+
+    useEffect(() => {
+        console.log(receivers);
+    }, [receivers]);
 
     const addToConversation = (user) => {
         const alreadyAdded = receivers.find((receiver) => receiver.id === user.id);

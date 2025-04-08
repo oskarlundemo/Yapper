@@ -15,6 +15,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
     const [receiverUsername, setReceiverUsername] = useState("");
     const [messages, setMessages] = useState([]);
     const [channel, setChannel] = useState(null); // Store the subscription channel
+    const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
 
     useEffect(() => {
@@ -34,32 +35,28 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
     }, [receiver]);
 
 
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+
+    useEffect(() => {
+
         if (!receiver) return;
 
-        const fetchMessages = async () => {
-            const { data, error } = await supabase
-                .from("messages")
-                .select(`*,
-                   sender:sender_id (
-                      id,
-                        username)
-                         `)
-                .or(
-                    `and(sender_id.eq.${user.id},receiver_id.eq.${receiver}), and(sender_id.eq.${receiver},receiver_id.eq.${user.id})`
-                )
-                .order("created_at", { ascending: true });
-
-            if (error) {
-                console.error("Error fetching messages:", error.message);
-            } else {
-                setMessages(data);
-                console.log(data);
+        fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
             }
-        };
-
-        fetchMessages();
+        })
+            .then(res => res.json())
+            .then(data => {
+                setMessages(data);
+            })
+            .catch(err => console.log(err));
 
 
         const newChannel = supabase
@@ -71,13 +68,30 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
                     schema: "public",
                     table: "messages"
                 },
-                (payload) => {
+                async (payload) => {
                     const newMessage = payload.new;
+
                     if (
                         (newMessage.sender_id === user.id && newMessage.receiver_id === receiver) ||
                         (newMessage.sender_id === receiver && newMessage.receiver_id === user.id)
                     ) {
-                        setMessages((prevMessages) => [...prevMessages, newMessage]); // Append new message
+                        const { data: enrichedMessage, error } = await supabase
+                            .from("messages")
+                            .select(`
+                        *,
+                        sender:sender_id (
+                            id,
+                            username
+                        )
+                    `)
+                            .eq("id", newMessage.id)
+                            .single();
+
+                        if (error) {
+                            console.error("Error enriching message:", error.message);
+                            return;
+                        }
+                        setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
                     }
                 }
             )
@@ -95,12 +109,6 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
         };
     }, [receiver]);
 
-    const messagesEndRef = useRef(null);
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
     return (
         <section className={'dashboard-chat-window'}>
             {showProfile ? (
@@ -112,7 +120,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
                     <div className={'dashboard-message-container'}>
 
                         {showMessage ? (
-                            <NewMessage API_URL={API_URL} />
+                            <NewMessage receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
                             <div className={'conversation-header'}>
                                 <h2>{receiverUsername}</h2>
@@ -121,7 +129,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
 
                         <div className="dashboard-message-content">
                             {showMessage ? (
-                                <p>Test</p>
+                                <p>New convo</p>
                             ) : (
                                 <>
                                     {messages.length > 0 &&
@@ -133,7 +141,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
                                                 content={message.content}
                                                 time={message.created_at}
                                                 user_id={message.sender_id}
-                                                sender={message.sender}
+                                                username={message.sender.username}
                                             />
                                         ))}
                                     <div ref={messagesEndRef} />
@@ -141,7 +149,7 @@ export const DashboardChatWindow = ({API_URL, showChatWindow, showMessage, inspe
                             )}
                         </div>
                     </div>
-                    <DashboardMessageArea API_URL={API_URL} receiver={receiver} />
+                    <DashboardMessageArea setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
             )}
         </section>
