@@ -10,3 +10,7 @@ Prio 2
 [] Sortera chattar efter senast aktivitet
 [] Server, så om man loggar in så visas alla meddelanden på servern
 [] Updatera chats i realtime, så när man blir vänner updateras det direkt
+
+
+Prio 3
+[] Felmeddelanden i login ska bara var 'Invalid username or password' eller '500 server error'

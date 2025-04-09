@@ -4,7 +4,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment";
 
 
-export const MessageCard = ({API_URL, content, user_id, time, sender, username}) => {
+export const MessageCard = ({content, user_id, time, username = ''}) => {
 
     const {user} = useAuth();
 

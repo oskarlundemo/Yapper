@@ -3,18 +3,29 @@
 
 
 import {Router} from 'express';
-import {getMessagesFromConversations, sendGroupMessage, sendPrivateMessage} from "../controllers/messagesController.js";
+import {
+    createGroupChat,
+    getMessagesFromGroupConversation,
+    getMessagesFromPrivateConversation,
+    sendGroupMessage,
+    sendPrivateMessage
+} from "../controllers/messagesController.js";
 
 const messagesRoute = Router();
 
 
-messagesRoute.get('/conversation/:sender_id/:receiver_id', getMessagesFromConversations);
+messagesRoute.get('/private/conversation/:sender_id/:receiver_id', getMessagesFromPrivateConversation);
+
+messagesRoute.get('/group/conversation/:sender_id/:receiver_id', getMessagesFromGroupConversation);
 
 messagesRoute.post('/conversation/:sender_id/:receiver_id', (req, res) => {
-    if (req.body.receivers.length > 1) {
+    if (req.body.receivers.length > 1 && req.body.groupChat) {
+        createGroupChat(req, res);
+    } else if (req.body.groupChat) {
         sendGroupMessage(req, res);
-    } else
+    } else {
         sendPrivateMessage(req, res);
+    }
 });
 
 messagesRoute.post('/group/:sender_id', sendGroupMessage);

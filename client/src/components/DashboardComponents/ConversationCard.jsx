@@ -10,7 +10,7 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversation, conversationId, latestMessage = '', username, sender_id = 0}) => {
+export const ConversationCard = ({showChatWindow, friend_id = 0, groupChat = false, inspectConversation, conversationId, latestMessage = '', username, sender_id = 0}) => {
 
     const {user} = useAuth();
     const [testLatest, setTestLatest] = useState('');
@@ -35,8 +35,8 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
                 console.error("Error fetching messages:", error.message);
             } else if (data && data.length > 0) {
                 setTestLatest(data[0].content);
-                setLatestTimestamp(data[0].created_at); // Set timestamp on fetch
-                setLatestSender(data[0].sender_id); // Set timestamp on fetch
+                setLatestTimestamp(data[0].created_at);
+                setLatestSender(data[0].sender_id);
             }
         };
 
@@ -93,7 +93,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, inspectConversa
     return (
         <div onClick={() => {
             showChatWindow();
-            inspectConversation(conversationId);
+            inspectConversation(conversationId, username, groupChat);
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
                 <UserAvatar username={username} height={40} width={40} />

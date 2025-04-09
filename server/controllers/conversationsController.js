@@ -39,10 +39,9 @@ export const getReceiverUsername = async (req, res) => {
 
 
 
-export const getUserConversations = async (req, res) => {
+export const getUsersPrivateConversations = async (req, res) => {
 
     try {
-
         const user_id = parseInt(req.params.user_id);
         const conversations = await prisma.friends.findMany({
             where: {
@@ -64,7 +63,7 @@ export const getUserConversations = async (req, res) => {
                 const friend = isUser ? conversation.Friend : conversation.User;
 
 
-                const latestMessage = await prisma.messages.findFirst({
+                const latestMessage = await prisma.privateMessages.findFirst({
                     where: {
                         OR: [
                             { sender_id: user_id, receiver_id: friendId },
@@ -95,3 +94,57 @@ export const getUserConversations = async (req, res) => {
     }
 }
 
+
+
+export const getUsersGroupConversations = async (req, res) => {
+
+    try {
+        const usersGroupChat = await prisma.groupMembers.findMany({
+            where: {
+                member_id: parseInt(req.params.user_id)
+            },
+            include: {
+                Member: true,
+                Group: {
+                    include: {
+                        GroupMessages: {
+                            include: {
+                                sender: true,
+                            }
+                        },
+                        GroupMembers: {
+                            include: {
+                                Member: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const formatedUsersGroupChat = await Promise.all(
+            usersGroupChat.map(async (chat) => {
+                let groupName = chat.Group.name;
+
+                if (!groupName) {
+                    groupName = chat.Group.GroupMembers
+                        .map((member) => member.Member.username)
+                        .join(', ');
+                }
+
+                return {
+                    chat,
+                    username: groupName,
+                };
+            })
+        );
+
+        res.status(200).json(formatedUsersGroupChat);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(`Error: ${error}`);
+    }
+
+
+}

@@ -19,7 +19,7 @@ export const Dashboard = ({API_URL}) => {
     };
 
     const toggleNewMessage = () => {
-        setShowNewMessage(!showNewMessage);
+        setShowNewMessage(false);
     }
 
     const showChatWindow = () => {

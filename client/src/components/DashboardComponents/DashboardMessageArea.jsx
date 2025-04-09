@@ -1,33 +1,13 @@
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
 
-export const DashboardMessageArea = ({receiver, setReceivers, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, groupChat, setReceivers, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
-    const [friend, setFriend] = useState(null);
-
-
-    useEffect(() => {
-            const checkFriendship = async () => {
-                fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        setFriend(data);
-                    })
-                    .catch(err => console.log(err));
-            }
-            checkFriendship();
-    }, [receiver])
 
 
     const sendFriendRequest = async (req, res) => {
@@ -56,12 +36,12 @@ export const DashboardMessageArea = ({receiver, setReceivers, receivers, API_URL
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({message, receivers})
+            body: JSON.stringify({message, receivers, groupChat }),
         })
 
         if (!friend) {
-            sendFriendRequest(req, res);
-            acceptFriendRequest(req, res);
+            await sendFriendRequest();
+            await acceptFriendRequest();
         }
 
         setMessage("");
