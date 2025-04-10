@@ -4,7 +4,7 @@
 import {Router} from 'express';
 import {
     checkFriendship,
-    loadFriendRequests,
+    loadFriendRequests, loadGroupRequests,
     sendFriendRequest
 } from "../controllers/notificationController.js";
 
@@ -13,6 +13,8 @@ const notificationRoute = Router();
 
 
 notificationRoute.get('/friend/requests/:user_id', loadFriendRequests)
+
+notificationRoute.get('/group/requests/:user_id', loadGroupRequests)
 
 notificationRoute.get('/friends/:receiver_id/:sender_id', checkFriendship)
 

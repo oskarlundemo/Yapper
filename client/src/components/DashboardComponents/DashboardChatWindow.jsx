@@ -1,16 +1,17 @@
 import '../../styles/Dashboard/DashBoardChatWindow.css';
 import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
 import { MessageCard } from "./MessageCard.jsx";
-import {useEffect, useRef, useState} from "react";
+import {use, useEffect, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {Notifications} from "./Notifications.jsx";
 import {NewMessage} from "./NewMessage.jsx";
+import {UserAvatar} from "../UserAvatar.jsx";
 
 
 
-export const DashboardChatWindow = ({API_URL, groupChat, chatName, showChatWindow, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName, showChatWindow, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [messages, setMessages] = useState([]);
     const [channel, setChannel] = useState(null); // Store the subscription channel
@@ -22,6 +23,7 @@ export const DashboardChatWindow = ({API_URL, groupChat, chatName, showChatWindo
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
+
 
 
     useEffect(() => {
@@ -93,7 +95,6 @@ export const DashboardChatWindow = ({API_URL, groupChat, chatName, showChatWindo
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
                     setMessages(data);
                 })
                 .catch(err => console.log(err));
@@ -161,7 +162,23 @@ export const DashboardChatWindow = ({API_URL, groupChat, chatName, showChatWindo
 
                         <div className="dashboard-message-content">
                             {showMessage ? (
-                                <p>New convo</p>
+                                <div className="new-conversation-info">
+                                    <div className="avatar-section-new-convo">
+                                        {receivers.length > 0 &&
+                                            receivers.map((receiver) => (
+                                                <UserAvatar width={40} height={40} key={receiver.id} user={receiver} />
+                                            ))
+                                        }
+
+                                        <div className="new-convo-section-username">
+                                            {receivers.length > 0 &&
+                                                receivers.map((receiver) => (
+                                                    <p key={receiver.id}>{receiver.username}</p>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                             ) : (
                                 <>
                                     {messages.length > 0 &&
@@ -181,7 +198,7 @@ export const DashboardChatWindow = ({API_URL, groupChat, chatName, showChatWindo
                             )}
                         </div>
                     </div>
-                    <DashboardMessageArea groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
+                    <DashboardMessageArea setGroupChat={setGroupChat} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
             )}
         </section>

@@ -18,15 +18,14 @@ export const loadFriendRequests = async (req, res) => {
                                 receiver_id: parseInt(req.params.user_id)
                             },
                             orderBy: {
-                                created_at: 'asc',
+                                created_at: 'desc'
                             },
                             take: 1
                         }
                     }
                 }
             }
-        })
-        console.log(friendRequests);
+        });
         res.status(200).json(friendRequests);
 
     } catch (err) {
@@ -36,11 +35,45 @@ export const loadFriendRequests = async (req, res) => {
 }
 
 
+export const loadGroupRequests = async (req, res) => {
+
+    try {
+        const groupRequests = await prisma.pendingGroupRequest.findMany({
+            where: {
+                receiver_id: parseInt(req.params.user_id)
+            },
+            include: {
+                Group: {
+                    include: {
+                        GroupMessages: {
+                            include: {
+                                sender: true
+                            },
+                            orderBy: {
+                                created_at: 'asc'
+                            },
+                            take: 1
+                        }
+                    }
+                },
+                Receiver: true
+            },
+        })
+
+
+        res.status(200).json(groupRequests);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json(`Error: ${err}`);
+    }
+
+
+}
+
+
+
 export const sendFriendRequest = async (req, res) => {
     try {
-
-        console.log(req.params);
-
         const existingRequest = await prisma.pendingFriendRequests.findFirst({
             where: {
                 OR: [

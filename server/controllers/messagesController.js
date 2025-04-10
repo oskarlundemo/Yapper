@@ -27,9 +27,9 @@ export const sendPrivateMessage = async (req, res) => {
 
 export const createGroupChat = async (req, res) => {
     try {
+
         const sender_id = parseInt(req.params.sender_id);
         const receivers = req.body.receivers;
-
 
         const result = await prisma.$transaction(async (prisma) => {
             const group = await prisma.groupChats.create({
@@ -45,17 +45,16 @@ export const createGroupChat = async (req, res) => {
                 }
             })
 
-            // Add each receiver as a group member
-            for (const receiver of receivers) {
-                await prisma.groupMembers.create({
+            for (const user of receivers) {
+                await prisma.pendingGroupRequest.create({
                     data: {
                         group_id: group.id,
-                        member_id: receiver.id,
+                        receiver_id: user.id,
                     }
                 });
             }
 
-            // Create the message with the group.id as receiver_id
+
             const messageRecord = await prisma.groupMessages.create({
                 data: {
                     sender_id: sender_id,
@@ -63,7 +62,13 @@ export const createGroupChat = async (req, res) => {
                     content: req.body.message,
                 }
             });
+
+
+            return group;
         });
+
+
+        res.status(200).json({result});
 
     } catch (err) {
         console.log(err);
@@ -134,9 +139,7 @@ export const getMessagesFromGroupConversation = async (req, res) => {
                 sender: true
             }
         })
-
         res.status(200).json(groupMessages);
-
     } catch (error) {
         console.log(error);
         res.status(500).json(`Error: ${error.message}`);

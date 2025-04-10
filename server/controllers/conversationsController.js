@@ -3,6 +3,48 @@
 import {prisma} from '../prisma/index.js';
 
 
+export const getAllConversations = async (req, res) => {
+
+
+    try {
+        const user_id = parseInt(req.params.user_id);
+
+        const groupConversations = await prisma.groupMembers.findMany({
+            where: {
+                member_id: user_id,
+            },
+            include: {
+                Group: {
+                    include: {
+                        GroupMessages: true
+                    }
+                }
+            }
+        })
+
+        const privateConversations = await prisma.friends.findMany({
+            where: {
+                OR: [
+                    { user_id: user_id },
+                    { friend_id: user_id }
+                ]
+            },
+            include: {
+                User: true,
+                Friend: true
+            }
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(`Error: ${error}`);
+    }
+}
+
+
+
+
 export const searchForConversations = async (req, res) => {
     try {
         const searchquery = req.params.searchQuery;

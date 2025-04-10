@@ -10,7 +10,9 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const ConversationCard = ({showChatWindow, friend_id = 0, groupChat = false, inspectConversation, conversationId, latestMessage = '', username, sender_id = 0}) => {
+export const ConversationCard = ({showChatWindow, friend_id = 0, timeStamp = '',
+                                     groupChat = false, inspectConversation, message,
+                                     conversationId, latestMessage = '', username, sender_id = 0}) => {
 
     const {user} = useAuth();
     const [testLatest, setTestLatest] = useState('');
@@ -102,11 +104,11 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, groupChat = fal
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        {moment(latestTimestamp || latestMessage?.created_at).format("h:mm A")}
+                        { moment(timeStamp).format('h:mm: A') ||  moment(latestTimestamp || latestMessage?.created_at).format("h:mm A")}
                     </span></h3>
                 <p className={'conversation-content'}>
                     {user.id === latestSender && <span>You: </span>}
-                    {parseLatestMessage(testLatest)}
+                    {message || parseLatestMessage(testLatest)}
                 </p>
             </div>
         </div>

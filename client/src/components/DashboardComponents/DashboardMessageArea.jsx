@@ -4,13 +4,22 @@ import {useAuth} from "../../context/AuthContext.jsx";
 
 
 
-export const DashboardMessageArea = ({receiver, friend, groupChat, setReceivers, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, groupChat, setGroupChat, setReceivers, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
+    const [focusedChat, setFocusedChat] = useState(null);
 
 
-    const sendFriendRequest = async (req, res) => {
+    useEffect(() => {
+        if (receivers && receivers.length > 1) {
+            setGroupChat(true);
+        } else {
+            setGroupChat(false);
+        }
+    }, [receivers]);
+
+    const sendFriendRequest = async () => {
         await fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
             method: "POST",
             headers: {
@@ -19,7 +28,7 @@ export const DashboardMessageArea = ({receiver, friend, groupChat, setReceivers,
         })
     }
 
-    const acceptFriendRequest = async (req, res) => {
+    const acceptFriendRequest = async () => {
         await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
             method: "GET",
             headers: {
@@ -38,6 +47,13 @@ export const DashboardMessageArea = ({receiver, friend, groupChat, setReceivers,
             },
             body: JSON.stringify({message, receivers, groupChat }),
         })
+            .then(res => res.json())
+            .then(data => {
+                // Ändra till denna chat, så man hoppar
+                setFocusedChat(data.id);
+                console.log(data);
+            })
+            .catch(err => console.log(err));
 
         if (!friend) {
             await sendFriendRequest();
@@ -81,6 +97,4 @@ export const DashboardMessageArea = ({receiver, friend, groupChat, setReceivers,
             </div>
         </div>
     );
-
-
 }

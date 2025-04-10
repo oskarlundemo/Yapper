@@ -1,15 +1,18 @@
 
 
 Prio 1
-[] Gruppchatar
+[x] Gruppchatar
 [] Skicka bilder
 [] Skicka gifs
+[] Skicka group request
+
 
 
 Prio 2
 [] Sortera chattar efter senast aktivitet
 [] Server, så om man loggar in så visas alla meddelanden på servern
 [] Updatera chats i realtime, så när man blir vänner updateras det direkt
+[] Inspektera chattar, så profilen kommer up till höger
 
 
 Prio 3

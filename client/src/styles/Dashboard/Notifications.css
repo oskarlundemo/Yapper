@@ -39,14 +39,10 @@
 .cards-container {
     p {
         margin: 0 auto;
-        align-self: center;
-        justify-self: center;
         opacity: 0.5;
     }
-
-    flex-direction: row;
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template: repeat(10, 1fr) / 1fr;
 
     height: 100%;
 }
@@ -58,15 +54,4 @@
     transition: var(--default-transition);
     padding: 0.5rem 1rem;
     flex-grow: 1;
-}
-
-
-.request-card:hover {
-    box-shadow: var(--soft-boxshadow);
-    cursor: pointer;
-}
-
-.request-card-avatar {
-    display: flex;
-    align-items: center;
 }

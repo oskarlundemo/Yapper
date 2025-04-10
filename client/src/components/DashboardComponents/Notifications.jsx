@@ -14,8 +14,8 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
     const {user} = useAuth();
 
     useEffect(() => {
-        const fetchFriendRequest = async () => {
-            await fetch(`${API_URL}/notifications/friend/requests/${user.id}`, {
+
+        fetch(`${API_URL}/notifications/friend/requests/${user.id}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -23,13 +23,23 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
                     setFriendRequest(data);
                 })
                 .catch(err => console.log(err));
-        }
 
-        fetchFriendRequest();
+
+
+         fetch(`${API_URL}/notifications/group/requests/${user.id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setGroupRequest(data);
+                })
+                .catch(err => console.log(err));
 
         const newChannel = supabase
             .channel('realtime-requests')
@@ -50,13 +60,13 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
 
         setChannel((prevChannel) => {
             if (prevChannel) {
-                supabase.removeChannel(prevChannel); // Ensure old channel is removed
+                supabase.removeChannel(prevChannel);
             }
-            return newChannel; // Store the latest channel in state
+            return newChannel;
         });
 
         return () => {
-            supabase.removeChannel(newChannel); // Cleanup function with latest channel reference
+            supabase.removeChannel(newChannel);
         };
 
     }, [])
@@ -77,8 +87,9 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
                                     key={sender.sender_id}
                                     conversationId={sender.sender_id}
                                     inspectConversation={inspectConversation}
-                                    username={sender.Sender.username}
+                                    username={sender?.Sender.username}
                                     message={sender?.Sender.messagesSent[0].content}
+                                    timeStamp={sender?.Sender.messagesSent[0].created_at}
                                 />
                             ))
                         ) : (
@@ -92,7 +103,19 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
 
                 <div className="cards-container">
                     {groupRequest.length > 0 ? (
-                        <h2>Fake friend request</h2>
+                        groupRequest.map((groupAdmin) => (
+                            <ConversationCard
+                                showChatWindow={showChatWindow}
+                                className="request-card"
+                                key={groupAdmin.id}
+                                conversationId={groupAdmin.Group.id}
+                                inspectConversation={inspectConversation}
+                                username={groupAdmin.Group.name || ''}
+                                message={groupAdmin?.Group.GroupMessages[0].content}
+                                groupChat={true}
+                                timeStamp={groupAdmin.Group.GroupMessages[0].created_at}
+                            />
+                        ))
                     ) : (
                         <p>No group request</p>
                     )}

@@ -6,10 +6,9 @@ import * as test from "node:test";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const DashboardMain = ({API_URL, showChatWindow, toggleShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
+export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
 
     const [messages, setMessages] = useState([]);
-    const [receiver, setReceiver] = useState(null);
     const [friend, setFriend] = useState(null);
     const [chatName, setChatName] = useState("");
     const [groupChat, setGroupChat] = useState(false);
@@ -40,8 +39,8 @@ export const DashboardMain = ({API_URL, showChatWindow, toggleShowNewMessage, to
     return (
         <main className={'dashboard-main'}>
             <DashboardNavigation toggleProfile={setShowProfile} />
-            <DashboardConversations toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectConversation={inspectConversation} API_URL={API_URL} showProfile={showProfile} />
-            <DashboardChatWindow groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectConversation} receiver={receiver} showRequests={showRequests} messages={messages} API_URL={API_URL} showProfile={showProfile}/>
+            <DashboardConversations showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectConversation={inspectConversation} API_URL={API_URL} showProfile={showProfile} />
+            <DashboardChatWindow setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectConversation} receiver={receiver} showRequests={showRequests} messages={messages} API_URL={API_URL} showProfile={showProfile}/>
         </main>
     )
 }

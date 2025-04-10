@@ -64,10 +64,19 @@
         color: var(--text-color);
         outline: none;
     }
+
+    svg {
+        transition: var(--default-transition);
+    }
+
+    svg:hover {
+        fill: var(--accent-color);
+        cursor: pointer;
+    }
 }
 
 .message-card-body:has(input:focus-within) {
-    border: 2px solid var(--accent-color);
+    border: 1px solid var(--accent-color);
 }
 
 .message-area-icons {
@@ -166,4 +175,13 @@
 .dashboard-message.other {
     flex-direction: row;
     justify-self: flex-start;
+}
+
+
+.new-convo-section-username {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
