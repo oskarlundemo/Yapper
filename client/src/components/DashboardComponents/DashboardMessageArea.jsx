@@ -4,20 +4,11 @@ import {useAuth} from "../../context/AuthContext.jsx";
 
 
 
-export const DashboardMessageArea = ({receiver, friend, groupChat, setGroupChat, setReceivers, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, setReceivers, groupChat, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
     const [focusedChat, setFocusedChat] = useState(null);
-
-
-    useEffect(() => {
-        if (receivers && receivers.length > 1) {
-            setGroupChat(true);
-        } else {
-            setGroupChat(false);
-        }
-    }, [receivers]);
 
     const sendFriendRequest = async () => {
         await fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
@@ -45,7 +36,7 @@ export const DashboardMessageArea = ({receiver, friend, groupChat, setGroupChat,
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({message, receivers, groupChat }),
+            body: JSON.stringify({message, receivers, groupChat}),
         })
             .then(res => res.json())
             .then(data => {

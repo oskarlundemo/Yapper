@@ -1,20 +1,18 @@
-import {ConversationCard} from "./ConversationCard.jsx";
+import {PrivateConversationCard} from "./PrivateConversationCard.jsx";
 import {useEffect, useState} from "react";
 import '../../styles/Dashboard/DashboardConversation.css'
 import {useAuth} from "../../context/AuthContext.jsx";
+import {GroupConversationCard} from "./GroupConversationCard.jsx";
 
 
-export const DashboardConversations = ({inspectConversation, setReceiver, showNewMessages, showChatWindow, API_URL, showProfile}) => {
+export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL, showProfile}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [users, setUsers] = useState([]);
-    const [privateConversations, setPrivateConversations] = useState([])
-    const [groupConversations, setGroupConversations] = useState([])
     const [allConversations, setAllConversations] = useState([])
     const {user} = useAuth();
 
     useEffect(() => {
-        fetch(`${API_URL}/conversations/private/${user.id}`, {
+        fetch(`${API_URL}/conversations/all/${user.id}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
@@ -22,24 +20,11 @@ export const DashboardConversations = ({inspectConversation, setReceiver, showNe
         })
             .then(response => response.json())
             .then(data => {
-                setPrivateConversations(data)
+                setAllConversations(data)
             })
             .catch(error => console.log(error));
-
-        fetch(`${API_URL}/conversations/group/${user.id}`, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setGroupConversations(data)
-            })
-            .catch(error => console.log(error));
-
     }, [])
+
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -57,7 +42,6 @@ export const DashboardConversations = ({inspectConversation, setReceiver, showNe
                  })
                  .then(response => response.json())
                  .then(data => {
-                     console.log(data);
                      setPrivateConversations(data)
                  })
                  .catch(err => console.log(err));
@@ -88,37 +72,31 @@ export const DashboardConversations = ({inspectConversation, setReceiver, showNe
             </div>
 
             <div className="conversations-container">
-                {privateConversations.length > 0 ? (
-                    privateConversations.map((conversation) => (
-                        <ConversationCard
-                            friend_id={conversation.id}
-                            showChatWindow={showChatWindow}
-                            inspectConversation={inspectConversation}
-                            username={conversation.username}
-                            key={conversation.id}
-                            conversationId={conversation.id}
-                            latestMessage={conversation.latestMessage}
-                        />))
+                {allConversations.length > 0 ? (
+                    allConversations.map((conversation) =>
+                        conversation.group ? (
+                            <GroupConversationCard
+                                key={conversation.group.id}
+                                groupId={conversation.group.id}
+                                groupName={conversation.group.name}
+                                latestMessage={conversation.latestMessage}
+                                showChatWindow={showChatWindow}
+                                inspectGroupChat={inspectGroupChat}
+                            />
+                        ) : (
+                            <PrivateConversationCard
+                                key={conversation.user.id}
+                                friend_id={conversation.user.id}
+                                username={conversation.user.username}
+                                latestMessage={conversation.latestMessage}
+                                showChatWindow={showChatWindow}
+                                inspectPrivateConversation={inspectPrivateConversation}
+                            />
+                        )
+                    )
                 ) : (
-                    <p>No private messages yet</p>
+                    <p>No conversations yet.</p>
                 )}
-
-                {groupConversations.length > 0 ? (
-                    groupConversations.map((conversation) => (
-                        <ConversationCard
-                            friend_id={conversation.id}
-                            showChatWindow={showChatWindow}
-                            inspectConversation={inspectConversation}
-                            username={conversation.username}
-                            key={conversation.chat.group_id}
-                            conversationId={conversation.chat.group_id}
-                            latestMessage={conversation.latestMessage}
-                            groupChat={true}
-                        />))
-                ) : (
-                    <p>No group chats yet</p>
-                )}
-
             </div>
 
         </aside>

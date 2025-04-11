@@ -10,42 +10,18 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 
-export const ConversationCard = ({showChatWindow, friend_id = 0, timeStamp = '',
-                                     groupChat = false, inspectConversation, message,
-                                     conversationId, latestMessage = '', username, sender_id = 0}) => {
+export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
+                                            inspectPrivateConversation,
+                                            latestMessage = null, username = ''}) => {
 
     const {user} = useAuth();
-    const [testLatest, setTestLatest] = useState('');
     const [channel, setChannel] = useState(null);
-    const [latestSender, setLatestSender] = useState(0);
-    const [latestTimestamp, setLatestTimestamp] = useState('');
+    const [updatedMessage, setUpdatedMessage] = useState(latestMessage);
 
     useEffect(() => {
         if (!user?.id || !friend_id) return;
 
-        const fetchMessages = async () => {
-            const { data, error } = await supabase
-                .from("messages")
-                .select("*")
-                .or(
-                    `and(sender_id.eq.${user.id},receiver_id.eq.${friend_id}), and(sender_id.eq.${friend_id},receiver_id.eq.${user.id})`
-                )
-                .order("created_at", { ascending: false })
-                .limit(1);
-
-            if (error) {
-                console.error("Error fetching messages:", error.message);
-            } else if (data && data.length > 0) {
-                setTestLatest(data[0].content);
-                setLatestTimestamp(data[0].created_at);
-                setLatestSender(data[0].sender_id);
-            }
-        };
-
-        fetchMessages();
-
         const channelName = `conversation-${user.id}-${friend_id}`;
-
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -61,9 +37,8 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, timeStamp = '',
                         (message.sender_id === user.id && message.receiver_id === friend_id) ||
                         (message.sender_id === friend_id && message.receiver_id === user.id)
                     ) {
-                        setTestLatest(message.content);
-                        setLatestSender(message.sender_id);
-                        setLatestTimestamp(message.created_at);
+                        setUpdatedMessage(message);
+                        console.log(message);
                     }
                 }
             )
@@ -95,7 +70,7 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, timeStamp = '',
     return (
         <div onClick={() => {
             showChatWindow();
-            inspectConversation(conversationId, username, groupChat);
+            inspectPrivateConversation(friend_id, username);
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
                 <UserAvatar username={username} height={40} width={40} />
@@ -104,11 +79,11 @@ export const ConversationCard = ({showChatWindow, friend_id = 0, timeStamp = '',
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        { moment(timeStamp).format('h:mm: A') ||  moment(latestTimestamp || latestMessage?.created_at).format("h:mm A")}
+                        {moment(updatedMessage.created_at).format("h:mm A")}
                     </span></h3>
                 <p className={'conversation-content'}>
-                    {user.id === latestSender && <span>You: </span>}
-                    {message || parseLatestMessage(testLatest)}
+                    {user.id === (updatedMessage.sender?.id || updatedMessage.sender_id) && <span>You: </span>}
+                    {parseLatestMessage(updatedMessage.content)}
                 </p>
             </div>
         </div>

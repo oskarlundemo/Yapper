@@ -11,10 +11,9 @@ import {UserAvatar} from "../UserAvatar.jsx";
 
 
 
-export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName, showChatWindow, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, chatName, groupChat, showChatWindow, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
-    const [messages, setMessages] = useState([]);
-    const [channel, setChannel] = useState(null); // Store the subscription channel
+    const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
 
@@ -31,17 +30,6 @@ export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName,
         if (!receiver) return;
 
         if (!groupChat) {
-            fetch(`${API_URL}/messages/private/conversation/${user.id}/${receiver}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    setMessages(data);
-                })
-                .catch(err => console.log(err));
 
             const newChannel = supabase
                 .channel(`realtime-chat-${receiver}`)
@@ -87,17 +75,6 @@ export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName,
             };
 
         } else {
-            fetch(`${API_URL}/messages/group/conversation/${user.id}/${receiver}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    setMessages(data);
-                })
-                .catch(err => console.log(err));
 
             const newChannel = supabase
                 .channel(`realtime-chat-${receiver}`)
@@ -190,6 +167,7 @@ export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName,
                                                 content={message.content}
                                                 time={message.created_at}
                                                 user_id={message.sender_id}
+
                                                 username={message.sender?.username || message.Sender?.username || "Unknown"}
                                             />
                                         ))}
@@ -198,7 +176,7 @@ export const DashboardChatWindow = ({API_URL, groupChat, setGroupChat, chatName,
                             )}
                         </div>
                     </div>
-                    <DashboardMessageArea setGroupChat={setGroupChat} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
+                    <DashboardMessageArea groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
             )}
         </section>

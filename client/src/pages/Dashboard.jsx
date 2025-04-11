@@ -11,7 +11,6 @@ export const Dashboard = ({API_URL}) => {
     const [showNewMessage, setShowNewMessage] = useState(true);
     const [receiver, setReceiver] = useState(null);
 
-
     const toggleRequests = () => {
         setShowRequests(!showRequests);
     }

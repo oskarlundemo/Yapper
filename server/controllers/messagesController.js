@@ -6,7 +6,7 @@ import {prisma} from '../prisma/index.js';
 
 export const sendPrivateMessage = async (req, res) => {
     try {
-        console.log('Skicka privat');
+        console.log('Skicka privat')
         const sender_id = parseInt(req.params.sender_id);
         const receiver_id = parseInt(req.params.receiver_id);
 
@@ -30,8 +30,10 @@ export const createGroupChat = async (req, res) => {
 
         const sender_id = parseInt(req.params.sender_id);
         const receivers = req.body.receivers;
+        let groupName = req.body.name;
 
         const result = await prisma.$transaction(async (prisma) => {
+
             const group = await prisma.groupChats.create({
                 data: {
                     admin_id: sender_id,
@@ -46,14 +48,31 @@ export const createGroupChat = async (req, res) => {
             })
 
             for (const user of receivers) {
-                await prisma.pendingGroupRequest.create({
+                await prisma.groupMembers.create({
                     data: {
                         group_id: group.id,
-                        receiver_id: user.id,
+                        member_id: user.id,
                     }
                 });
             }
 
+
+            if (!groupName) {
+                const namesOfGroupMembers = await prisma.groupMembers.findMany({
+                    where: {group_id: group.id}, include: {Member: true}
+                })
+
+                groupName = namesOfGroupMembers.map((member) => member.Member.username).join(', ');
+
+                await prisma.groupChats.update({
+                    data: {
+                        name: groupName,
+                    },
+                    where: {
+                        id: group.id,
+                    }
+                })
+            }
 
             const messageRecord = await prisma.groupMessages.create({
                 data: {
@@ -63,10 +82,8 @@ export const createGroupChat = async (req, res) => {
                 }
             });
 
-
             return group;
         });
-
 
         res.status(200).json({result});
 
@@ -79,6 +96,8 @@ export const createGroupChat = async (req, res) => {
 export const sendGroupMessage = async (req, res) => {
 
     try {
+        console.log('Skicka grupp')
+
         const sender_id = parseInt(req.params.sender_id);
         const receivers = req.body.receivers;
         const receiver = parseInt(req.params.receiver_id)

@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import '../../styles/Dashboard/Notifications.css'
 import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
-import {ConversationCard} from "./ConversationCard.jsx";
+import {PrivateConversationCard} from "./PrivateConversationCard.jsx";
 
 export const Notifications = ({API_URL, showChatWindow, inspectConversation}) => {
 
@@ -81,7 +81,7 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
                     <div className={'cards-container'}>
                         {friendRequest.length > 0 ? (
                             friendRequest.map((sender) => (
-                                <ConversationCard
+                                <PrivateConversationCard
                                     showChatWindow={showChatWindow}
                                     className="request-card"
                                     key={sender.sender_id}
@@ -104,7 +104,7 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
                 <div className="cards-container">
                     {groupRequest.length > 0 ? (
                         groupRequest.map((groupAdmin) => (
-                            <ConversationCard
+                            <PrivateConversationCard
                                 showChatWindow={showChatWindow}
                                 className="request-card"
                                 key={groupAdmin.id}

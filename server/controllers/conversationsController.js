@@ -7,25 +7,13 @@ export const getAllConversations = async (req, res) => {
 
 
     try {
+        // Private
         const user_id = parseInt(req.params.user_id);
 
-        const groupConversations = await prisma.groupMembers.findMany({
-            where: {
-                member_id: user_id,
-            },
-            include: {
-                Group: {
-                    include: {
-                        GroupMessages: true
-                    }
-                }
-            }
-        })
-
-        const privateConversations = await prisma.friends.findMany({
+        const friends = await prisma.friends.findMany({
             where: {
                 OR: [
-                    { user_id: user_id },
+                    { user_id },
                     { friend_id: user_id }
                 ]
             },
@@ -35,6 +23,162 @@ export const getAllConversations = async (req, res) => {
             }
         });
 
+        const pendingRequests = await prisma.pendingFriendRequests.findMany({
+            where: {
+                receiver_id: user_id
+            },
+            include: {
+                Sender: true
+            }
+        });
+
+        // Format accepted friends
+        const formattedFriends = await Promise.all(
+            friends.map(async (relation) => {
+                const otherUser = relation.User.id === user_id ? relation.Friend : relation.User;
+
+                const latestMessage = await prisma.privateMessages.findFirst({
+                    where: {
+                        OR: [
+                            { sender_id: user_id, receiver_id: otherUser.id },
+                            { sender_id: otherUser.id, receiver_id: user_id }
+                        ]
+                    },
+                    orderBy: {
+                        created_at: 'desc'
+                    },
+                    include: {
+                        sender: true
+                    }
+                });
+
+                return {
+                    status: "friend",
+                    user: {
+                        id: otherUser.id,
+                        username: otherUser.username,
+                        avatar: otherUser.avatar,
+                        email: otherUser.email
+                    },
+                    latestMessage: latestMessage
+                        ? {
+                            content: latestMessage.content,
+                            created_at: latestMessage.created_at,
+                            sender: {
+                                id: latestMessage.sender.id,
+                                username: latestMessage.sender.username
+                            }
+                        }
+                        : null
+                };
+            })
+        );
+
+        // Format pending requests
+        const formattedPending = await Promise.all(
+            pendingRequests.map(async (request) => {
+                const sender = request.Sender;
+
+                const latestMessage = await prisma.privateMessages.findFirst({
+                    where: {
+                        OR: [
+                            { sender_id: user_id, receiver_id: sender.id },
+                            { sender_id: sender.id, receiver_id: user_id }
+                        ]
+                    },
+                    orderBy: {
+                        created_at: 'desc'
+                    },
+                    include: {
+                        sender: true
+                    }
+                });
+
+                return {
+                    status: "pending",
+                    user: {
+                        id: sender.id,
+                        username: sender.username,
+                        avatar: sender.avatar,
+                        email: sender.email
+                    },
+                    latestMessage: latestMessage
+                        ? {
+                            content: latestMessage.content,
+                            created_at: latestMessage.created_at,
+                            sender: {
+                                id: latestMessage.sender.id,
+                                username: latestMessage.sender.username
+                            }
+                        }
+                        : null
+                };
+            })
+        );
+
+        const usersGroupChat = await prisma.groupMembers.findMany({
+            where: {
+                member_id: parseInt(req.params.user_id)
+            },
+            include: {
+                Member: true,
+                Group: {
+                    include: {
+                        GroupMessages: {
+                            include: {
+                                sender: true,
+                            },
+                            orderBy: {
+                                created_at: 'desc'
+                            },
+                            take: 1
+                        },
+                        GroupMembers: {
+                            include: {
+                                Member: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+        const formattedGroupChats = usersGroupChat.map((chat) => {
+            const group = chat.Group;
+
+            const latestMessage = group.GroupMessages[0];
+
+
+            const groupName = group.name
+                ? group.name
+                : group.GroupMembers.map((m) => m.Member.username).join(', ');
+
+            return {
+                group: {
+                    id: group.id,
+                    name: groupName,
+                },
+                latestMessage: latestMessage
+                    ? {
+                        content: latestMessage.content,
+                        created_at: latestMessage.created_at,
+                        sender: {
+                            id: latestMessage.sender.id,
+                            username: latestMessage.sender.username,
+                        },
+                    }
+                    : null,
+            };
+        });
+
+
+        const conversations = [...formattedFriends, ...formattedPending];
+
+        const mergedPrivateAndGrops = [...conversations, ...formattedGroupChats];
+
+        
+        res.status(200).json(mergedPrivateAndGrops);
 
     } catch (error) {
         console.error(error);
@@ -85,10 +229,11 @@ export const getUsersPrivateConversations = async (req, res) => {
 
     try {
         const user_id = parseInt(req.params.user_id);
-        const conversations = await prisma.friends.findMany({
+
+        const friends = await prisma.friends.findMany({
             where: {
                 OR: [
-                    { user_id: user_id },
+                    { user_id },
                     { friend_id: user_id }
                 ]
             },
@@ -98,38 +243,102 @@ export const getUsersPrivateConversations = async (req, res) => {
             }
         });
 
-        const formattedConversations = await Promise.all(
-            conversations.map(async (conversation) => {
-                const isUser = conversation.user_id === user_id;
-                const friendId = isUser ? conversation.friend_id : conversation.user_id;
-                const friend = isUser ? conversation.Friend : conversation.User;
+        const pendingRequests = await prisma.pendingFriendRequests.findMany({
+            where: {
+                receiver_id: user_id
+            },
+            include: {
+                Sender: true
+            }
+        });
 
+        // Format accepted friends
+        const formattedFriends = await Promise.all(
+            friends.map(async (relation) => {
+                const otherUser = relation.User.id === user_id ? relation.Friend : relation.User;
 
                 const latestMessage = await prisma.privateMessages.findFirst({
                     where: {
                         OR: [
-                            { sender_id: user_id, receiver_id: friendId },
-                            { sender_id: friendId, receiver_id: user_id }
+                            { sender_id: user_id, receiver_id: otherUser.id },
+                            { sender_id: otherUser.id, receiver_id: user_id }
                         ]
                     },
                     orderBy: {
                         created_at: 'desc'
+                    },
+                    include: {
+                        sender: true
                     }
                 });
 
                 return {
-                    id: friendId,
-                    username: friend.username,
-                    friend,
-                    latestMessage: latestMessage ? {
-                        content: latestMessage.content,
-                        sender_id: latestMessage.sender_id,
-                        created_at: latestMessage.created_at
-                    } : null
+                    status: "friend",
+                    user: {
+                        id: otherUser.id,
+                        username: otherUser.username,
+                        avatar: otherUser.avatar,
+                        email: otherUser.email
+                    },
+                    latestMessage: latestMessage
+                        ? {
+                            content: latestMessage.content,
+                            created_at: latestMessage.created_at,
+                            sender: {
+                                id: latestMessage.sender.id,
+                                username: latestMessage.sender.username
+                            }
+                        }
+                        : null
                 };
             })
         );
-        res.status(200).json(formattedConversations);
+
+        // Format pending requests
+        const formattedPending = await Promise.all(
+            pendingRequests.map(async (request) => {
+                const sender = request.Sender;
+
+                const latestMessage = await prisma.privateMessages.findFirst({
+                    where: {
+                        OR: [
+                            { sender_id: user_id, receiver_id: sender.id },
+                            { sender_id: sender.id, receiver_id: user_id }
+                        ]
+                    },
+                    orderBy: {
+                        created_at: 'desc'
+                    },
+                    include: {
+                        sender: true
+                    }
+                });
+
+                return {
+                    status: "pending",
+                    user: {
+                        id: sender.id,
+                        username: sender.username,
+                        avatar: sender.avatar,
+                        email: sender.email
+                    },
+                    latestMessage: latestMessage
+                        ? {
+                            content: latestMessage.content,
+                            created_at: latestMessage.created_at,
+                            sender: {
+                                id: latestMessage.sender.id,
+                                username: latestMessage.sender.username
+                            }
+                        }
+                        : null
+                };
+            })
+        );
+
+        const conversations = [...formattedFriends, ...formattedPending];
+
+        res.status(200).json(conversations);
     } catch (err) {
         console.error(err);
         res.status(500).json(`Error: ${err}`);
@@ -152,7 +361,11 @@ export const getUsersGroupConversations = async (req, res) => {
                         GroupMessages: {
                             include: {
                                 sender: true,
-                            }
+                            },
+                            orderBy: {
+                                created_at: 'desc'
+                            },
+                            take: 1
                         },
                         GroupMembers: {
                             include: {
@@ -164,29 +377,11 @@ export const getUsersGroupConversations = async (req, res) => {
             }
         });
 
-        const formatedUsersGroupChat = await Promise.all(
-            usersGroupChat.map(async (chat) => {
-                let groupName = chat.Group.name;
 
-                if (!groupName) {
-                    groupName = chat.Group.GroupMembers
-                        .map((member) => member.Member.username)
-                        .join(', ');
-                }
-
-                return {
-                    chat,
-                    username: groupName,
-                };
-            })
-        );
-
-        res.status(200).json(formatedUsersGroupChat);
+        res.status(200).json(usersGroupChat);
 
     } catch (error) {
         console.error(error);
         res.status(500).json(`Error: ${error}`);
     }
-
-
 }
