@@ -28,31 +28,39 @@ export const DashboardMessageArea = ({receiver, friend, setReceivers, groupChat,
         })
     }
 
+    useEffect(() => {
+        console.log("Current message state:", message);
+    }, [message]);
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({message, receivers, groupChat}),
-        })
-            .then(res => res.json())
-            .then(data => {
-                // Ändra till denna chat, så man hoppar
-                setFocusedChat(data.id);
-                console.log(data);
-            })
-            .catch(err => console.log(err));
+        try {
+            const res = await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message, receivers, groupChat }),
+            });
 
-        if (!friend) {
-            await sendFriendRequest();
-            await acceptFriendRequest();
+            const data = await res.json();
+            setFocusedChat(data.id);
+            console.log(data);
+
+            if (!friend) {
+                await sendFriendRequest();
+                await acceptFriendRequest();
+            }
+
+            setMessage("");
+
+        } catch (err) {
+            console.error("Message send error:", err);
         }
-
-        setMessage("");
-        setReceivers([]);
+        setReceivers([]); // this can stay here
     };
 
     return (

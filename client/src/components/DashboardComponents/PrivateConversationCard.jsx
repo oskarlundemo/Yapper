@@ -12,11 +12,12 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                                             inspectPrivateConversation,
+                                            setUpdatedMessage,
                                             latestMessage = null, username = ''}) => {
 
     const {user} = useAuth();
     const [channel, setChannel] = useState(null);
-    const [updatedMessage, setUpdatedMessage] = useState(latestMessage);
+    const [localMessage, setLocalMessage] = useState(latestMessage);
 
     useEffect(() => {
         if (!user?.id || !friend_id) return;
@@ -37,6 +38,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                         (message.sender_id === user.id && message.receiver_id === friend_id) ||
                         (message.sender_id === friend_id && message.receiver_id === user.id)
                     ) {
+                        setLocalMessage(message);
                         setUpdatedMessage(message);
                         console.log(message);
                     }
@@ -79,11 +81,11 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        {moment(updatedMessage.created_at).format("h:mm A")}
+                        {moment(localMessage.created_at).format("h:mm A")}
                     </span></h3>
                 <p className={'conversation-content'}>
-                    {user.id === (updatedMessage.sender?.id || updatedMessage.sender_id) && <span>You: </span>}
-                    {parseLatestMessage(updatedMessage.content)}
+                    {user.id === (localMessage.sender?.id || localMessage.sender_id) && <span>You: </span>}
+                    {parseLatestMessage(localMessage.content)}
                 </p>
             </div>
         </div>

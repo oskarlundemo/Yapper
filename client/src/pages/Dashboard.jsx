@@ -1,7 +1,7 @@
 
 
 import '../styles/Dashboard/Dashboard.css'
-import {DashboardHeader} from "../components/DashboardComponents/DashboardHeader.jsx";
+import {DashboardMenu} from "../components/DashboardComponents/DashboardMenu.jsx";
 import {DashboardMain} from "../components/DashboardComponents/DashboardMain.jsx";
 import {useState} from "react";
 
@@ -35,7 +35,6 @@ export const Dashboard = ({API_URL}) => {
 
     return (
         <div className={'dashboard-wrapper'}>
-            <DashboardHeader toggleRequests={toggleRequests} toggleProfile={toggleProfile} />
             <DashboardMain
                 toggleShowNewMessage={setShowNewMessage} toggleShowMessage={hideNewMessage}
                 showMessage={showNewMessage} showChatWindow={showChatWindow}

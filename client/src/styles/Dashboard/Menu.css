@@ -2,11 +2,13 @@
 
 
 .dashboard-header {
-    background-color: var(--background-color);
+    background-color: var(--secondary-color);
     padding: 0 1rem;
 
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
 }
 
 .header-company-logo {
@@ -23,11 +25,13 @@
 }
 
 .header-user-container {
+    margin: 1rem 0;
     gap: 1rem;
     position: relative;
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    justify-self: flex-start;
+    align-self: flex-start;
 
     p {
         margin-right: 1rem;
@@ -36,8 +40,8 @@
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
-    right: 0;
+    top: -250%;               /* Aligns to the top of avatar */
+    left: 100%;           /* Moves it to the right of avatar */
     display: none;
     background-color: var(--background-color);
     box-shadow: var(--soft-boxshadow);
@@ -51,9 +55,7 @@
 }
 
 .header-user-container:hover {
-    svg:last-of-type {
-        transform: rotate(90deg);
-    }
+    cursor: pointer;
 }
 
 .dropdown {

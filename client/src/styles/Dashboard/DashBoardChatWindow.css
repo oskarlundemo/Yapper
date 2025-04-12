@@ -4,7 +4,7 @@
     display: grid;
     grid-template-rows: 0.1fr 2fr;
     flex: 1;
-    min-height: 0; /* important for proper scroll behavior in nested grids/flex */
+    min-height: 0;
 }
 
 .dashboard-message-content {
@@ -12,7 +12,6 @@
     display: grid;
     grid-template-rows: repeat(10, auto);
     overflow-y: auto;
-    min-height: 0; /* important! */
 }
 
 
@@ -90,7 +89,7 @@
     grid-template-rows: 2fr 0.2fr;
     border-radius: var(--border-radius);
     overflow: hidden;
-    margin: 0.75rem;
+    margin: 1rem 1rem 1rem 0;
 }
 
 
@@ -108,11 +107,6 @@
 
 .dashboard-message-avatar {
     margin: 0.5rem;
-    img {
-        height: 30px;
-        width: 30px;
-        border-radius: 50%;
-    }
 }
 
 

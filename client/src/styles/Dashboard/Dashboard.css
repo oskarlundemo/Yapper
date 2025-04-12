@@ -10,7 +10,7 @@ html, body, #root {
 .dashboard-wrapper {
     height: 100vh;
     display: grid;
-    grid-template-rows: 0.1fr auto;
+    grid-template-rows: auto;
 }
 
 .dashboard-main {
@@ -20,6 +20,7 @@ html, body, #root {
     height: 100%;        /* Take full height of its grid row */
     min-height: 0;       /* Allow it to shrink if needed */
     overflow: hidden;    /* Prevent internal overflow from pushing it */
+    gap: 1rem;
 }
 
 .dashboard-header{
@@ -56,6 +57,7 @@ html, body, #root {
     flex-direction: column;
     gap: 0.5rem;
     box-shadow: var(--soft-boxshadow);
-    margin: 0.75rem 0 0.75rem 0.75rem;
+    margin: 1rem 0;
+
 }
 

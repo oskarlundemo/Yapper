@@ -25,6 +25,27 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
             .catch(error => console.log(error));
     }, [])
 
+    useEffect(() => {
+        if (!updatedMessage) return;
+
+        setAllConversations(prevConversations => {
+            const updated = prevConversations.map(conv => {
+                if (conv.group && updatedMessage.group_id && conv.group.id === updatedMessage.group_id) {
+                    return { ...conv, latestMessage: updatedMessage };
+                }
+
+                if (!conv.group && conv.user.id === (user.id === updatedMessage.sender_id ? updatedMessage.receiver_id : updatedMessage.sender_id)) {
+                    return { ...conv, latestMessage: updatedMessage };
+                }
+
+                return conv;
+            });
+
+            return [...updated].sort((a, b) =>
+                new Date(b.latestMessage?.created_at || 0) - new Date(a.latestMessage?.created_at || 0)
+            );
+        });
+    }, [updatedMessage]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -73,23 +94,25 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
 
             <div className="conversations-container">
                 {allConversations.length > 0 ? (
-                    allConversations.map((conversation) =>
+                    allConversations.map((conversation, index) =>
                         conversation.group ? (
                             <GroupConversationCard
-                                key={conversation.group.id}
+                                key={index}
                                 groupId={conversation.group.id}
                                 groupName={conversation.group.name}
                                 latestMessage={conversation.latestMessage}
                                 showChatWindow={showChatWindow}
+                                setUpdatedMessage={setUpdatedMessage}
                                 inspectGroupChat={inspectGroupChat}
                             />
                         ) : (
                             <PrivateConversationCard
-                                key={conversation.user.id}
+                                key={index}
                                 friend_id={conversation.user.id}
                                 username={conversation.user.username}
                                 latestMessage={conversation.latestMessage}
                                 showChatWindow={showChatWindow}
+                                setUpdatedMessage={setUpdatedMessage}
                                 inspectPrivateConversation={inspectPrivateConversation}
                             />
                         )

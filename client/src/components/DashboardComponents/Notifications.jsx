@@ -14,7 +14,6 @@ export const Notifications = ({API_URL, showChatWindow, inspectConversation}) =>
     const {user} = useAuth();
 
     useEffect(() => {
-
         fetch(`${API_URL}/notifications/friend/requests/${user.id}`, {
                 method: "GET",
                 headers: {

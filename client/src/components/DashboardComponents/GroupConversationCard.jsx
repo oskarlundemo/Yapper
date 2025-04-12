@@ -19,14 +19,14 @@ import {supabase} from "../../../../server/controllers/supabaseController.js";
 export const GroupConversationCard = ({
                                           showChatWindow,
                                           groupId = 0,
-                                          inspectGroupChat,
+                                          inspectGroupChat, setUpdatedMessage,
                                           latestMessage = null,
                                           groupName = '',
                                       }) => {
 
     const {user} = useAuth();
     const [channel, setChannel] = useState(null);
-    const [updatedMessage, setUpdatedMessage] = useState(latestMessage);
+    const [localMessage, setLocalMessage] = useState(latestMessage);
 
 
     useEffect(() => {
@@ -42,12 +42,30 @@ export const GroupConversationCard = ({
                     schema: 'public',
                     table: 'GroupMessages',
                 },
-                (payload) => {
+                async (payload) => {
                     const message = payload.new;
-                    // Check if the message belongs to the current group
+
                     if (message.group_id === groupId) {
-                        setUpdatedMessage(message); // Update with new message
-                        console.log('New message:', message); // Debugging message payload
+                        // Fetch enriched message with sender info
+                        const {data: enrichedMessages, error} = await supabase
+                            .from('GroupMessages')
+                            .select('*, sender:sender_id(id, username)') // adjust as needed
+                            .eq('group_id', groupId)
+                            .order('created_at', { ascending: false })
+                            .limit(1);
+
+                        if (error) {
+                            console.error("Error fetching sender:", error.message);
+                            return;
+                        }
+
+                        if (enrichedMessages && enrichedMessages.length > 0) {
+                            setLocalMessage(enrichedMessages[0]);
+                            setUpdatedMessage(enrichedMessages[0]);
+                            console.log("New enriched message:", enrichedMessages[0]);
+                        } else {
+                            console.warn("No messages found for this group.");
+                        }
                     }
                 }
             )
@@ -91,11 +109,22 @@ export const GroupConversationCard = ({
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{groupName}
                     <span>
-                        {moment(updatedMessage?.created_at).format("h:mm A")}
+                        {moment(localMessage?.created_at).format("h:mm A")}
                     </span></h3>
                 <p className={'conversation-content'}>
-                    {user.id === (updatedMessage.sender_id || 0) && <span>You: </span>}
-                    {parseLatestMessage(updatedMessage.content)}
+
+                    {user.id === localMessage.sender_id ? (
+                        <>
+                        <span>You: </span>
+                        {parseLatestMessage(localMessage.content)}
+                        </>
+                    ) : (
+                        <>
+                        <span>{localMessage.sender?.username || ''}: </span>
+                            {parseLatestMessage(localMessage.content)}
+                        </>
+                        )}
+
                 </p>
             </div>
         </div>

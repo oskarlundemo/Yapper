@@ -1,9 +1,8 @@
-import {DashboardNavigation} from "./DashboardNavigation.jsx";
 import {DashboardConversations} from "./DashboardConversations.jsx";
 import {DashboardChatWindow} from "./DashboardChatWindow.jsx";
-import {use, useState} from "react";
-import * as test from "node:test";
+import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
+import {DashboardMenu} from "./DashboardMenu.jsx";
 
 
 export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
@@ -69,8 +68,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
     return (
         <main className={'dashboard-main'}>
-            <DashboardNavigation toggleProfile={setShowProfile} />
-            <DashboardConversations updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage()} messages={messages} inspectGroupChat={inspectGroupChat} showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile} />
+            <DashboardMenu/>
+            <DashboardConversations updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat} showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile} />
             <DashboardChatWindow groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
         </main>
     )
