@@ -31,6 +31,7 @@ export const Dashboard = ({API_URL}) => {
     const showChatWindow = () => {
         setShowProfile(false);
         setShowRequests(false);
+        setShowNewMessage(false);
     }
 
     return (

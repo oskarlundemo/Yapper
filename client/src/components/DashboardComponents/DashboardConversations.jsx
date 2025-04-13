@@ -1,15 +1,87 @@
 import {PrivateConversationCard} from "./PrivateConversationCard.jsx";
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import '../../styles/Dashboard/DashboardConversation.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {GroupConversationCard} from "./GroupConversationCard.jsx";
+import {LoadingExample} from "./LoadingExample.jsx";
+import {supabase} from "../../../../server/controllers/supabaseController.js";
 
 
 export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL, showProfile}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [allConversations, setAllConversations] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [privateChannel, setPrivateChannel] = useState(null);
+    const [groupChannel, setGroupChannel] = useState(null);
     const {user} = useAuth();
+
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-conversation-private')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'PrivateMessages'
+                },
+                async (payload) => {
+                    const newMessage = payload.new;
+
+                    if (newMessage.receiver_id !== user.id || newMessage.sender_id !== user.id) return;
+
+                    const { data: enrichedMessage, error } = await supabase
+                        .from('PrivateMessages')
+                        .select('*, sender:sender_id (id, username)')
+                        .eq('id', newMessage.id)
+                        .single();
+
+                    if (error) {
+                        console.log(error);
+                        return;
+                    }
+
+                    console.log('New convo');
+                    console.log(enrichedMessage);
+
+                    setAllConversations(prevConversations => {
+                        const senderId = enrichedMessage.sender.id;
+
+                        const alreadyExists = prevConversations.some(conv =>
+                            conv.user?.id === senderId
+                        );
+
+                        if (alreadyExists) {
+                            return prevConversations.map(conv =>
+                                conv.user?.id === senderId ? { ...conv, latestMessage: enrichedMessage } : conv
+                            );
+                        }
+
+                        const newConv = {
+                            user: enrichedMessage.sender,
+                            latestMessage: enrichedMessage
+                        };
+
+                        return [newConv, ...prevConversations];
+                    });
+                }
+            )
+            .subscribe();
+
+        setPrivateChannel(newChannel);
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
+
+
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/all/${user.id}`, {
@@ -21,6 +93,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
             .then(response => response.json())
             .then(data => {
                 setAllConversations(data)
+                setLoading(false)
             })
             .catch(error => console.log(error));
     }, [])
@@ -47,9 +120,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
         });
     }, [updatedMessage]);
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-    }
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -82,7 +153,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 <form onSubmit={handleSubmit} className="search-bar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
                     <input
-                        onChange={handleSearchChange}
+                        onChange={() => setSearchQuery(e.target.value)}
                         value={searchQuery}
                         type="text"
                         id="search"
@@ -92,33 +163,45 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 </form>
             </div>
 
-            <div className="conversations-container">
-                {allConversations.length > 0 ? (
-                    allConversations.map((conversation, index) =>
-                        conversation.group ? (
-                            <GroupConversationCard
-                                key={index}
-                                groupId={conversation.group.id}
-                                groupName={conversation.group.name}
-                                latestMessage={conversation.latestMessage}
-                                showChatWindow={showChatWindow}
-                                setUpdatedMessage={setUpdatedMessage}
-                                inspectGroupChat={inspectGroupChat}
-                            />
-                        ) : (
-                            <PrivateConversationCard
-                                key={index}
-                                friend_id={conversation.user.id}
-                                username={conversation.user.username}
-                                latestMessage={conversation.latestMessage}
-                                showChatWindow={showChatWindow}
-                                setUpdatedMessage={setUpdatedMessage}
-                                inspectPrivateConversation={inspectPrivateConversation}
-                            />
-                        )
-                    )
+
+            <div className={`conversations-container ${loading ? ' loading' : ''}`}>
+
+                {loading ? (
+                    <>
+                    <LoadingExample/>
+                    <LoadingExample/>
+                    <LoadingExample/>
+                    </>
                 ) : (
-                    <p>No conversations yet.</p>
+                    <>
+                    {allConversations.length > 0 ? (
+                            allConversations.map((conversation, index) =>
+                                conversation.group ? (
+                                    <GroupConversationCard
+                                        key={index}
+                                        groupId={conversation.group.id}
+                                        groupName={conversation.group.name}
+                                        latestMessage={conversation.latestMessage}
+                                        showChatWindow={showChatWindow}
+                                        setUpdatedMessage={setUpdatedMessage}
+                                        inspectGroupChat={inspectGroupChat}
+                                    />
+                                ) : (
+                                    <PrivateConversationCard
+                                        key={index}
+                                        friend_id={conversation.user.id}
+                                        username={conversation.user.username}
+                                        latestMessage={conversation.latestMessage}
+                                        showChatWindow={showChatWindow}
+                                        setUpdatedMessage={setUpdatedMessage}
+                                        inspectPrivateConversation={inspectPrivateConversation}
+                                    />
+                                )
+                            )
+                        ) : (
+                            <p>No conversations yet.</p>
+                        )}
+                    </>
                 )}
             </div>
 

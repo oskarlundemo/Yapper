@@ -18,6 +18,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         setGroupChat(false);
         setReceiver(receiver_id);
         setChatName(chatname);
+        showChatWindow();
+
         await fetch(`${API_URL}/notifications/friends/${receiver_id}/${user.id}`, {
             method: "GET",
             headers: {
@@ -27,6 +29,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             .then(res => res.json())
             .then(data => {
                 setFriend(data);
+                console.log(data);
             })
             .catch(err => console.log(err));
 
@@ -50,6 +53,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const inspectGroupChat = async (receiver_id, chatname) => {
         setGroupChat(true);
         setReceiver(receiver_id);
+        showChatWindow();
         setChatName(chatname);
         fetch(`${API_URL}/messages/group/conversation/${user.id}/${receiver_id}`, {
             method: "GET",
@@ -70,7 +74,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         <main className={'dashboard-main'}>
             <DashboardMenu/>
             <DashboardConversations updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat} showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile} />
-            <DashboardChatWindow groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
+            <DashboardChatWindow setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
         </main>
     )
 }

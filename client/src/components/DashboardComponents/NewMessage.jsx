@@ -3,17 +3,18 @@ import '../../styles/Dashboard/NewMessage.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {ContactCard} from "./ContactCard.jsx";
 
-export const NewMessage = ({API_URL, receivers, setReceivers}) => {
+export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => {
 
     const [userSearchString, setUserSearchString] = useState("");
     const [inputFocused, setInputFocused] = useState(false);
-    const [filteredContacts, setFilteredContacts] = useState([]);
+    const [moreUsers, setMoreUsers] = useState([]);
+    const [filteredMoreUsers, setFilteredMoreUsers] = useState([]);
 
+    const [filteredContacts, setFilteredContacts] = useState([]);
     const [userFriends, setUserFriends] = useState([]);
     const {user} = useAuth()
 
     useEffect(() => {
-
         fetch(`${API_URL}/friends/all/${user.id}`, {
             method: 'GET',
             headers: {
@@ -26,6 +27,19 @@ export const NewMessage = ({API_URL, receivers, setReceivers}) => {
             })
             .catch(err => console.log(err))
 
+
+        fetch(`${API_URL}/users/${user.id}/filter`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setMoreUsers(data);
+            })
+            .catch(err => console.log(err))
     }, [])
 
 
@@ -38,8 +52,17 @@ export const NewMessage = ({API_URL, receivers, setReceivers}) => {
 
 
     useEffect(() => {
-        console.log(receivers);
+        const filtered = moreUsers.filter((entry) =>
+            entry.username.toLowerCase().includes(userSearchString.toLowerCase())
+        );
+        setFilteredMoreUsers(filtered);
+    }, [userSearchString, moreUsers]);
+
+
+    useEffect(() => {
+        receivers.length  >= 2 ? setGroupChat(true) : setGroupChat(false);
     }, [receivers]);
+
 
     const addToConversation = (user) => {
         const alreadyAdded = receivers.find((receiver) => receiver.id === user.id);
@@ -70,35 +93,51 @@ export const NewMessage = ({API_URL, receivers, setReceivers}) => {
             </div>
 
             <div className="new-message-input-container">
-
                 <input
-                    type="text"
-                    id="message"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    value={userSearchString}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setTimeout(() => setInputFocused(false), 150)} // timeout to allow click on dropdown
-                    onChange={(e) => setUserSearchString(e.target.value)}
+                        type="text"
+                        id="message"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        value={userSearchString}
+                        onFocus={() => setInputFocused(true)}
+                        onBlur={() => setTimeout(() => setInputFocused(false), 150)} // timeout to allow click on dropdown onChange={(e) => setUserSearchString(e.target.value)}
                 />
 
                 {inputFocused && (
                     <div className="new-message-search-results">
-                        <p>Your contacts</p>
-                        {filteredContacts.length > 0 ? (
-                            filteredContacts.map((friend) => (
-                                <ContactCard
-                                    addToConversation={addToConversation}
-                                    friend={friend}
-                                    key={friend.id}/>
-                            ))
-                        ) : (
-                            <p>No matches found</p>
+
+                        {filteredContacts.length > 0 && (
+                            <>
+                                <p className="sub-header-contact">Your contacts</p>
+                                {filteredContacts.map((friend) => (
+                                    <ContactCard
+                                        key={friend.id}
+                                        friend={friend}
+                                        addToConversation={addToConversation}
+                                    />
+                                ))}
+                            </>
+                        )}
+
+                        {filteredMoreUsers.length > 0 && (
+                            <>
+                                <p className="sub-header-contact">Other users</p>
+                                {filteredMoreUsers.map((user) => (
+                                    <ContactCard
+                                        key={user.id}
+                                        friend={user}
+                                        addToConversation={addToConversation}
+                                    />
+                                ))}
+                            </>
+                        )}
+
+                        {filteredContacts.length === 0 && filteredMoreUsers.length === 0 && (
+                            <p className="no-results-text">No users found</p>
                         )}
                     </div>
                 )}
-
             </div>
         </div>
     )

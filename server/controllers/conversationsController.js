@@ -7,7 +7,7 @@ export const getAllConversations = async (req, res) => {
 
 
     try {
-        // Private
+
         const user_id = parseInt(req.params.user_id);
 
         const friends = await prisma.friends.findMany({

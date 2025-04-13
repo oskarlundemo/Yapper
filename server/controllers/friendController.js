@@ -4,7 +4,6 @@ import {prisma} from "../prisma/index.js";
 
 
 export const getFriendsList = async (req, res) => {
-
     try {
         const friendsList = await prisma.friends.findMany({
             where: {
@@ -39,16 +38,18 @@ export const getFriendsList = async (req, res) => {
     }
 }
 
-
-
 export const acceptRequest = async (req, res) => {
     try {
-        const request = await prisma.pendingFriendRequests.findUnique({
+
+        const senderId = parseInt(req.params.sender_id);
+        const receiverId = parseInt(req.params.receiver_id);
+
+        const request = await prisma.pendingFriendRequests.findFirst({
             where: {
-                sender_id_receiver_id: {
-                    sender_id: parseInt(req.params.sender_id),
-                    receiver_id: parseInt(req.params.receiver_id)
-                }
+                OR: [
+                    { sender_id: senderId, receiver_id: receiverId },
+                    { sender_id: receiverId, receiver_id: senderId },
+                ]
             }
         })
 
@@ -57,8 +58,8 @@ export const acceptRequest = async (req, res) => {
                 prisma.pendingFriendRequests.delete({
                     where: {
                         sender_id_receiver_id: {
-                            sender_id: parseInt(req.params.sender_id),
-                            receiver_id: parseInt(req.params.receiver_id)
+                            receiver_id: receiverId,
+                            sender_id: senderId,
                         }
                     }
                 }),

@@ -1,19 +1,21 @@
 
 
 Prio 1
-[x] Gruppchatar
+[x] Gruppchattar
 [] Skicka bilder
 [] Skicka gifs
 [] Skicka group request
-
-
+[] Admin can lägga till och ta bort användare efter gruppen är skapad
+[] Användare kan blockera andra eller lämna gruppkonversationer
 
 Prio 2
-[] Sortera chattar efter senast aktivitet
-[] Server, så om man loggar in så visas alla meddelanden på servern
+[x] Sortera chattar efter senast aktivitet
+[x] Server, så om man loggar in så visas alla meddelanden på servern
 [] Updatera chats i realtime, så när man blir vänner updateras det direkt
 [] Inspektera chattar, så profilen kommer up till höger
+[] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
+[] Se en grön cirkel om användaren är online
 
 
 Prio 3
-[] Felmeddelanden i login ska bara var 'Invalid username or password' eller '500 server error'
+[x] Felmeddelanden i login ska bara var 'Invalid username or password' eller '500 server error'

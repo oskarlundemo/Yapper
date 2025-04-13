@@ -6,17 +6,54 @@ import {prisma} from '../prisma/index.js';
 
 export const sendPrivateMessage = async (req, res) => {
     try {
-        console.log('Skicka privat')
-        const sender_id = parseInt(req.params.sender_id);
-        const receiver_id = parseInt(req.params.receiver_id);
+        const senderId = parseInt(req.params.sender_id);
+        const receiverIdParams = parseInt(req.params.receiver_id);
+        const receiverBody = req.body.receivers?.[0]?.id;
+        const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
 
-        await prisma.privateMessages.create({
-            data: {
-                sender_id: sender_id,
-                receiver_id: receiver_id,
-                content: req.body.message
+        console.log(req.body);
+        console.log(req.params);
+        console.log('Mottagare');
+        console.log(receiverId);
+
+
+        await prisma.$transaction(async () => {
+            await prisma.privateMessages.create({
+                data: {
+                    sender_id: senderId,
+                    receiver_id: receiverId,
+                    content: req.body.message
+                }
+            });
+
+            const request = await prisma.pendingFriendRequests.findFirst({
+                where: {
+                    OR: [
+                        { sender_id: senderId, receiver_id: receiverId },
+                        { sender_id: receiverId, receiver_id: senderId },
+                    ]
+                }
+            });
+
+            const friends = await prisma.friends.findFirst({
+                where: {
+                    OR: [
+                        { friend_id: senderId, user_id: receiverId },
+                        { friend_id: receiverId, user_id: senderId },
+                    ]
+                }
+            });
+
+            if (!request && !friends) {
+                await prisma.pendingFriendRequests.create({
+                    data: {
+                        sender_id: senderId,
+                        receiver_id: receiverId
+                    }
+                });
             }
-        })
+        });
+
         res.status(200).json('Successfully sent message');
     } catch (err) {
         console.log(err);

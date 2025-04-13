@@ -4,7 +4,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment";
 
 
-export const MessageCard = ({content, user_id, time, username = ''}) => {
+export const MessageCard = ({content, user_id, time, setMiniBar, username = ''}) => {
 
     const {user} = useAuth();
 
@@ -18,7 +18,7 @@ export const MessageCard = ({content, user_id, time, username = ''}) => {
             <div className={`dashboard-message-text-container ${user.id === user_id ? '' : 'other'}`}>
                 <div className={`dashboard-message-header ${user.id === user_id ? '' : 'other'}`}>
                     <h3>{moment(time).format("h:mm A")}</h3>
-                    <h3>{username}</h3>
+                    <h3 onClick={setMiniBar(true)}>{username}</h3>
                 </div>
 
                 <div className={`dashboard-message-body ${user.id === user_id ? '' : 'other'}`}>

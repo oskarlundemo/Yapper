@@ -3,35 +3,45 @@
 
 
 
+.user-profile-container .hidden {
+    display: none;
+}
 
 
 
 .user-profile-container {
-    height: 100%;
-    width: 100%;
     justify-content: flex-start;
     align-items: center;
     display: flex;
     background-color: var(--background-color);
     flex-direction: column;
-    grid-row: 1 / -1;
     padding: 1rem;
+    gap: 4rem;
+    grid-area: 3 / 2 / 1 / 2;
+
+    svg {
+        align-self: flex-end;
+    }
+
+    svg:first-of-type:hover {
+        cursor: pointer;
+        fill: var(--error-color)
+    }
 }
 
 
 .user-profile-info {
     display: flex;
-    align-items: flex-end;
-    flex-direction: row;
-    align-self: flex-start;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 2rem;
 }
 
 
 .user-avatar {
-    align-self: flex-start;
-    width: 200px;
-    height: 200px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     justify-content: center;

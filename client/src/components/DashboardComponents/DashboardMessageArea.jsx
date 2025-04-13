@@ -1,23 +1,13 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
 
 
-export const DashboardMessageArea = ({receiver, friend, setReceivers, groupChat, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, groupChat, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
-    const [focusedChat, setFocusedChat] = useState(null);
-
-    const sendFriendRequest = async () => {
-        await fetch(`${API_URL}/notifications/friends/${receiver}/${user.id}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        })
-    }
 
     const acceptFriendRequest = async () => {
         await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
@@ -28,17 +18,10 @@ export const DashboardMessageArea = ({receiver, friend, setReceivers, groupChat,
         })
     }
 
-    useEffect(() => {
-        console.log("Current message state:", message);
-    }, [message]);
-
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            const res = await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
+            await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -46,25 +29,22 @@ export const DashboardMessageArea = ({receiver, friend, setReceivers, groupChat,
                 body: JSON.stringify({ message, receivers, groupChat }),
             });
 
-            const data = await res.json();
-            setFocusedChat(data.id);
-            console.log(data);
-
-            if (!friend) {
-                await sendFriendRequest();
-                await acceptFriendRequest();
-            }
-
             setMessage("");
+            setReceivers([]);
 
         } catch (err) {
             console.error("Message send error:", err);
         }
-        setReceivers([]); // this can stay here
+
+        if (!friend) {
+            await acceptFriendRequest();
+        }
+        setMessage("");
+        setReceivers([]);
     };
 
     return (
-        <div className={'dashboard-message-input'}>
+        <div className={`dashboard-message-input ${miniBar ? 'mini' : ''}`}>
             <div className="message-card">
 
                 {!friend && (

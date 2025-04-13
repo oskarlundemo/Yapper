@@ -85,3 +85,9 @@
         cursor: pointer;
     }
 }
+
+.sub-header-contact {
+    color: var(--secondary-color);
+    text-align: left;
+    margin: 0.5rem;
+}
