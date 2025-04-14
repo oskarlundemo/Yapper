@@ -9,7 +9,7 @@ export const MessageCard = ({content, user_id, time, setMiniBar, username = ''})
     const {user} = useAuth();
 
     return (
-        <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
+        <div onClick={() => setMiniBar(true)} className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
 
             <div className={"dashboard-message-avatar"}>
                 <UserAvatar height={20} width={20}/>

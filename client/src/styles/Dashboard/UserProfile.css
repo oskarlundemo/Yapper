@@ -3,12 +3,6 @@
 
 
 
-.user-profile-container .hidden {
-    display: none;
-}
-
-
-
 .user-profile-container {
     justify-content: flex-start;
     align-items: center;
@@ -25,8 +19,12 @@
 
     svg:first-of-type:hover {
         cursor: pointer;
-        fill: var(--error-color)
+        fill: var(--error-color);
     }
+}
+
+.user-profile-container.hidden {
+    display: none;
 }
 
 

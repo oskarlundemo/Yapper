@@ -118,7 +118,7 @@ export const DashboardChatWindow = ({API_URL, chatName, groupChat, setGroupChat,
     }, [receiver]);
 
     return (
-        <section className={'dashboard-chat-window'}>
+        <section className={`dashboard-chat-window`}>
                 <>
                     <div className={`dashboard-message-container ${miniBar ? 'mini' : ''}`}>
                         {showMessage ? (
