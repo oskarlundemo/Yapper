@@ -10,19 +10,17 @@ import {UserAvatar} from "../UserAvatar.jsx";
 
 
 
-export const DashboardChatWindow = ({API_URL, chatName, groupChat, setGroupChat, showChatWindow, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, inspectedUser, miniBar, setMiniBar, groupChat, setGroupChat, showChatWindow, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
-    const [miniBar, setMiniBar] = useState(false);
 
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
     }, [messages]);
-
 
 
     useEffect(() => {
@@ -120,7 +118,7 @@ export const DashboardChatWindow = ({API_URL, chatName, groupChat, setGroupChat,
     return (
         <section className={`dashboard-chat-window`}>
                 <>
-                    <div className={`dashboard-message-container ${miniBar ? 'mini' : ''}`}>
+                    <div className={`dashboard-message-container ${miniBar ? '' : 'mini'}`}>
                         {showMessage ? (
                             <NewMessage setGroupChat={setGroupChat} receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
@@ -158,13 +156,16 @@ export const DashboardChatWindow = ({API_URL, chatName, groupChat, setGroupChat,
                                     {messages.length > 0 &&
                                         messages.map((message) => (
                                             <MessageCard
+                                                showUserInfo={showUserInfo}
                                                 setMiniBar={setMiniBar}
+                                                miniBar={miniBar}
                                                 API_URL={API_URL}
                                                 key={message.id}
                                                 message={message}
                                                 content={message.content}
                                                 time={message.created_at}
                                                 user_id={message.sender_id}
+                                                sender={message.sender}
                                                 username={message.sender?.username || message.Sender?.username || "Unknown"}
                                             />
                                         ))}
@@ -174,7 +175,7 @@ export const DashboardChatWindow = ({API_URL, chatName, groupChat, setGroupChat,
                         </div>
 
                     </div>
-                    <UserProfile miniBar={miniBar} setMiniBar={setMiniBar} />
+                    <UserProfile inspectedUser={inspectedUser} API_URL={API_URL} miniBar={miniBar} setMiniBar={setMiniBar} />
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
         </section>

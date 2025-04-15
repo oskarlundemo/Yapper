@@ -4,17 +4,62 @@
 
 import {prisma} from '../prisma/index.js';
 
+
+
+export const sendGifGroupChat = async (req, res) => {
+    try {
+        const sender = parseInt(req.params.sender_id);
+        const receiver = parseInt(req.params.receiver_id);
+        const gif = req.body.gif;
+
+        await prisma.groupMessages.create({
+            data: {
+                sender_id: sender,
+                group_id: receiver,
+                content: gif.images.original.url,
+            }
+        })
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+export const sendGifPrivateConversation = async (req, res) => {
+
+
+
+    try {
+
+        const sender = parseInt(req.params.sender_id);
+        const receiver = parseInt(req.params.receiver_id);
+        const gif = req.body.gif;
+
+        await prisma.privateMessages.create({
+            data: {
+                sender_id: sender,
+                receiver_id: receiver,
+                content: gif.images.original.url,
+            }
+        })
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+
+
 export const sendPrivateMessage = async (req, res) => {
     try {
         const senderId = parseInt(req.params.sender_id);
         const receiverIdParams = parseInt(req.params.receiver_id);
         const receiverBody = req.body.receivers?.[0]?.id;
         const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
-
-        console.log(req.body);
-        console.log(req.params);
-        console.log('Mottagare');
-        console.log(receiverId);
 
 
         await prisma.$transaction(async () => {

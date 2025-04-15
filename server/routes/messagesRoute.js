@@ -6,9 +6,9 @@ import {Router} from 'express';
 import {
     createGroupChat,
     getMessagesFromGroupConversation,
-    getMessagesFromPrivateConversation,
+    getMessagesFromPrivateConversation, sendGifGroupChat, sendGifPrivateConversation,
     sendGroupMessage,
-    sendPrivateMessage
+    sendPrivateMessage,
 } from "../controllers/messagesController.js";
 
 const messagesRoute = Router();
@@ -20,9 +20,6 @@ messagesRoute.get('/group/conversation/:sender_id/:receiver_id', getMessagesFrom
 
 
 messagesRoute.post('/conversation/:sender_id/:receiver_id', (req, res) => {
-
-
-
     if (req.body.receivers.length > 1 && req.body.groupChat) {
         console.log('New groupchat with message');
         createGroupChat(req, res);
@@ -36,5 +33,14 @@ messagesRoute.post('/conversation/:sender_id/:receiver_id', (req, res) => {
 });
 
 messagesRoute.post('/group/:sender_id', sendGroupMessage);
+
+messagesRoute.post('/gif/:sender_id/:receiver_id', (req, res) => {
+    if (req.body.groupChat) {
+        sendGifGroupChat(req, res);
+    } else {
+        sendGifPrivateConversation(req, res);
+    }
+});
+
 
 export default messagesRoute;

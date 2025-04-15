@@ -64,6 +64,8 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             const subString = content.substring(0, 20);
             const lastSpace = subString.lastIndexOf(' ');
             return content.substring(0, lastSpace) + '...';
+        } else if (content.includes('media.giphy.com')){
+            return 'Sent a GIF'
         }
         return content;
     }
