@@ -10,7 +10,7 @@ import {UserAvatar} from "../UserAvatar.jsx";
 
 
 
-export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, inspectedUser, miniBar, setMiniBar, groupChat, setGroupChat, showChatWindow, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUser, miniBar, setMiniBar, groupChat, setGroupChat, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
@@ -175,7 +175,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, inspectedU
                         </div>
 
                     </div>
-                    <UserProfile inspectedUser={inspectedUser} API_URL={API_URL} miniBar={miniBar} setMiniBar={setMiniBar} />
+                    <UserProfile API_URL={API_URL} selectedUser={selectedUser} API_URL={API_URL} miniBar={miniBar} setMiniBar={setMiniBar} />
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
         </section>

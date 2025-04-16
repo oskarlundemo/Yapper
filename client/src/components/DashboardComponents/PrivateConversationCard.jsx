@@ -60,13 +60,15 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
 
 
     const parseLatestMessage = (content) => {
-        if (content.length > 20 && content) {
+        if (content.includes('giphy.com')) {
+            return 'Sent a GIF '
+        }
+        else if(content.length > 20 && content) {
             const subString = content.substring(0, 20);
             const lastSpace = subString.lastIndexOf(' ');
             return content.substring(0, lastSpace) + '...';
-        } else if (content.includes('media.giphy.com')){
-            return 'Sent a GIF'
         }
+
         return content;
     }
 
@@ -87,7 +89,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                     </span></h3>
                 <p className={'conversation-content'}>
                     {user.id === (localMessage.sender?.id || localMessage.sender_id) && <span>You: </span>}
-                    {parseLatestMessage(localMessage.content)}
+                    {parseLatestMessage(latestMessage.content)}
                 </p>
             </div>
         </div>

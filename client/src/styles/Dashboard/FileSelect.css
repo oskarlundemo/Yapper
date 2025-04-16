@@ -1,0 +1,12 @@
+
+
+
+.file-btn {
+    padding: 0;
+    background: none;
+}
+
+
+.file-btn:focus {
+    outline: none;
+}
