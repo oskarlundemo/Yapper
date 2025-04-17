@@ -47,9 +47,9 @@ export const LoginBox = ({showLogin, toggleLogin, URL}) => {
 
             const result = await response.json();
 
-            if (!response.ok) { // Check for non-200 status codes
-                console.log(result.errors || result.error); // This will print any error message returned from the backend
-                setErrors(result.errors || result.error); // Assuming result.errors is an array or result.error is a string
+            if (!response.ok) {
+                console.log(result.errors || result.error);
+                setErrors(result.errors || result.error);
             } else {
                 login(result.token);
                 navigate('/dashboard');

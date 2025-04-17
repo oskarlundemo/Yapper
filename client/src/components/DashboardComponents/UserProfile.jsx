@@ -37,9 +37,6 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, API_URL})
         formData.append('avatar', newAvatar);
         formData.append('bio', bio);
 
-        console.log("Sending file:", newAvatar);
-
-
         try {
             fetch(`${API_URL}/users/update/profile/${user.id}`, {
                 method: 'POST',
@@ -67,7 +64,7 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, API_URL})
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
                             {disabledBio ? (
-                                <p>{selectedUser?.bio || 'No bio'}</p>
+                                <p className={'user-bio'}>{selectedUser?.bio || 'No bio'}</p>
                             ) : (
                                 <>
                                 <textarea value={bio}

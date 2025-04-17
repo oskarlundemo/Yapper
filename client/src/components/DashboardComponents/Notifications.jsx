@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 
 import '../../styles/Dashboard/Notifications.css'
-import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {PrivateConversationCard} from "./PrivateConversationCard.jsx";
+import {supabase} from "../../services/supabaseClient.js";
 
 export const Notifications = ({API_URL, showChatWindow, inspectConversation}) => {
 

@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
-import {supabase} from "../../../server/controllers/supabaseController.js";
 import {useAuth} from "../context/AuthContext.jsx";
+import {supabase} from "../services/supabaseClient.js";
 
 
 
@@ -11,9 +11,16 @@ export const UserAvatar = ({height, width, user = null, setSaveChanges = null, s
 
     useEffect(() => {
         const fetchImage = async () => {
-            if (!user?.avatar) return; // Prevent fetching if user.avatar is not set
-            const { data } = supabase.storage.from("yapper").getPublicUrl(user.avatar);
-            setCurrentAvatar(data.publicUrl);
+            if (!user?.avatar) return;
+            const { data, error } = supabase.storage
+                .from("yapper")
+                .getPublicUrl(`avatars/${user.avatar}`);
+
+            if (error) {
+                console.error("Error getting public URL:", error);
+            } else {
+                setCurrentAvatar(data.publicUrl);
+            }
         };
         fetchImage();
     }, [user]);

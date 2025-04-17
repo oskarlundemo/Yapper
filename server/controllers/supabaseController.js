@@ -1,13 +1,12 @@
 
 
 
-
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-
 const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_ANON_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
 );
 
 export { supabase };
@@ -32,7 +31,7 @@ export const saveFile = async (req, res) => {
         return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const filePath = `books/${req.file.originalname}`;
+    const filePath = `avatars/${req.file.originalname}`;
     const fileMimeType = req.file.mimetype;
 
     try {

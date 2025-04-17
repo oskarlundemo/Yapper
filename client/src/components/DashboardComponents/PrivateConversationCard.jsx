@@ -6,12 +6,12 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment/moment.js";
-import {supabase} from "../../../../server/controllers/supabaseController.js";
+import {supabase} from "../../services/supabaseClient.js";
 
 
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
-                                            inspectPrivateConversation,
+                                            inspectPrivateConversation, testUser,
                                             setUpdatedMessage,
                                             latestMessage = null, username = ''}) => {
 
@@ -58,28 +58,13 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
         };
     }, [user.id, friend_id]);
 
-
-    const parseLatestMessage = (content) => {
-        if (content.includes('giphy.com')) {
-            return 'Sent a GIF '
-        }
-        else if(content.length > 20 && content) {
-            const subString = content.substring(0, 20);
-            const lastSpace = subString.lastIndexOf(' ');
-            return content.substring(0, lastSpace) + '...';
-        }
-
-        return content;
-    }
-
-
     return (
         <div onClick={() => {
             showChatWindow();
             inspectPrivateConversation(friend_id, username);
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
-                <UserAvatar username={username} height={40} width={40} />
+                <UserAvatar user={testUser} username={username} height={40} width={40} />
             </div>
 
             <div className="conversation-card-content">
@@ -94,4 +79,20 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             </div>
         </div>
     )
+}
+
+
+
+
+export const parseLatestMessage = (content) => {
+    if (content.includes('giphy.com')) {
+        return 'Sent a GIF '
+    }
+    else if(content.length > 20 && content) {
+        const subString = content.substring(0, 20);
+        const lastSpace = subString.lastIndexOf(' ');
+        return content.substring(0, lastSpace) + '...';
+    }
+
+    return content;
 }

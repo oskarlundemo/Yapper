@@ -2,7 +2,6 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment";
-import * as test from "node:test";
 
 
 export const MessageCard = ({content, user_id, showUserInfo, sender, time, setMiniBar, miniBar, username = ''}) => {
@@ -18,7 +17,7 @@ export const MessageCard = ({content, user_id, showUserInfo, sender, time, setMi
         <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
 
             <div onClick={() => showUserInfo(sender)} className={"dashboard-message-avatar"}>
-                <UserAvatar height={20} width={20}/>
+                <UserAvatar user={sender} height={30} width={30}/>
             </div>
 
             <div className={`dashboard-message-text-container ${user.id === user_id ? '' : 'other'}`}>

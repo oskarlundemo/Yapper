@@ -101,7 +101,7 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => 
                         autoCapitalize="off"
                         value={userSearchString}
                         onFocus={() => setInputFocused(true)}
-                        onBlur={() => setTimeout(() => setInputFocused(false), 150)} // timeout to allow click on dropdown onChange={(e) => setUserSearchString(e.target.value)}
+                        onBlur={() => setTimeout(() => setInputFocused(false), 150)}
                 />
 
                 {inputFocused && (
@@ -113,7 +113,7 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => 
                                 {filteredContacts.map((friend) => (
                                     <ContactCard
                                         key={friend.id}
-                                        friend={friend}
+                                        friend={friend?.friend || friend}
                                         addToConversation={addToConversation}
                                     />
                                 ))}

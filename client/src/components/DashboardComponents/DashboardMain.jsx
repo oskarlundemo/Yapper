@@ -18,7 +18,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const {user} = useAuth();
 
 
-    const showUserInfo = (user) => {
+    const showUserInfo = (user = null) => {
         setMiniBar(true);
         setSelectedUser(user);
     }
@@ -81,7 +81,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
     return (
         <main className={'dashboard-main'}>
-            <DashboardMenu/>
+            <DashboardMenu showProfile={showUserInfo} />
             <DashboardConversations updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat} showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile} />
             <DashboardChatWindow selectedUser={selectedUser} showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
         </main>

@@ -40,8 +40,8 @@
 
 .dropdown-menu {
     position: absolute;
-    top: -250%;               /* Aligns to the top of avatar */
-    left: 100%;           /* Moves it to the right of avatar */
+    top: -100%;
+    left: 100%;
     display: none;
     background-color: var(--background-color);
     box-shadow: var(--soft-boxshadow);

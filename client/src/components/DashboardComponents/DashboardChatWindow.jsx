@@ -3,10 +3,10 @@ import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
 import { MessageCard } from "./MessageCard.jsx";
 import {useEffect, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
-import {supabase} from "../../../../server/controllers/supabaseController.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
+import {supabase} from "../../services/supabaseClient.js";
 
 
 
@@ -175,7 +175,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                         </div>
 
                     </div>
-                    <UserProfile API_URL={API_URL} selectedUser={selectedUser} API_URL={API_URL} miniBar={miniBar} setMiniBar={setMiniBar} />
+                    <UserProfile API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
         </section>

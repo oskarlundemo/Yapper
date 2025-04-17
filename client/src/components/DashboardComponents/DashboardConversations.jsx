@@ -4,7 +4,7 @@ import '../../styles/Dashboard/DashboardConversation.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {GroupConversationCard} from "./GroupConversationCard.jsx";
 import {LoadingExample} from "./LoadingExample.jsx";
-import {supabase} from "../../../../server/controllers/supabaseController.js";
+import {supabase} from "../../services/supabaseClient.js";
 
 
 export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL, showProfile}) => {
@@ -28,17 +28,17 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'PrivateMessages'
+                    table: 'PendingFriendRequests'
                 },
                 async (payload) => {
-                    const newMessage = payload.new;
+                    const pendingRequest = payload.new;
 
-                    if (newMessage.receiver_id !== user.id || newMessage.sender_id !== user.id) return;
+                    if (pendingRequest.receiver_id !== user.id || pendingRequest.sender_id !== user.id) return;
 
                     const { data: enrichedMessage, error } = await supabase
-                        .from('PrivateMessages')
+                        .from('PendingFriendRequests')
                         .select('*, sender:sender_id (id, username)')
-                        .eq('id', newMessage.id)
+                        .eq('id', pendingRequest.id)
                         .single();
 
                     if (error) {
@@ -46,7 +46,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         return;
                     }
 
-                    console.log('New convo');
                     console.log(enrichedMessage);
 
                     setAllConversations(prevConversations => {
@@ -189,6 +188,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                                 ) : (
                                     <PrivateConversationCard
                                         key={index}
+                                        testUser={conversation.user}
                                         friend_id={conversation.user.id}
                                         username={conversation.user.username}
                                         latestMessage={conversation.latestMessage}

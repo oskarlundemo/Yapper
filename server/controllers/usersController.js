@@ -1,4 +1,5 @@
 import {prisma} from '../prisma/index.js';
+import {saveFile} from "./supabaseController.js";
 
 
 export const retrieveUsers = async (req, res) => {
@@ -34,3 +35,79 @@ export const retrieveUsers = async (req, res) => {
         res.status(500).json(`Error: ${err.message}`);
     }
 };
+
+
+
+export const updateUserProfile = async (req, res) => {
+
+
+    console.log(req.file)
+    console.log(req.body.bio)
+    console.log(req.params.user_id)
+
+
+    try {
+        const userId = parseInt(req.params.user_id);
+
+        const userProfile = await prisma.users.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+
+        await updateUserBio(req, res, userProfile)
+        await updateAvatar(req, res, userProfile)
+
+
+    } catch (err) {
+        console.error('Error retrieving user profile:', err);
+    }
+}
+
+
+
+export const updateAvatar = async (req, res, userProfile) => {
+
+
+    try {
+
+        if (req.file) {
+            await prisma.users.update({
+                data: {
+                    avatar: req.file.originalname,
+                },
+                where: {
+                    id: userProfile.id,
+                }
+            })
+            await saveFile(req, res);
+        }
+    } catch (err) {
+        console.error('Error retrieving avatar:', err);
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
+
+
+
+
+export const updateUserBio = async (req, res) => {
+    try {
+        if (!req.body.bio)
+            return res.status(400).send('Bio not found');
+
+        await prisma.users.update({
+            data: {
+                bio: req.body.bio,
+            },
+            where: {
+                id: parseInt(req.params.user_id),
+            }
+        })
+    } catch (err) {
+        console.error('Error retrieving user bio:', err);
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}

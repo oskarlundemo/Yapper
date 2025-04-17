@@ -11,13 +11,6 @@ export const Dashboard = ({API_URL}) => {
     const [showNewMessage, setShowNewMessage] = useState(true);
     const [receiver, setReceiver] = useState(null);
 
-    const toggleRequests = () => {
-        setShowRequests(!showRequests);
-    }
-
-    const toggleProfile = () => {
-        setShowProfile(!showProfile);
-    };
 
     const hideNewMessage = () => {
         setShowNewMessage(false);

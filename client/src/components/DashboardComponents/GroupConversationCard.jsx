@@ -11,9 +11,8 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment/moment.js";
-import {supabase} from "../../../../server/controllers/supabaseController.js";
-
-
+import {supabase} from "../../services/supabaseClient.js";
+import {parseLatestMessage} from "./PrivateConversationCard.jsx";
 
 
 export const GroupConversationCard = ({
@@ -82,19 +81,6 @@ export const GroupConversationCard = ({
             supabase.removeChannel(newChannel); // Remove the subscription on cleanup
         };
     }, [user.id, groupId]); // Dependency array ensures effect runs when user or groupId changes
-
-
-
-
-
-    const parseLatestMessage = (content) => {
-        if (content.length > 20 && content) {
-            const subString = content.substring(0, 20);
-            const lastSpace = subString.lastIndexOf(' ');
-            return content.substring(0, lastSpace) + '...';
-        }
-        return content;
-    }
 
 
     return (
