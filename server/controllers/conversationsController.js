@@ -3,6 +3,58 @@
 import {prisma} from '../prisma/index.js';
 
 
+
+
+export const newPendingNotification = async (req, res) => {
+
+    try {
+
+        const senderId = parseInt(req.params.sender_id);
+        const receiverId = parseInt(req.params.receiver_id);
+        const currentLoggedIn = parseInt(req.params.logged_in_id); // pass this properly
+
+        const oppositeUserId = currentLoggedIn === senderId ? receiverId : senderId;
+
+        const user = await prisma.users.findUnique({
+            where: {
+                id: oppositeUserId,
+            },
+        });
+
+        const latestMessage = await prisma.privateMessages.findFirst({
+            where: {
+                OR: [
+                    { sender_id: senderId, receiver_id: receiverId },
+                    { sender_id: receiverId, receiver_id: senderId },
+                ]
+            },
+            orderBy: {
+                created_at: 'desc'
+            },
+            include: {
+                sender: true
+            },
+            take: 1
+        });
+
+        const newConvo = {
+            user,
+            latestMessage,
+        }
+
+        return res.status(200).json(newConvo);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({Message: 'Something went wrong'});
+    }
+
+}
+
+
+
+
+
 export const getAllConversations = async (req, res) => {
 
     try {

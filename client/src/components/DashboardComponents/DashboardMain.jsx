@@ -38,7 +38,6 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             .then(res => res.json())
             .then(data => {
                 setFriend(data);
-                console.log(data);
             })
             .catch(err => console.log(err));
 

@@ -99,6 +99,7 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => 
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"
+                        onChange={(e) => setUserSearchString(e.target.value)}
                         value={userSearchString}
                         onFocus={() => setInputFocused(true)}
                         onBlur={() => setTimeout(() => setInputFocused(false), 150)}

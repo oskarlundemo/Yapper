@@ -6,7 +6,6 @@ import {UserAvatar} from "../UserAvatar.jsx";
 
 export const DashboardMenu = ({ showProfile }) => {
     const { logout, user } = useAuth();
-    console.log(user)
 
     return (
         <nav className={'dashboard-header'}>

@@ -15,6 +15,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
     const [privateChannel, setPrivateChannel] = useState(null);
     const [groupChannel, setGroupChannel] = useState(null);
     const {user} = useAuth();
+    const [privateConvo, setPrivateConvo] = useState(null);
 
 
 
@@ -31,14 +32,18 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                     table: 'PendingFriendRequests'
                 },
                 async (payload) => {
+
+                    console.log(payload);
+
                     const pendingRequest = payload.new;
 
-                    if (pendingRequest.receiver_id !== user.id || pendingRequest.sender_id !== user.id) return;
+                    if (pendingRequest.receiver_id !== user.id && pendingRequest.sender_id !== user.id) return;
 
                     const { data: enrichedMessage, error } = await supabase
                         .from('PendingFriendRequests')
                         .select('*, sender:sender_id (id, username)')
-                        .eq('id', pendingRequest.id)
+                        .eq('sender_id', pendingRequest.sender_id)
+                        .eq('receiver_id', pendingRequest.receiver_id)
                         .single();
 
                     if (error) {
@@ -46,28 +51,21 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         return;
                     }
 
-                    console.log(enrichedMessage);
 
-                    setAllConversations(prevConversations => {
-                        const senderId = enrichedMessage.sender.id;
-
-                        const alreadyExists = prevConversations.some(conv =>
-                            conv.user?.id === senderId
-                        );
-
-                        if (alreadyExists) {
-                            return prevConversations.map(conv =>
-                                conv.user?.id === senderId ? { ...conv, latestMessage: enrichedMessage } : conv
-                            );
+                    const response = await fetch(`${API_URL}/conversations/new/${pendingRequest.sender_id}/${pendingRequest.receiver_id}/${user.id}/`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
                         }
-
-                        const newConv = {
-                            user: enrichedMessage.sender,
-                            latestMessage: enrichedMessage
-                        };
-
-                        return [newConv, ...prevConversations];
                     });
+
+                    const newConversation = await response.json();
+
+                    const audio = new Audio('notification.mp3');
+                    await audio.play()
+
+                    setAllConversations(prev => [newConversation, ...prev]);
+
                 }
             )
             .subscribe();
@@ -80,7 +78,12 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
     }, [user?.id]);
 
 
-
+    useEffect(() => {
+        if (allConversations.length > 0) {
+            console.log("✅ All conversations updated:");
+            console.log(allConversations);
+        }
+    }, [allConversations]);
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/all/${user.id}`, {
@@ -92,6 +95,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
             .then(response => response.json())
             .then(data => {
                 setAllConversations(data)
+                console.log(data)
                 setLoading(false)
             })
             .catch(error => console.log(error));
@@ -174,30 +178,30 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 ) : (
                     <>
                     {allConversations.length > 0 ? (
-                            allConversations.map((conversation, index) =>
-                                conversation.group ? (
-                                    <GroupConversationCard
-                                        key={index}
-                                        groupId={conversation.group.id}
-                                        groupName={conversation.group.name}
-                                        latestMessage={conversation.latestMessage}
-                                        showChatWindow={showChatWindow}
-                                        setUpdatedMessage={setUpdatedMessage}
-                                        inspectGroupChat={inspectGroupChat}
-                                    />
-                                ) : (
-                                    <PrivateConversationCard
-                                        key={index}
-                                        testUser={conversation.user}
-                                        friend_id={conversation.user.id}
-                                        username={conversation.user.username}
-                                        latestMessage={conversation.latestMessage}
-                                        showChatWindow={showChatWindow}
-                                        setUpdatedMessage={setUpdatedMessage}
-                                        inspectPrivateConversation={inspectPrivateConversation}
-                                    />
-                                )
+                        allConversations.map((conversation, index) =>
+                            conversation.group && conversation.group.id ? (
+                                <GroupConversationCard
+                                    key={index}
+                                    groupId={conversation.group.id}
+                                    groupName={conversation.group.name}
+                                    latestMessage={conversation.latestMessage}
+                                    showChatWindow={showChatWindow}
+                                    setUpdatedMessage={setUpdatedMessage}
+                                    inspectGroupChat={inspectGroupChat}
+                                />
+                            ) : (
+                                <PrivateConversationCard
+                                    key={index}
+                                    user={conversation.user}
+                                    friend_id={conversation.user.id}
+                                    username={conversation.user.username}
+                                    latestMessage={conversation.latestMessage}
+                                    showChatWindow={showChatWindow}
+                                    setUpdatedMessage={setUpdatedMessage}
+                                    inspectPrivateConversation={inspectPrivateConversation}
+                                />
                             )
+                        )
                         ) : (
                             <p>No conversations yet.</p>
                         )}

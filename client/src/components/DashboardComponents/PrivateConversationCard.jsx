@@ -11,18 +11,18 @@ import {supabase} from "../../services/supabaseClient.js";
 
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
-                                            inspectPrivateConversation, testUser,
+                                            inspectPrivateConversation, user,
                                             setUpdatedMessage,
                                             latestMessage = null, username = ''}) => {
 
-    const {user} = useAuth();
+    const {user: loggedIn} = useAuth();
     const [channel, setChannel] = useState(null);
     const [localMessage, setLocalMessage] = useState(latestMessage);
 
     useEffect(() => {
-        if (!user?.id || !friend_id) return;
+        if (!loggedIn?.id || !friend_id) return;
 
-        const channelName = `conversation-${user.id}-${friend_id}`;
+        const channelName = `conversation-${loggedIn.id}-${friend_id}`;
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -35,12 +35,11 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                 (payload) => {
                     const message = payload.new;
                     if (
-                        (message.sender_id === user.id && message.receiver_id === friend_id) ||
-                        (message.sender_id === friend_id && message.receiver_id === user.id)
+                        (message.sender_id === loggedIn.id && message.receiver_id === friend_id) ||
+                        (message.sender_id === friend_id && message.receiver_id === loggedIn.id)
                     ) {
                         setLocalMessage(message);
                         setUpdatedMessage(message);
-                        console.log(message);
                     }
                 }
             )
@@ -56,7 +55,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
         return () => {
             supabase.removeChannel(newChannel);
         };
-    }, [user.id, friend_id]);
+    }, [loggedIn.id, friend_id]);
 
     return (
         <div onClick={() => {
@@ -64,7 +63,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             inspectPrivateConversation(friend_id, username);
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
-                <UserAvatar user={testUser} username={username} height={40} width={40} />
+                <UserAvatar user={user} username={username} height={40} width={40} />
             </div>
 
             <div className="conversation-card-content">
@@ -73,7 +72,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                         {moment(localMessage.created_at).format("h:mm A")}
                     </span></h3>
                 <p className={'conversation-content'}>
-                    {user.id === (localMessage.sender?.id || localMessage.sender_id) && <span>You: </span>}
+                    {loggedIn.id === (localMessage.sender?.id || localMessage.sender_id) && <span>You: </span>}
                     {parseLatestMessage(latestMessage.content)}
                 </p>
             </div>
