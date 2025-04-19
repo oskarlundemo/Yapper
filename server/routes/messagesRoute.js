@@ -18,7 +18,6 @@ messagesRoute.get('/private/conversation/:sender_id/:receiver_id', getMessagesFr
 
 messagesRoute.get('/group/conversation/:sender_id/:receiver_id', getMessagesFromGroupConversation);
 
-
 messagesRoute.post('/conversation/:sender_id/:receiver_id', (req, res) => {
     if (req.body.receivers.length > 1 && req.body.groupChat) {
         console.log('New groupchat with message');

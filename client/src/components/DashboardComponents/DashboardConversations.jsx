@@ -33,8 +33,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 },
                 async (payload) => {
 
-                    console.log(payload);
-
                     const pendingRequest = payload.new;
 
                     if (pendingRequest.receiver_id !== user.id && pendingRequest.sender_id !== user.id) return;
@@ -50,7 +48,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         console.log(error);
                         return;
                     }
-
 
                     const response = await fetch(`${API_URL}/conversations/new/${pendingRequest.sender_id}/${pendingRequest.receiver_id}/${user.id}/`, {
                         method: 'GET',
@@ -77,13 +74,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
         };
     }, [user?.id]);
 
-
-    useEffect(() => {
-        if (allConversations.length > 0) {
-            console.log("✅ All conversations updated:");
-            console.log(allConversations);
-        }
-    }, [allConversations]);
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/all/${user.id}`, {

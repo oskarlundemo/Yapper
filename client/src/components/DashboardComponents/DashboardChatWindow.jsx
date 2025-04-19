@@ -46,15 +46,17 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                         ) {
                             const { data: enrichedMessage, error } = await supabase
                                 .from("messages")
-                                .select(`*, sender:sender_id (
-                                id, username)`)
+                                .select(`*, sender:sender_id (id, username, avatar)`)
                                 .eq("id", newMessage.id)
                                 .single();
+
                             if (error) {
                                 console.error("Error enriching message:", error.message);
-                                return;
+                            } else {
+                                const audio = new Audio('notification.mp3');
+                                await audio.play();
+                                setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
                             }
-                            setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
                         }
                     }
                 )

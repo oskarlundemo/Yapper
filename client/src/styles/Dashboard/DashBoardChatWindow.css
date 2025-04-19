@@ -76,6 +76,11 @@
         outline: none;
     }
 
+    form {
+        display: flex;
+        width: 100%;
+    }
+
     svg {
         transition: var(--default-transition);
     }

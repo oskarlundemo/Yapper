@@ -1,0 +1,24 @@
+
+
+
+
+.file-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+
+.file-card {
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    svg:hover {
+        cursor: pointer;
+        fill: var(--error-color)
+    }
+}

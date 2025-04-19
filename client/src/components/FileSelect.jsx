@@ -1,7 +1,7 @@
 import {useRef, useState} from "react";
 import '../styles/Dashboard/FileSelect.css'
 
-export const FileSelect = () => {
+export const FileSelect = ({handleFileAdd}) => {
 
     const [file, setFile] = useState(null);
     const fileInputRef = useRef(null);
@@ -20,7 +20,7 @@ export const FileSelect = () => {
             <input
                 type="file"
                 ref={fileInputRef}
-                onChange={handleFileChange}
+                onChange={handleFileAdd}
                 className="hidden"
             />
 
