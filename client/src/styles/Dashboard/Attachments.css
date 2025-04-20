@@ -1,0 +1,9 @@
+
+
+.attachment {
+
+    p {
+        text-decoration: underline !important;
+        cursor: pointer;
+    }
+}

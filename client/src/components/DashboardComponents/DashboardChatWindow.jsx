@@ -1,13 +1,12 @@
 import '../../styles/Dashboard/DashBoardChatWindow.css';
-import { DashboardMessageArea } from "./DashboardMessageArea.jsx";
-import { MessageCard } from "./MessageCard.jsx";
+import {DashboardMessageArea} from "./DashboardMessageArea.jsx";
+import {MessageCard} from "./MessageCard.jsx";
 import {useEffect, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 import {supabase} from "../../services/supabaseClient.js";
-
 
 
 export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUser, miniBar, setMiniBar, groupChat, setGroupChat, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
@@ -49,10 +48,19 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                                 .select(`*, sender:sender_id (id, username, avatar)`)
                                 .eq("id", newMessage.id)
                                 .single();
-
                             if (error) {
                                 console.error("Error enriching message:", error.message);
                             } else {
+
+                                const response = await fetch(`${API_URL}/messages/files/${newMessage.id}`, {
+                                    method: "GET",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    }
+                                })
+
+                                enrichedMessage.attachments = await response.json();
+
                                 const audio = new Audio('notification.mp3');
                                 await audio.play();
                                 setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
@@ -169,6 +177,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                                                 user_id={message.sender_id}
                                                 sender={message.sender}
                                                 username={message.sender?.username || message.Sender?.username || "Unknown"}
+                                                files={message.attachments || null}
                                             />
                                         ))}
                                     <div ref={messagesEndRef} />

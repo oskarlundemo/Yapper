@@ -24,16 +24,26 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const formData = new FormData();
+
+        files.forEach(file => {
+            formData.append('files', file);
+        });
+
+
+        formData.append('receivers', JSON.stringify(receivers));
+        formData.append('groupChat', groupChat);
+        formData.append('message', message);
+
         try {
             await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ message, receivers, groupChat }),
+                body: formData
             });
 
             setMessage("");
+            setFiles([]);
             setReceivers([]);
 
         } catch (err) {
@@ -86,6 +96,8 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
                     </form>
 
                     <div className={'message-area-icons'}>
+
+                        <svg onClick={(e) => handleSubmit(e)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
 
                         <GifContainer groupChat={groupChat} API_URL={API_URL} receiver={receiver} sender={user.id} showGifs={gifs} setShowGifs={showGifs} />
 

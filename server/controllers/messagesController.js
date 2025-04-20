@@ -3,6 +3,7 @@
 
 
 import {prisma} from '../prisma/index.js';
+import {saveFiles} from "./supabaseController.js";
 
 
 
@@ -28,8 +29,6 @@ export const sendGifGroupChat = async (req, res) => {
 
 
 export const sendGifPrivateConversation = async (req, res) => {
-
-
 
     try {
 
@@ -61,15 +60,39 @@ export const sendPrivateMessage = async (req, res) => {
         const receiverBody = req.body.receivers?.[0]?.id;
         const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
 
-
         await prisma.$transaction(async () => {
-            await prisma.privateMessages.create({
+            const message = await prisma.privateMessages.create({
                 data: {
                     sender_id: senderId,
                     receiver_id: receiverId,
                     content: req.body.message
                 }
             });
+
+            if (req.files) {
+                await prisma.$transaction(async () => {
+                    const files = req.files;
+                    for (const file of files) {
+
+                        const newFile = await prisma.file.create({
+                            data: {
+                                path: file.originalname,
+                                size: file.size,
+                            }
+                        })
+
+                        await prisma.attachedFile.create({
+                            data: {
+                                message_id: message.id,
+                                file_id: newFile.id
+                            }
+                        })
+                    }
+
+                    await saveFiles(req, res);
+                })
+            }
+
 
             const request = await prisma.pendingFriendRequests.findFirst({
                 where: {
@@ -105,6 +128,31 @@ export const sendPrivateMessage = async (req, res) => {
         res.status(500).json(`Error: ${err.message}`);
     }
 }
+
+
+export const checkFiles = async (req, res) => {
+
+    try {
+        const msgId = parseInt(req.params.message_id);
+
+        const files = await prisma.attachedFile.findMany({
+            where: {
+                message_id: msgId
+            },
+            include: {
+                file: true
+            }
+        })
+        if (!files) {
+            res.status(404).send('No files found.');
+        } else {
+            res.status(200).json(files);
+        }
+    } catch (err) {
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 
 
 export const createGroupChat = async (req, res) => {
@@ -220,7 +268,24 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
             }
         });
 
-        res.status(200).json(messages);
+        const allFiles = await prisma.attachedFile.findMany({
+            where: {
+                message_id: {
+                    in: messages.map(message => message.id) // Get all message IDs at once
+                }
+            },
+            include: {
+                file: true
+            }
+        });
+
+        const messagesWithAttachments = messages.map(message => {
+            message.attachments = allFiles.filter(file => file.message_id === message.id);
+            return message;
+        });
+
+        res.status(200).json(messagesWithAttachments);
+
 
     } catch (err) {
         console.log(err);

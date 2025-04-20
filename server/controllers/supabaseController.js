@@ -26,7 +26,7 @@ export { supabase };
 
 
 
-export const saveFile = async (req, res) => {
+export const saveAvatar = async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
     }
@@ -55,6 +55,42 @@ export const saveFile = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
+
+
+export const saveFiles = async (req, res) => {
+
+    try {
+        if (!req.files) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        const files = req.files;
+
+        for (const file of files) {
+
+            const filePath = `files/${file.originalname}`;
+            const fileMimeType = file.mimetype;
+
+            const {data, error} = await supabase
+                .storage
+                .from('yapper')
+                .upload(filePath, file.buffer, {
+                    contentType: fileMimeType,
+                    cacheControl: '3600',
+                    upsert: true,
+                })
+
+            if (error) {
+                console.error("Upload Error:", error.message);
+                return { message: 'Error saving image' };
+            }
+        }
+
+    }  catch (err) {
+        console.error("Unexpected Error Uploading File:", err);
+        return res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
 
 
 export const deleteImageFromDb = async (filepath) => {

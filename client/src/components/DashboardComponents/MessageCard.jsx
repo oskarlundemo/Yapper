@@ -2,9 +2,10 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment";
+import {Attachment} from "./Attachment.jsx";
 
 
-export const MessageCard = ({content, user_id, showUserInfo, sender, time, setMiniBar, miniBar, username = ''}) => {
+export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, setMiniBar, miniBar, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
@@ -30,7 +31,17 @@ export const MessageCard = ({content, user_id, showUserInfo, sender, time, setMi
                     {isGif ? (
                         <img src={content}  alt={content}/>
                     ) : (
-                        <p>{content}</p>
+                        <>
+
+                            {files?.length > 0 && (
+                                files.map((file, index) => (
+                                    <Attachment file={file} key={index}/>
+                                ))
+                            )}
+
+                            <p>{content}</p>
+                        </>
+
                     )}
                 </div>
 

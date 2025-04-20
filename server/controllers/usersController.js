@@ -1,5 +1,5 @@
 import {prisma} from '../prisma/index.js';
-import {saveFile} from "./supabaseController.js";
+import {saveAvatar} from "./supabaseController.js";
 
 
 export const retrieveUsers = async (req, res) => {
@@ -40,12 +40,6 @@ export const retrieveUsers = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
 
-
-    console.log(req.file)
-    console.log(req.body.bio)
-    console.log(req.params.user_id)
-
-
     try {
         const userId = parseInt(req.params.user_id);
 
@@ -57,7 +51,6 @@ export const updateUserProfile = async (req, res) => {
 
         await updateUserBio(req, res, userProfile)
         await updateAvatar(req, res, userProfile)
-
 
     } catch (err) {
         console.error('Error retrieving user profile:', err);
@@ -80,7 +73,7 @@ export const updateAvatar = async (req, res, userProfile) => {
                     id: userProfile.id,
                 }
             })
-            await saveFile(req, res);
+            await saveAvatar(req, res);
         }
     } catch (err) {
         console.error('Error retrieving avatar:', err);
