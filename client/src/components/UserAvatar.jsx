@@ -5,17 +5,22 @@ import {supabase} from "../services/supabaseClient.js";
 
 
 
-export const UserAvatar = ({height, width, user = null, setSaveChanges = null, setNewAvatar = null, selectPicture = false, file = null, setFile = null}) => {
-    const [currentAvatar, setCurrentAvatar] = useState(null);
+export const UserAvatar = ({height, width, user = null,
+                               setSaveChanges = null, setNewAvatar = null,
+                               selectPicture = false, file = null, setFile = null}) => {
+    const [currentAvatar, setCurrentAvatar] = useState(user?.avatar);
     const {user: loggedInUser} = useAuth();
 
     useEffect(() => {
         const fetchImage = async () => {
-            if (!user?.avatar) return;
+            if (!user?.avatar) {
+                setCurrentAvatar(null);
+                setFile(null);
+                return;
+            }
             const { data, error } = supabase.storage
                 .from("yapper")
                 .getPublicUrl(`avatars/${user.avatar}`);
-
             if (error) {
                 console.error("Error getting public URL:", error);
             } else {

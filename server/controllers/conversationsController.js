@@ -2,6 +2,44 @@
 
 import {prisma} from '../prisma/index.js';
 
+export const newGroupChat = async (req, res) => {
+
+    try {
+
+        console.log('I new group chat not');
+
+        const groupId = parseInt(req.params.group_id);
+
+        const group = await prisma.groupChats.findUnique({
+            where: {
+                id: groupId,
+            }
+        })
+
+        const groupChatLatestMessage = await prisma.groupMessages.findFirst({
+            where: {
+                group_id: groupId,
+            },
+            include: {
+                sender: true
+            },
+            orderBy: {
+                created_at: 'desc'
+            },
+            take: 1
+        })
+
+        const formattedGroupNotification = {
+            group: group,
+            latestMessage: groupChatLatestMessage
+        }
+
+        res.status(200).json(formattedGroupNotification);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({Message: 'Something went wrong'});
+    }
+}
 
 
 
@@ -46,7 +84,7 @@ export const newPendingNotification = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.status(500).send({Message: 'Something went wrong'});
+        res.status(500).json({Message: 'Something went wrong'});
     }
 
 }

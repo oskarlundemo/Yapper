@@ -5,7 +5,7 @@
 import {Router} from 'express'
 import {
     getAllConversations,
-    getReceiverUsername, newPendingNotification,
+    getReceiverUsername, newGroupChat, newPendingNotification,
     searchForConversations
 } from "../controllers/conversationsController.js";
 
@@ -21,6 +21,8 @@ conversationRouter.get('/all/:user_id', getAllConversations);
 conversationRouter.get('/receiver/:receiver_id', getReceiverUsername);
 
 conversationRouter.get('/new/:sender_id/:receiver_id/:logged_in_id', newPendingNotification);
+
+conversationRouter.get('/new/group/:group_id', newGroupChat)
 
 
 

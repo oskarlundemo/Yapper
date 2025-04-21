@@ -4,7 +4,7 @@ import {Router} from 'express';
 import multer from 'multer';
 const upload = multer()
 import {
-    checkFiles,
+    checkFiles, checkGroupFiles,
     createGroupChat,
     getMessagesFromGroupConversation,
     getMessagesFromPrivateConversation, sendGifGroupChat, sendGifPrivateConversation,
@@ -21,7 +21,9 @@ messagesRoute.get('/group/conversation/:sender_id/:receiver_id', getMessagesFrom
 
 messagesRoute.post('/conversation/:sender_id/:receiver_id', upload.array('files'), (req, res) => {
 
-    if (req.body.receivers.length > 1 && req.body.groupChat === 'true') {
+    const receivers = JSON.parse(req.body?.receivers);
+
+    if (receivers.length > 1 && req.body.groupChat === 'true') {
         console.log('New groupchat with message');
         createGroupChat(req, res);
     } else if (req.body.groupChat === 'true')  {
@@ -45,6 +47,8 @@ messagesRoute.post('/gif/:sender_id/:receiver_id', (req, res) => {
 
 
 messagesRoute.get('/files/:message_id', checkFiles)
+
+messagesRoute.get('/files/group/:message_id', checkGroupFiles)
 
 
 export default messagesRoute;

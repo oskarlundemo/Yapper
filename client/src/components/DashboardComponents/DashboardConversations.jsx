@@ -7,7 +7,7 @@ import {LoadingExample} from "./LoadingExample.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 
 
-export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL, showProfile}) => {
+export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [allConversations, setAllConversations] = useState([])
@@ -15,7 +15,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
     const [privateChannel, setPrivateChannel] = useState(null);
     const [groupChannel, setGroupChannel] = useState(null);
     const {user} = useAuth();
-    const [privateConvo, setPrivateConvo] = useState(null);
 
 
 
@@ -62,7 +61,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                     await audio.play()
 
                     setAllConversations(prev => [newConversation, ...prev]);
-
                 }
             )
             .subscribe();
@@ -73,6 +71,65 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
             supabase.removeChannel(newChannel);
         };
     }, [user?.id]);
+
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-conversation-group')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'GroupMembers'
+                },
+                async (payload) => {
+
+                    const groupMemberEntry = payload.new;
+
+                    if (groupMemberEntry.member_id !== user.id) return;
+
+                    const { data: enrichedMessage, error } = await supabase
+                        .from('GroupMembers')
+                        .select('*')
+                        .eq('group_id', groupMemberEntry.group_id)
+                        .eq('member_id', user.id)
+                        .single();
+
+                    if (error) {
+                        console.log(error);
+                        return;
+                    }
+
+                    const response = await fetch(`${API_URL}/conversations/new/group/${groupMemberEntry.group_id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    const newGroupConversation = await response.json();
+
+                    console.log(newGroupConversation);
+
+                    const audio = new Audio('notification.mp3');
+                    await audio.play()
+
+                    setAllConversations(prev => [newGroupConversation, ...prev]);
+                }
+            )
+            .subscribe();
+
+        setGroupChannel(newChannel);
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
 
 
     useEffect(() => {

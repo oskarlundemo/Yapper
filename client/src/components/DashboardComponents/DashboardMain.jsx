@@ -18,9 +18,9 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const {user} = useAuth();
 
 
-    const showUserInfo = (user = null) => {
+    const showUserInfo = (inspectedUser = null) => {
         setMiniBar(true);
-        setSelectedUser(user);
+        setSelectedUser(inspectedUser);
     }
 
     const inspectPrivateConversation = async (receiver_id, chatname = '') => {
@@ -57,7 +57,6 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
     }
 
-
     const inspectGroupChat = async (receiver_id, chatname) => {
         setGroupChat(true);
         setReceiver(receiver_id);
@@ -75,7 +74,6 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             })
             .catch(err => console.log(err));
     }
-
 
 
     return (

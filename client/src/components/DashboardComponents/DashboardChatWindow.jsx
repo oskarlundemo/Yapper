@@ -9,7 +9,9 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 
 
-export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUser, miniBar, setMiniBar, groupChat, setGroupChat, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
+                                        selectedUser, miniBar, setMiniBar, groupChat,
+                                        setGroupChat, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
@@ -58,9 +60,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                                         "Content-Type": "application/json"
                                     }
                                 })
-
                                 enrichedMessage.attachments = await response.json();
-
                                 const audio = new Audio('notification.mp3');
                                 await audio.play();
                                 setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
@@ -92,10 +92,11 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                         table: "GroupMessages"
                     },
                     async () => {
-                        {
-                            const { data: enrichedMessage, error } = await supabase
+                        const newMessage = payload.new;
+
+                        const { data: enrichedMessage, error } = await supabase
                                 .from("GroupMessages")
-                                .select(`*, sender:sender_id ( id, username )`)
+                                .select(`*, sender:sender_id ( id, username, avatar)`)
                                 .eq("group_id", receiver)
                                 .order("created_at", { ascending: false })
                                 .limit(1)
@@ -105,8 +106,20 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                                 console.error("Error enriching message:", error.message);
                                 return;
                             }
+
+
+                            const response = await fetch(`${API_URL}/messages/files/group/${newMessage.id}`, {
+                                method: "GET",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                }
+                            })
+                            enrichedMessage.attachments = await response.json();
+
+
+                            const audio = new Audio('notification.mp3');
+                            await audio.play();
                             setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
-                        }
                     }
                 )
                 .subscribe();
@@ -177,7 +190,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName, selectedUs
                                                 user_id={message.sender_id}
                                                 sender={message.sender}
                                                 username={message.sender?.username || message.Sender?.username || "Unknown"}
-                                                files={message.attachments || null}
+                                                files={message.attachments || message.AttachedFile || null}
                                             />
                                         ))}
                                     <div ref={messagesEndRef} />

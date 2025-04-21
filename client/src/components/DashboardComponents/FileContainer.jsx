@@ -1,13 +1,6 @@
-import {useEffect} from "react";
 
 
 export const FileContainer = ({files, removeFile}) => {
-
-
-    useEffect(() => {
-        console.log(files);
-    }, [files]);
-
 
     return (
         <div className="file-container">
@@ -19,5 +12,4 @@ export const FileContainer = ({files, removeFile}) => {
             ))}
         </div>
     )
-
 }

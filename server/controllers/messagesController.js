@@ -55,10 +55,14 @@ export const sendGifPrivateConversation = async (req, res) => {
 
 export const sendPrivateMessage = async (req, res) => {
     try {
+        console.log(req.body);
         const senderId = parseInt(req.params.sender_id);
+        let receiverArray = JSON.parse(req.body.receivers);
         const receiverIdParams = parseInt(req.params.receiver_id);
-        const receiverBody = req.body.receivers?.[0]?.id;
+        const receiverBody = receiverArray[0]?.id;
         const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
+
+        console.log(req.body);
 
         await prisma.$transaction(async () => {
             const message = await prisma.privateMessages.create({
@@ -154,12 +158,39 @@ export const checkFiles = async (req, res) => {
 }
 
 
+export const checkGroupFiles = async (req, res) => {
+
+    try {
+        const msgId = parseInt(req.params.message_id);
+
+        const files = await prisma.attachedFile.findMany({
+            where: {
+                group_message_id: msgId
+            },
+            include: {
+                file: true
+            }
+        })
+
+        if (!files) {
+            res.status(404).send('No files found.');
+        } else {
+            res.status(200).json(files);
+        }
+    } catch (err) {
+        res.status(500).send('Internal Server Error');
+    }
+
+
+}
+
+
 
 export const createGroupChat = async (req, res) => {
     try {
 
         const sender_id = parseInt(req.params.sender_id);
-        const receivers = req.body.receivers;
+        const receivers = JSON.parse(req.body.receivers);
         let groupName = req.body.name;
 
         const result = await prisma.$transaction(async (prisma) => {
@@ -229,16 +260,40 @@ export const sendGroupMessage = async (req, res) => {
         console.log('Skicka grupp')
 
         const sender_id = parseInt(req.params.sender_id);
-        const receivers = req.body.receivers;
         const receiver = parseInt(req.params.receiver_id)
 
-        await prisma.groupMessages.create({
+        const message = await prisma.groupMessages.create({
             data: {
                 sender_id: sender_id,
                 group_id: receiver,
                 content: req.body.message,
             }
         });
+
+
+        if (req.files) {
+            await prisma.$transaction(async () => {
+                const files = req.files;
+                for (const file of files) {
+
+                    const newFile = await prisma.file.create({
+                        data: {
+                            path: file.originalname,
+                            size: file.size,
+                        }
+                    })
+
+                    await prisma.attachedFile.create({
+                        data: {
+                            group_message_id: message.id,
+                            file_id: newFile.id
+                        }
+                    })
+                }
+
+                await saveFiles(req, res);
+            })
+        }
 
     } catch (err) {
         console.log(err);
@@ -271,7 +326,7 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
         const allFiles = await prisma.attachedFile.findMany({
             where: {
                 message_id: {
-                    in: messages.map(message => message.id) // Get all message IDs at once
+                    in: messages.map(message => message.id)
                 }
             },
             include: {
@@ -293,22 +348,28 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
     }
 }
 
+
 export const getMessagesFromGroupConversation = async (req, res) => {
-
     try {
-        const receiver_id = parseInt(req.params.receiver_id);
-        const groupMessages = await prisma.groupMessages.findMany({
-            where: {
-                group_id: receiver_id
-            },
-            include: {
-                sender: true
-            }
-        })
-        res.status(200).json(groupMessages);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json(`Error: ${error.message}`);
-    }
+        const groupId = parseInt(req.params.receiver_id, 10);
 
-}
+        const groupMessages = await prisma.groupMessages.findMany({
+            where: { group_id: groupId },
+            include: {
+                sender: true,
+                AttachedFile: {
+                    include: { file: true }
+                }
+            },
+            orderBy: { created_at: 'asc' }
+        });
+
+
+        console.log(groupMessages);
+
+        return res.status(200).json(groupMessages);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(`Error: ${error.message}`);
+    }
+};

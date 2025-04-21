@@ -31,7 +31,6 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
             formData.append('files', file);
         });
 
-
         formData.append('receivers', JSON.stringify(receivers));
         formData.append('groupChat', groupChat);
         formData.append('message', message);
@@ -59,8 +58,10 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
 
 
     const handleFileAdd = (e) => {
-        const selectedFile = e.target.files[0];
-        setFiles([...files, selectedFile]);
+        if (e.target.files[0].name) {
+            const selectedFile = e.target.files[0];
+            setFiles([...files, selectedFile]);
+        }
     }
 
     const handleFileRemove = (name) => {

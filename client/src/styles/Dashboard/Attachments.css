@@ -1,9 +1,41 @@
 
 
 .attachment {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
+.attachment-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+
+    svg:first-of-type {
+        display: none;
+    }
+
+    svg {
+        transition: var(--default-transition);
+    }
 
     p {
         text-decoration: underline !important;
         cursor: pointer;
+        margin: 0;
+    }
+}
+
+.attachment-container:hover {
+    cursor: pointer;
+
+    svg:nth-of-type(2) {
+        display: none;
+    }
+
+    svg:nth-of-type(1) {
+        display: flex;
     }
 }

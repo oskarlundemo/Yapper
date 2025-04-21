@@ -21,7 +21,6 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, API_URL})
     }, [selectedUser])
 
 
-
     useEffect(() => {
         setCharsCount(bio?.length)
     }, [bio])

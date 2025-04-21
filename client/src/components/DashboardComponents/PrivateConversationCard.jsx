@@ -84,10 +84,15 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
 
 
 export const parseLatestMessage = (content) => {
-    if (content.includes('giphy.com')) {
+
+    if (!content) {
+        return;
+    }
+
+    if (content?.includes('giphy.com')) {
         return 'Sent a GIF '
     }
-    else if(content.length > 20 && content) {
+    else if(content?.length > 20 && content) {
         const subString = content.substring(0, 20);
         const lastSpace = subString.lastIndexOf(' ');
         return content.substring(0, lastSpace) + '...';

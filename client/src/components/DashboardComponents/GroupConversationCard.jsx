@@ -45,10 +45,9 @@ export const GroupConversationCard = ({
                     const message = payload.new;
 
                     if (message.group_id === groupId) {
-                        // Fetch enriched message with sender info
                         const {data: enrichedMessages, error} = await supabase
                             .from('GroupMessages')
-                            .select('*, sender:sender_id(id, username)') // adjust as needed
+                            .select('*, sender:sender_id(id, username)')
                             .eq('group_id', groupId)
                             .order('created_at', { ascending: false })
                             .limit(1);
@@ -78,9 +77,9 @@ export const GroupConversationCard = ({
             return newChannel;
         });
         return () => {
-            supabase.removeChannel(newChannel); // Remove the subscription on cleanup
+            supabase.removeChannel(newChannel);
         };
-    }, [user.id, groupId]); // Dependency array ensures effect runs when user or groupId changes
+    }, [user.id, groupId]);
 
 
     return (

@@ -156,6 +156,8 @@
     border-radius: 10px;
     text-align: left;
     color: var(--text-color);
+    display: flex;
+    flex-direction: column;
 
     p {
         color: white;
