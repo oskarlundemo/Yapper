@@ -55,7 +55,6 @@ export const sendGifPrivateConversation = async (req, res) => {
 
 export const sendPrivateMessage = async (req, res) => {
     try {
-        console.log(req.body);
         const senderId = parseInt(req.params.sender_id);
         let receiverArray = JSON.parse(req.body.receivers);
         const receiverIdParams = parseInt(req.params.receiver_id);
@@ -294,7 +293,7 @@ export const sendGroupMessage = async (req, res) => {
                 await saveFiles(req, res);
             })
         }
-
+        res.status(200).json('Successfully sent message');
     } catch (err) {
         console.log(err);
         res.status(500).json(`Error: ${err.message}`);
@@ -363,10 +362,6 @@ export const getMessagesFromGroupConversation = async (req, res) => {
             },
             orderBy: { created_at: 'asc' }
         });
-
-
-        console.log(groupMessages);
-
         return res.status(200).json(groupMessages);
     } catch (error) {
         console.error(error);

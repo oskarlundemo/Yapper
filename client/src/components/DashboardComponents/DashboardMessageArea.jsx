@@ -14,6 +14,9 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
 
 
     const acceptFriendRequest = async () => {
+
+        if (!receiver) return;
+
         await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
             method: "GET",
             headers: {
@@ -41,19 +44,20 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
                 body: formData
             });
 
+
             setMessage("");
             setFiles([]);
             setReceivers([]);
-
         } catch (err) {
             console.error("Message send error:", err);
         }
 
-        if (!friend) {
+        if (!friend && !groupChat) {
             await acceptFriendRequest();
         }
         setMessage("");
         setReceivers([]);
+
     };
 
 

@@ -7,11 +7,12 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 import {supabase} from "../../services/supabaseClient.js";
+import {MessageSplitter} from "./MessageSplitter.jsx";
 
 
 export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                                         selectedUser, miniBar, setMiniBar, groupChat,
-                                        setGroupChat, messages, setMessages, friend, showMessage, inspectConversation, receiver, showProfile, showRequests}) => {
+                                        setGroupChat, messages, setMessages, friend, showMessage, receiver}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
@@ -53,7 +54,6 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                             if (error) {
                                 console.error("Error enriching message:", error.message);
                             } else {
-
                                 const response = await fetch(`${API_URL}/messages/files/${newMessage.id}`, {
                                     method: "GET",
                                     headers: {
@@ -91,7 +91,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                         schema: "public",
                         table: "GroupMessages"
                     },
-                    async () => {
+                    async (payload) => {
                         const newMessage = payload.new;
 
                         const { data: enrichedMessage, error } = await supabase
@@ -107,15 +107,14 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                                 return;
                             }
 
-
                             const response = await fetch(`${API_URL}/messages/files/group/${newMessage.id}`, {
                                 method: "GET",
                                 headers: {
                                     "Content-Type": "application/json"
                                 }
                             })
-                            enrichedMessage.attachments = await response.json();
 
+                            enrichedMessage.attachments = await response.json();
 
                             const audio = new Audio('notification.mp3');
                             await audio.play();
@@ -138,7 +137,57 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
 
     }, [receiver]);
 
+
+
+    const renderedMessages = [];
+    let lastDate = null;
+
+    messages.forEach((message) => {
+        const currDate = new Date(message.created_at);
+
+        const isNewDay =
+            !lastDate ||
+            currDate.getFullYear() !== lastDate.getFullYear() ||
+            currDate.getMonth() !== lastDate.getMonth() ||
+            currDate.getDate() !== lastDate.getDate();
+
+        if (isNewDay) {
+            const formattedDate = currDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+
+            renderedMessages.push(
+                <MessageSplitter key={`split-${message.id}`} date={formattedDate} />
+            );
+            lastDate = currDate;
+        }
+
+        renderedMessages.push(
+            <MessageCard
+                showUserInfo={showUserInfo}
+                setMiniBar={setMiniBar}
+                miniBar={miniBar}
+                API_URL={API_URL}
+                key={message.id}
+                message={message}
+                content={message.content}
+                time={message.created_at}
+                user_id={message.sender_id}
+                sender={message.sender}
+                username={message.sender?.username || message.Sender?.username || "Unknown"}
+                files={message.attachments || message.AttachedFile || null}
+            />
+        );
+    });
+
+
+
+
     return (
+
         <section className={`dashboard-chat-window`}>
                 <>
                     <div className={`dashboard-message-container ${miniBar ? '' : 'mini'}`}>
@@ -176,23 +225,7 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                                 </div>
                             ) : (
                                 <>
-                                    {messages.length > 0 &&
-                                        messages.map((message) => (
-                                            <MessageCard
-                                                showUserInfo={showUserInfo}
-                                                setMiniBar={setMiniBar}
-                                                miniBar={miniBar}
-                                                API_URL={API_URL}
-                                                key={message.id}
-                                                message={message}
-                                                content={message.content}
-                                                time={message.created_at}
-                                                user_id={message.sender_id}
-                                                sender={message.sender}
-                                                username={message.sender?.username || message.Sender?.username || "Unknown"}
-                                                files={message.attachments || message.AttachedFile || null}
-                                            />
-                                        ))}
+                                    {renderedMessages}
                                     <div ref={messagesEndRef} />
                                 </>
                             )}
