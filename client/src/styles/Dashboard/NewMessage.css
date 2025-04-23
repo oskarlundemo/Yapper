@@ -91,3 +91,17 @@
     text-align: left;
     margin: 0.5rem;
 }
+
+
+.new-conversation-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.avatar-section-new-convo {
+    img:not(:first-child) {
+        margin-left: -10px;
+    }
+}

@@ -5,12 +5,14 @@ import {useEffect, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
-import {UserAvatar} from "../UserAvatar.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 import {MessageSplitter} from "./MessageSplitter.jsx";
+import {GroupMemberInfo} from "./GroupMemberInfo.jsx";
+import {ConversationHeader} from "./ConversationHeader.jsx";
+import {GroupProfile} from "./GroupProfile.jsx";
 
 
-export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
+export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName,
                                         selectedUser, miniBar, setMiniBar, groupChat,
                                         setGroupChat, messages, setMessages, friend, showMessage, receiver}) => {
 
@@ -194,35 +196,12 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                         {showMessage ? (
                             <NewMessage setGroupChat={setGroupChat} receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
-                            <div className={'conversation-header'}>
-                                <h2>{chatName}</h2>
-                            </div>
+                            <ConversationHeader showGroupInfo={showGroupInfo} groupChat={groupChat} showUserInfo={showUserInfo} chatname={chatName} />
                         )}
 
                         <div className="dashboard-message-content">
                             {showMessage ? (
-                                <div className="new-conversation-info">
-                                    <div className="avatar-section-new-convo">
-                                        {receivers.length > 0 &&
-                                            receivers.map((receiver) => (
-                                                <UserAvatar
-                                                    width={40} height={40}
-                                                    key={receiver.id}
-                                                    user={receiver}
-
-                                                />
-                                            ))
-                                        }
-
-                                        <div className="new-convo-section-username">
-                                            {receivers.length > 0 &&
-                                                receivers.map((receiver) => (
-                                                    <p key={receiver.id}>{receiver.username}</p>
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
+                                <GroupMemberInfo selectedUser={selectedUser} receivers={receivers}/>
                             ) : (
                                 <>
                                     {renderedMessages}
@@ -232,7 +211,12 @@ export const DashboardChatWindow = ({API_URL, showUserInfo, chatName,
                         </div>
 
                     </div>
-                    <UserProfile API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
+
+                    {groupChat ? (
+                        <GroupProfile g API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
+                        ) : (
+                            <UserProfile API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
+                        )}
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
         </section>

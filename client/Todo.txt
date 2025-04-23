@@ -7,13 +7,14 @@ Prio 1
 [?] Skicka group request
 [] Admin can lägga till och ta bort användare efter gruppen är skapad
 [] Användare kan blockera andra eller lämna gruppkonversationer
+[]
 
 Prio 2
 [x] Sortera chattar efter senast aktivitet
 [x] Server, så om man loggar in så visas alla meddelanden på servern
-[] Updatera chats i realtime, så när man blir vänner updateras det direkt
-[] Inspektera chattar, så profilen kommer up till höger
-[] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
+[x] Updatera chats i realtime, så när man blir vänner updateras det direkt
+[x] Inspektera chattar, så profilen kommer up till höger
+[x] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
 [] Se en grön cirkel om användaren är online
 
 

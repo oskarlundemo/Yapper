@@ -307,6 +307,8 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
         const sender_id = parseInt(req.params.sender_id);
         const receiver_id = parseInt(req.params.receiver_id);
 
+        console.log(req.params)
+
         const messages = await prisma.privateMessages.findMany({
             where: {
                 OR: [
@@ -333,12 +335,18 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
             }
         });
 
+        const otherUser = await prisma.users.findUnique({
+            where: {
+                id: receiver_id,
+            }
+        })
+
         const messagesWithAttachments = messages.map(message => {
             message.attachments = allFiles.filter(file => file.message_id === message.id);
             return message;
         });
 
-        res.status(200).json(messagesWithAttachments);
+        res.status(200).json({messagesWithAttachments, otherUser});
 
 
     } catch (err) {
@@ -350,7 +358,7 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
 
 export const getMessagesFromGroupConversation = async (req, res) => {
     try {
-        const groupId = parseInt(req.params.receiver_id, 10);
+        const groupId = parseInt(req.params.receiver_id);
 
         const groupMessages = await prisma.groupMessages.findMany({
             where: { group_id: groupId },
@@ -358,11 +366,18 @@ export const getMessagesFromGroupConversation = async (req, res) => {
                 sender: true,
                 AttachedFile: {
                     include: { file: true }
-                }
+                },
             },
             orderBy: { created_at: 'asc' }
         });
-        return res.status(200).json(groupMessages);
+
+        const group = await prisma.groupChats.findUnique({
+            where: {
+                id: groupId
+            }
+        })
+
+        return res.status(200).json({groupMessages, group});
     } catch (error) {
         console.error(error);
         return res.status(500).json(`Error: ${error.message}`);

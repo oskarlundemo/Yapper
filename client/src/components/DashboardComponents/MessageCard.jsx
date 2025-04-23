@@ -3,10 +3,9 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment";
 import {Attachment} from "./Attachment.jsx";
-import {MessageSplitter} from "./MessageSplitter.jsx";
 
 
-export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, previousTime, username = ''}) => {
+export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);

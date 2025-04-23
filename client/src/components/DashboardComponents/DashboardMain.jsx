@@ -14,6 +14,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const [updatedMessage, setUpdatedMessage] = useState(null);
     const [miniBar, setMiniBar] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [currentGroupInfo, setCurrentGroupInfo] = useState(null);
 
     const {user} = useAuth();
 
@@ -21,6 +22,12 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const showUserInfo = (inspectedUser = null) => {
         setMiniBar(true);
         setSelectedUser(inspectedUser);
+        console.log(inspectedUser);
+    }
+
+
+    const showGroupInfo = () => {
+        setMiniBar(true);
     }
 
     const inspectPrivateConversation = async (receiver_id, chatname = '') => {
@@ -49,7 +56,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         })
             .then(res => res.json())
             .then(data => {
-                setMessages(data);
+                setMessages(data.messagesWithAttachments);
+                setSelectedUser(data.otherUser);
             })
             .catch(err => console.log(err));
 
@@ -70,7 +78,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         })
             .then(res => res.json())
             .then(data => {
-                setMessages(data);
+                setMessages(data.groupMessages);
+                setCurrentGroupInfo(data.group);
             })
             .catch(err => console.log(err));
     }
@@ -80,7 +89,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         <main className={'dashboard-main'}>
             <DashboardMenu showProfile={showUserInfo} />
             <DashboardConversations updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat} showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile} />
-            <DashboardChatWindow selectedUser={selectedUser} showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
+            <DashboardChatWindow currentGroupInfo={currentGroupInfo} showGroupInfo={showGroupInfo} selectedUser={selectedUser} showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName} friend={friend} showMessage={showMessage} showChatWindow={showChatWindow} inspectConversation={inspectPrivateConversation} receiver={receiver} showRequests={showRequests} messages={messages} setMessages={setMessages} API_URL={API_URL} showProfile={showProfile}/>
         </main>
     )
 }
