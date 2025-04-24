@@ -1,0 +1,31 @@
+
+
+
+.group-settings {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    li {
+        list-style: none;
+        padding: 1rem;
+        transition: var(--default-transition);
+        border-radius: var(--border-radius);
+    }
+
+    li:hover {
+        cursor: pointer;
+        background-color: var(--secondary-color);
+    }
+}
+
+.group-name-input {
+    border: none;
+    font-size: 2rem;
+    font-family: inherit;
+}
+
+.group-name-input:focus {
+    outline: none;
+}

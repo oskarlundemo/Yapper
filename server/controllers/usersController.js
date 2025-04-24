@@ -60,11 +60,9 @@ export const updateUserProfile = async (req, res) => {
 
 
 export const updateAvatar = async (req, res, userProfile) => {
-
-
     try {
-
         if (req.file) {
+            console.log(req.file);
             await prisma.users.update({
                 data: {
                     avatar: req.file.originalname,

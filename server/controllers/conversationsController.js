@@ -236,7 +236,6 @@ export const getAllConversations = async (req, res) => {
 
             const latestMessage = group.GroupMessages[0];
 
-
             const groupName = group.name
                 ? group.name
                 : group.GroupMembers.map((m) => m.Member.username).join(', ');
@@ -245,6 +244,7 @@ export const getAllConversations = async (req, res) => {
                 group: {
                     id: group.id,
                     name: groupName,
+                    avatar: group.avatar,
                 },
                 latestMessage: latestMessage
                     ? {

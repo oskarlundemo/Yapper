@@ -57,6 +57,40 @@ export const saveAvatar = async (req, res) => {
 };
 
 
+export const saveGroupAvatar = async (req, res) => {
+
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const filePath = `groupavatars/${req.file.originalname}`;
+    const fileMimeType = req.file.mimetype;
+
+
+    try {
+        const {data, error} = await supabase
+            .storage
+            .from('yapper')
+            .upload(filePath, req.file.buffer, {
+                contentType: fileMimeType,
+                cacheControl: '3600',
+                upsert: true,
+            });
+
+        if (error) {
+            console.error("Upload Error:", error.message);
+        }
+
+        return { message: 'Group avatar successfully updated' };
+
+    } catch (err) {
+        console.error("Unexpected Error Uploading File:", err);
+        return res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+
+}
+
+
 export const saveFiles = async (req, res) => {
 
     try {
@@ -91,31 +125,6 @@ export const saveFiles = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 }
-
-
-export const deleteImageFromDb = async (filepath) => {
-    try {
-        const { data, error } = await supabase
-            .storage
-            .from('library')
-            .remove([`books/${filepath}`]);
-
-        if (error) {
-            console.error("Error deleting image:", error.message);
-            return { error: error.message };
-        }
-
-        if (!data) {
-            console.log("Image not found in storage.");
-            return { error: "Image not found" };
-        }
-
-        return { message: "Image deleted successfully" };
-    } catch (err) {
-        console.error("Unexpected error deleting image:", err);
-        return { error: err.message };
-    }
-};
 
 
 

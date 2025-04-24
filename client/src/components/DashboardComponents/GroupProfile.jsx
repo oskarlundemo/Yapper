@@ -7,6 +7,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {GroupAvatar} from "./GroupAvatar.jsx";
+import '../../styles/Dashboard/GroupProfile.css'
 
 export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
 
@@ -18,6 +19,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
     const [disabledBio, setDisabledBio] = useState(true)
     const [saveChanges, setSaveChanges] = useState(false)
     const [charsCount, setCharsCount] = useState(0)
+    const [groupName, setGroupName] = useState(group.name)
 
     useEffect(() => {
         setDescription(group?.description)
@@ -61,16 +63,25 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
                 </div>
 
                 <div className={'user-info'}>
-                    <h2>{group?.name || ''}</h2>
+
+                    {disabledBio ? (
+                        <h2>{groupName || ''}</h2>
+                    ) : (
+                        <input className={'group-name-input'}
+                               type={'text'}
+                               value={groupName}
+                               onChange={e => setGroupName(e.target.value)}
+                        />
+                    )}
                     {group?.admin_id === user.id ? (
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
                             {disabledBio ? (
-                                <p className={'user-bio'}>{group?.description || 'No description'}</p>
+                                <p className={'user-bio'}>{group?.description || description || 'No description'}</p>
                             ) : (
                                 <>
                                 <textarea value={description}
-                                          placeholder={group?.description || 'No description'}
+                                          placeholder={group?.description || description || 'No description'}
                                           disabled={disabledBio}
                                           onChange={(e) => setDescription(e.target.value)}
                                 />
@@ -91,11 +102,29 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
                                     Save changes
                                 </button>
                             )}
-
                         </form>
                     ) : (
-                        <p>{group?.description || 'No description'}</p>
+                        <p>{group?.description || description || 'No description'}</p>
                     )}
+
+
+                    <div className={'group-settings-container'}>
+
+
+                        <ul className={'group-settings'}>
+
+
+                            <li>Chat members</li>
+
+
+                        </ul>
+
+
+
+                    </div>
+
+
+
                 </div>
             </div>
 

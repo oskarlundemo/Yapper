@@ -13,6 +13,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment/moment.js";
 import {supabase} from "../../services/supabaseClient.js";
 import {parseLatestMessage} from "./PrivateConversationCard.jsx";
+import {GroupAvatar} from "./GroupAvatar.jsx";
 
 
 export const GroupConversationCard = ({
@@ -20,7 +21,7 @@ export const GroupConversationCard = ({
                                           groupId = 0,
                                           inspectGroupChat, setUpdatedMessage,
                                           latestMessage = null,
-                                          groupName = '',
+                                          groupName = '', group = null,
                                       }) => {
 
     const {user} = useAuth();
@@ -88,7 +89,7 @@ export const GroupConversationCard = ({
             inspectGroupChat(groupId, groupName);
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
-                <UserAvatar username={latestMessage.sender} height={40} width={40} />
+                <GroupAvatar group={group} height={40} width={40} />
             </div>
 
             <div className="conversation-card-content">

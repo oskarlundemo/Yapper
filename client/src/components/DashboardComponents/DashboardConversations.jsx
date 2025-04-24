@@ -229,6 +229,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                             conversation.group && conversation.group.id ? (
                                 <GroupConversationCard
                                     key={index}
+                                    group={conversation.group}
                                     groupId={conversation.group.id}
                                     groupName={conversation.group.name}
                                     latestMessage={conversation.latestMessage}
