@@ -26,13 +26,15 @@ export const GroupConversationCard = ({
 
     const {user} = useAuth();
     const [channel, setChannel] = useState(null);
+    const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [localMessage, setLocalMessage] = useState(latestMessage);
+    const [testGroupName, setGroupName] = useState(groupName);
 
 
     useEffect(() => {
         if (!user?.id || !groupId) return;
 
-        const channelName = `conversation-${user.id}-${groupId}`;
+        const channelName = `latestmessage-${user.id}-${groupId}`;
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -70,8 +72,44 @@ export const GroupConversationCard = ({
             )
             .subscribe();
 
-        // Cleanup on unmount
         setChannel((prevChannel) => {
+            if (prevChannel) {
+                supabase.removeChannel(prevChannel);
+            }
+            return newChannel;
+        });
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user.id, groupId]);
+
+
+    useEffect(() => {
+        if (!user?.id || !groupId) return;
+
+        const channelName = `groupname-${user.id}-${groupId}`;
+        const newChannel = supabase
+            .channel(channelName)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'GroupChats',
+                },
+                async (payload) => {
+
+                    const group = payload.new;
+                    console.log(group)
+
+                    if (group.id === groupId) {
+                        setGroupName(group.name);
+                    }
+                }
+            )
+            .subscribe();
+
+        setGroupNameChannel((prevChannel) => {
             if (prevChannel) {
                 supabase.removeChannel(prevChannel);
             }
@@ -93,7 +131,7 @@ export const GroupConversationCard = ({
             </div>
 
             <div className="conversation-card-content">
-                <h3 className={'conversation-contact'}>{groupName}
+                <h3 className={'conversation-contact'}>{testGroupName}
                     <span>
                         {moment(localMessage?.created_at).format("h:mm A")}
                     </span></h3>

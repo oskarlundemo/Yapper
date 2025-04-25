@@ -4,10 +4,8 @@ import {prisma} from "../prisma/index.js";
 export const updateGroupDescription = async(req,res, next) => {
 
     try {
-        console.log(req.body)
         if (!req.body.description)
-            return res.status(400).send('Bio not found');
-
+            return;
         await prisma.groupChats.update({
             where: {
                 id: parseInt(req.params.groupId),
@@ -25,6 +23,30 @@ export const updateGroupDescription = async(req,res, next) => {
     }
 }
 
+
+export const updateGroupName = async(req,res, next) => {
+
+    try {
+        if (!req.body.groupName)
+            return;
+
+        const groupName = req.body.groupName;
+
+        await prisma.groupChats.update({
+            where: {
+                id: parseInt(req.params.groupId),
+            },
+            data: {
+                name: groupName,
+            }
+        })
+        next();
+    } catch (err) {
+        console.log(err)
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
 export const updateGroupAvatar = async (req,res, next) => {
     try {
         if (req.file) {
@@ -36,8 +58,8 @@ export const updateGroupAvatar = async (req,res, next) => {
                     id: parseInt(req.params.groupId),
                 }
             })
+            res.status(200).json({message: "Group updated successfully"});
         }
-        res.status(200).json({message: "Group updated successfully"});
         next();
     } catch (err) {
         console.log(err)

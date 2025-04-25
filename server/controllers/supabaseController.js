@@ -57,7 +57,7 @@ export const saveAvatar = async (req, res) => {
 };
 
 
-export const saveGroupAvatar = async (req, res) => {
+export const saveGroupAvatar = async (req, res, next) => {
 
     if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -81,6 +81,7 @@ export const saveGroupAvatar = async (req, res) => {
             console.error("Upload Error:", error.message);
         }
 
+        next()
         return { message: 'Group avatar successfully updated' };
 
     } catch (err) {

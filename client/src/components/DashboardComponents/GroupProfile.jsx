@@ -8,21 +8,67 @@ import {useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {GroupAvatar} from "./GroupAvatar.jsx";
 import '../../styles/Dashboard/GroupProfile.css'
+import {supabase} from "../../services/supabaseClient.js";
 
 export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
 
     const {user} = useAuth();
 
-    const [description, setDescription] = useState("")
+    const [description, setDescription] = useState(group?.description || '');
     const [file, setFile] = useState(null)
     const [newAvatar, setNewAvatar] = useState(null)
-    const [disabledBio, setDisabledBio] = useState(true)
+    const [disabledDescription, setDisabledDescription] = useState(true)
     const [saveChanges, setSaveChanges] = useState(false)
     const [charsCount, setCharsCount] = useState(0)
-    const [groupName, setGroupName] = useState(group.name)
+    const [groupName, setGroupName] = useState(group?.name)
+    const [groupNameChannel, setGroupNameChannel] = useState(null);
 
     useEffect(() => {
-        setDescription(group?.description)
+        if (!user?.id || !group?.id) return;
+
+        const channelName = `updateGroupProfile-${user.id}-${group.id}`;
+        const newChannel = supabase
+            .channel(channelName)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'GroupChats',
+                },
+                async (payload) => {
+
+                    const group = payload.new;
+                    console.log(group)
+
+                    if (group.id === group.id) {
+                        setGroupName(group.name);
+                        setDescription(group.description);
+                    }
+                }
+            )
+            .subscribe();
+
+        setGroupNameChannel((prevChannel) => {
+            if (prevChannel) {
+                supabase.removeChannel(prevChannel);
+            }
+            return newChannel;
+        });
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user.id, group]);
+
+
+
+
+    useEffect(() => {
+        setDescription(group?.description || '')
+    }, [group])
+
+    useEffect(() => {
+        setGroupName(group?.name || '')
     }, [group])
 
 
@@ -35,11 +81,12 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
         e.preventDefault();
 
         setSaveChanges(false);
-        setDisabledBio(true);
+        setDisabledDescription(true);
 
         const formData = new FormData();
         formData.append('avatar', newAvatar);
         formData.append('description', description);
+        formData.append('groupName', groupName);
 
         try {
             fetch(`${API_URL}/groups/update/${group.id}`, {
@@ -64,7 +111,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
 
                 <div className={'user-info'}>
 
-                    {disabledBio ? (
+                    {disabledDescription ? (
                         <h2>{groupName || ''}</h2>
                     ) : (
                         <input className={'group-name-input'}
@@ -76,22 +123,22 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
                     {group?.admin_id === user.id ? (
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
-                            {disabledBio ? (
-                                <p className={'user-bio'}>{group?.description || description || 'No description'}</p>
+                            {disabledDescription ? (
+                                <p className={'user-bio'}>{ description || 'No description'}</p>
                             ) : (
                                 <>
                                 <textarea value={description}
-                                          placeholder={group?.description || description || 'No description'}
-                                          disabled={disabledBio}
+                                          placeholder={description}
+                                          disabled={disabledDescription}
                                           onChange={(e) => setDescription(e.target.value)}
                                 />
                                     <p><span>{charsCount}</span>/50</p>
                                 </>
                             )}
 
-                            {disabledBio ? (
+                            {disabledDescription ? (
                                 <svg onClick={() => {
-                                    setDisabledBio(!disabledBio);
+                                    setDisabledDescription(!disabledDescription);
                                     setSaveChanges(true);
                                 }} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>
                             ): null}
@@ -104,7 +151,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
                             )}
                         </form>
                     ) : (
-                        <p>{group?.description || description || 'No description'}</p>
+                        <p>{description || 'No description'}</p>
                     )}
 
 

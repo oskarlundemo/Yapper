@@ -26,7 +26,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
             }
         };
         fetchImage();
-    }, [user]);
+    }, [group]);
 
 
     const fileInputRef = useRef(null);
