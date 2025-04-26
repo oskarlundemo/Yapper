@@ -20,16 +20,20 @@ export const GroupConversationCard = ({
                                           showChatWindow,
                                           groupId = 0,
                                           inspectGroupChat, setUpdatedMessage,
+                                          groupName, setGroupName,
                                           latestMessage = null,
-                                          groupName = '', group = null,
+                                          group = null,
                                       }) => {
 
     const {user} = useAuth();
     const [channel, setChannel] = useState(null);
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [localMessage, setLocalMessage] = useState(latestMessage);
-    const [testGroupName, setGroupName] = useState(groupName);
 
+
+    useEffect(() => {
+        setGroupName(group?.name);
+    }, []);
 
     useEffect(() => {
         if (!user?.id || !groupId) return;
@@ -100,7 +104,6 @@ export const GroupConversationCard = ({
                 async (payload) => {
 
                     const group = payload.new;
-                    console.log(group)
 
                     if (group.id === groupId) {
                         setGroupName(group.name);
@@ -131,7 +134,7 @@ export const GroupConversationCard = ({
             </div>
 
             <div className="conversation-card-content">
-                <h3 className={'conversation-contact'}>{testGroupName}
+                <h3 className={'conversation-contact'}>{groupName}
                     <span>
                         {moment(localMessage?.created_at).format("h:mm A")}
                     </span></h3>

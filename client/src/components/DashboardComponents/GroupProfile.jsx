@@ -10,7 +10,7 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 import '../../styles/Dashboard/GroupProfile.css'
 import {supabase} from "../../services/supabaseClient.js";
 
-export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
+export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setGroupName, API_URL}) => {
 
     const {user} = useAuth();
 
@@ -20,7 +20,6 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL}) => {
     const [disabledDescription, setDisabledDescription] = useState(true)
     const [saveChanges, setSaveChanges] = useState(false)
     const [charsCount, setCharsCount] = useState(0)
-    const [groupName, setGroupName] = useState(group?.name)
     const [groupNameChannel, setGroupNameChannel] = useState(null);
 
     useEffect(() => {

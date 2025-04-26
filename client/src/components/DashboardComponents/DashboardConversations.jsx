@@ -7,7 +7,10 @@ import {LoadingExample} from "./LoadingExample.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 
 
-export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setUpdatedMessage, inspectGroupChat, showNewMessages, showChatWindow, API_URL}) => {
+export const DashboardConversations = ({inspectPrivateConversation, updatedMessage,
+                                           setUpdatedMessage, inspectGroupChat,
+                                           groupName, setGroupName,
+                                           showNewMessages, showChatWindow, API_URL}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [allConversations, setAllConversations] = useState([])
@@ -228,10 +231,11 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         allConversations.map((conversation, index) =>
                             conversation.group && conversation.group.id ? (
                                 <GroupConversationCard
+                                    groupName={groupName}
+                                    setGroupName={setGroupName}
                                     key={index}
                                     group={conversation.group}
                                     groupId={conversation.group.id}
-                                    groupName={conversation.group.name}
                                     latestMessage={conversation.latestMessage}
                                     showChatWindow={showChatWindow}
                                     setUpdatedMessage={setUpdatedMessage}
