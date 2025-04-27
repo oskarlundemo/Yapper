@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+
+.groupMemberPopUp {
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    padding: 1rem;
+    z-index: 4;
+    background-color: var(--background-color);
+    box-shadow: var(--default-boxshadow);
+    transition: var(--default-transition);
+    border-radius: var(--border-radius);
+    transform: translate(-50%, -50%) scale(1);
+
+}
+
+.groupMemberPopUp.hide {
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.groupMemberPopUp-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    svg:hover {
+        fill: var(--error-color);
+        cursor: pointer;
+    }
+}

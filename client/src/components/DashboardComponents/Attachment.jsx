@@ -15,8 +15,6 @@ export const Attachment = ({file}) => {
 
 
         const url = URL.createObjectURL(data)
-
-
         const a = document.createElement('a');
         a.href = url;
         a.download = path;
@@ -25,7 +23,6 @@ export const Attachment = ({file}) => {
         document.body.removeChild(a);
 
         URL.revokeObjectURL(url);
-
     }
 
     return (

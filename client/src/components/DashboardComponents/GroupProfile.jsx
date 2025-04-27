@@ -10,7 +10,7 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 import '../../styles/Dashboard/GroupProfile.css'
 import {supabase} from "../../services/supabaseClient.js";
 
-export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setGroupName, API_URL}) => {
+export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setGroupName, API_URL, showGroupMembers}) => {
 
     const {user} = useAuth();
 
@@ -155,17 +155,9 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setG
 
 
                     <div className={'group-settings-container'}>
-
-
                         <ul className={'group-settings'}>
-
-
-                            <li>Chat members</li>
-
-
+                            <li onClick={() => showGroupMembers(group)}>Chat members</li>
                         </ul>
-
-
 
                     </div>
 

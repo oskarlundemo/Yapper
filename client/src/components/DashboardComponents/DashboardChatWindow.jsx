@@ -14,7 +14,7 @@ import {GroupProfile} from "./GroupProfile.jsx";
 
 export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName,
                                         selectedUser, miniBar, setMiniBar, groupChat, setGroupName, groupName,
-                                        setGroupChat, messages, setMessages, friend, showMessage, receiver}) => {
+                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, showGroupMembers}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
@@ -214,7 +214,7 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                     </div>
 
                     {groupChat ? (
-                        <GroupProfile groupName={groupName} setGroupName={setGroupName} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
+                        <GroupProfile showGroupMembers={showGroupMembers} groupName={groupName} setGroupName={setGroupName} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
                         ) : (
                             <UserProfile API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
                         )}
