@@ -80,9 +80,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                 setSelectedUser(data.otherUser);
             })
             .catch(err => console.log(err));
-
         toggleShowMessage(false);
-
     }
 
     const inspectGroupChat = async (receiver_id, chatname) => {
@@ -101,6 +99,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             .then(data => {
                 setMessages(data.groupMessages);
                 setCurrentGroupInfo(data.group);
+                console.log(data);
             })
             .catch(err => console.log(err));
     }
@@ -127,8 +126,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                                  API_URL={API_URL} showProfile={showProfile} showGroupMembers={showGroupMembers}
                 />
             </main>
-            <GroupMemberPopUp hideOverlay={setHideOverlay} closePopUp={setHideGroupPopUp}  hidePopUp={hideGroupPopUp} />
-            <Overlay setHideOverlay={setHideOverlay} clickOnOverlay={clickOnOverlay}/>
+            <GroupMemberPopUp group={currentGroupInfo} hideOverlay={setHideOverlay} closePopUp={setHideGroupPopUp}  hidePopUp={hideGroupPopUp} />
+            <Overlay hideOverlay={hideOverlay} setHideOverlay={setHideOverlay} clickOnOverlay={clickOnOverlay}/>
         </>
     )
 }

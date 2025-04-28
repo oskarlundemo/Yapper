@@ -10,17 +10,17 @@
 .groupMemberPopUp {
     width: 400px;
     height: 400px;
-    top: 50%;
-    left: 50%;
     position: fixed;
+    transform: translate(-50%, -50%) scale(1);
+    left: 50%;
+    top: 50%;
+
     padding: 1rem;
     z-index: 4;
     background-color: var(--background-color);
     box-shadow: var(--default-boxshadow);
-    transition: var(--default-transition);
     border-radius: var(--border-radius);
-    transform: translate(-50%, -50%) scale(1);
-
+    transition: var(--default-transition);
 }
 
 .groupMemberPopUp.hide {
@@ -37,3 +37,59 @@
         cursor: pointer;
     }
 }
+
+
+.groupMemberPopUp-add {
+    margin: 0 0 2rem 0;
+    input {
+        border: none;
+        outline: none;
+        border-bottom: 2px solid var(--secondary-color);
+        transition: var(--default-transition);
+        width: 100%;
+        padding: 0;
+        font-size: inherit;
+        font-family: inherit;
+    }
+
+    input:focus {
+        border-bottom: 2px solid var(--accent-color);
+    }
+}
+
+.groupMemberPopUp-users {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.groupMemberPopUp-user-card {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+.user-card-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    position: relative;
+
+    svg {
+        transition: var(--default-transition);
+    }
+
+    svg:hover {
+        cursor: pointer;
+        fill: var(--error-color);
+    }
+
+    span {
+        position: relative;
+        display: none;
+    }
+}
+
+

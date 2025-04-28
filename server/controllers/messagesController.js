@@ -374,6 +374,13 @@ export const getMessagesFromGroupConversation = async (req, res) => {
         const group = await prisma.groupChats.findUnique({
             where: {
                 id: groupId
+            },
+            include: {
+                GroupMembers: {
+                    include: {
+                        Member: true,
+                    }
+                }
             }
         })
 

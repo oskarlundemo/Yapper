@@ -3,12 +3,14 @@ import {useState} from "react";
 
 import '../../styles/Dashboard/GroupMemberPopUp.css'
 import {ContactCard} from "./ContactCard.jsx";
+import {UserAvatar} from "../UserAvatar.jsx";
 
 export const GroupMemberPopUp = ({group, hidePopUp, closePopUp, hideOverlay}) => {
 
+    console.log(group)
 
-    const [groupMembers, setGroupMembers] = useState(group || []);
-
+    const [groupMembers, setGroupMembers] = useState(group.GroupMembers);
+    const [addUserInput, setAddUserInput] = useState("");
 
     return (
         <div className={`groupMemberPopUp ${hidePopUp ? "hide" : ""}`}>
@@ -17,11 +19,32 @@ export const GroupMemberPopUp = ({group, hidePopUp, closePopUp, hideOverlay}) =>
                 <svg onClick={() => {closePopUp(true); hideOverlay(true)}} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
             </div>
 
-            <div className="groupMemberPopUp-users">
-                {group  && (
-                    group.map((member, index) => (
-                        <ContactCard friend={member} key={member.id}/>
 
+            <div className="groupMemberPopUp-add">
+                <input
+                    className="groupMemberPopUp-input"
+                    type="text"
+                    placeholder="Add member"
+                    onChange={(e) => setAddUserInput(e.target.value)}
+                    value={addUserInput}
+                />
+            </div>
+
+
+            <div className="groupMemberPopUp-users">
+
+                {groupMembers.length > 0 && (
+                    groupMembers.map((groupMember, index) => (
+                        <div className="groupMemberPopUp-user-card" key={index}>
+                            <UserAvatar user={groupMember.Member} width={40} height={40} key={index}/>
+                            <p key={index}>{groupMember.Member.username}</p>
+
+
+                            <div className="user-card-controls">
+                                <span>Remove</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-520v-80h240v80H640Zm-280 40q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"/></svg>
+                            </div>
+                        </div>
                     ))
                 )}
             </div>
