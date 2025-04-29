@@ -76,7 +76,7 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
         <div className={`dashboard-message-input ${miniBar ? '' : 'mini'}`}>
             <div className="message-card">
 
-                {!friend && (
+                {(!friend && !groupChat) && (
                     <div className="friend-request-alert">
                         <p>By answering to a message you automatically become friends</p>
                     </div>

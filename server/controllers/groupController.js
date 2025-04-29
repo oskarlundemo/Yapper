@@ -2,7 +2,6 @@ import {prisma} from "../prisma/index.js";
 
 
 export const updateGroupDescription = async(req,res, next) => {
-
     try {
         if (!req.body.description)
             return;
@@ -24,11 +23,115 @@ export const updateGroupDescription = async(req,res, next) => {
 }
 
 
-export const updateGroupName = async(req,res, next) => {
 
+
+
+export const leaveGroupChat = async(req,res) => {
+
+    try {
+        await prisma.groupMembers.delete({
+            where: {
+                member_id_group_id: {
+                    group_id: parseInt(req.params.groupId),
+                    member_id: parseInt(req.params.groupMemberId)
+                }
+            }
+        })
+        res.status(200).json(`User left the group chat`);
+    } catch (err) {
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
+
+export const deleteGroupChat = async(req,res) => {
+
+    try {
+        await prisma.groupChats.delete({
+            where: {
+                id: parseInt(req.params.groupId),
+            }
+        })
+        res.status(201).json('Group deleted successfully');
+    } catch (err) {
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
+export const addUserToGroup = async(req,res, next) => {
+
+    try {
+        await prisma.groupMembers.create({
+            data: {
+                group_id: parseInt(req.params.groupId),
+                member_id: parseInt(req.params.newUserId)
+            }
+        })
+
+
+        const updatedUsers = await prisma.groupChats.findUnique({
+            where: {
+                id: parseInt(req.params.groupId),
+            },
+            include: {
+                GroupMembers: {
+                    include: {
+                        Member: true
+                    }
+                }
+            }
+        })
+
+        res.status(200).json(updatedUsers);
+
+    } catch (err) {
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
+export const removeUserFromGroup = async(req,res) => {
+    try {
+        await prisma.groupMembers.delete({
+            where: {
+                member_id_group_id: {
+                    group_id: parseInt(req.params.groupId),
+                    member_id: parseInt(req.params.groupMemberId)
+                }
+            }
+        })
+
+        const remainingUsers = await prisma.groupChats.findUnique({
+            where: {
+                id: parseInt(req.params.groupId),
+            },
+            include: {
+                GroupMembers: {
+                    include: {
+                        Member: true
+                    }
+                }
+            }
+        })
+
+        res.status(200).json(remainingUsers);
+    } catch (err) {
+        console.log(err)
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
+
+
+export const updateGroupName = async(req,res, next) => {
     try {
         if (!req.body.groupName)
             return;
+
+        console.log(req.body)
 
         const groupName = req.body.groupName;
 

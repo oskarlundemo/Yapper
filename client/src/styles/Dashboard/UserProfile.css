@@ -4,6 +4,7 @@
 
 
 .user-profile-container {
+
     justify-content: flex-start;
     align-items: center;
     display: flex;
@@ -201,4 +202,43 @@
 
 .user-bio {
     text-align: center !important;
+}
+
+
+.loading-avatar {
+    animation: pulse 2s infinite;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+}
+
+.loading-username {
+    animation: pulse 2s infinite;
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    height: 3rem;
+    width: 150px;
+    align-self: center;
+}
+
+
+.loading-body-text {
+    margin-top: 1rem;
+    animation: pulse 2s infinite;
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    height: 300px;
+    width: 150px;
+    align-self: center;
+}
+
+
+.block-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: fit-content;
+    align-self: center;
 }

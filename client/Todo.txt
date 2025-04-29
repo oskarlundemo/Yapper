@@ -5,8 +5,9 @@ Prio 1
 [x] Skicka bilder
 [x] Skicka gifs
 [?] Skicka group request
-[] Admin can lägga till och ta bort användare efter gruppen är skapad
+[x] Admin can lägga till och ta bort användare efter gruppen är skapad
 [] Användare kan blockera andra eller lämna gruppkonversationer
+[x] Användare kan lämna gruppchattar
 []
 
 Prio 2

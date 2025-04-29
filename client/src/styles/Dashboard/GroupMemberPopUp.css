@@ -14,6 +14,8 @@
     transform: translate(-50%, -50%) scale(1);
     left: 50%;
     top: 50%;
+    display: flex;
+    flex-direction: column;
 
     padding: 1rem;
     z-index: 4;
@@ -76,20 +78,58 @@
     align-items: center;
     margin-left: auto;
     position: relative;
+}
 
-    svg {
-        transition: var(--default-transition);
+
+.user-card-box {
+    position: relative;
+    display: flex;
+
+
+    span {
+        display: none;
+        position: absolute;
+        transform: translateY(-100%) translateX(-30%);
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        padding: 2px 3px;
     }
+}
+
+.user-card-box:hover {
 
     svg:hover {
         cursor: pointer;
-        fill: var(--error-color);
     }
 
-    span {
-        position: relative;
-        display: none;
+    span{
+        display: block;
     }
 }
 
 
+.groupMemberPopUp-footer {
+    margin-top: auto;
+    justify-self: center;
+    align-self: center;
+
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+}
+
+
+.admin-icon:hover {
+    fill: var(--golden-yellow);
+}
+
+.remove-icon:hover {
+    cursor: pointer;
+    fill: var(--error-color);
+}

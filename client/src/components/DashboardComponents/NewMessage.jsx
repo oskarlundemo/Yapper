@@ -2,45 +2,15 @@ import {useEffect, useState} from "react";
 import '../../styles/Dashboard/NewMessage.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {ContactCard} from "./ContactCard.jsx";
+import {DropDownWithUsersComponent} from "./DropDownWithUsers.jsx";
 
-export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => {
+export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
 
     const [userSearchString, setUserSearchString] = useState("");
     const [inputFocused, setInputFocused] = useState(false);
-    const [moreUsers, setMoreUsers] = useState([]);
     const [filteredMoreUsers, setFilteredMoreUsers] = useState([]);
-
     const [filteredContacts, setFilteredContacts] = useState([]);
-    const [userFriends, setUserFriends] = useState([]);
     const {user} = useAuth()
-
-    useEffect(() => {
-        fetch(`${API_URL}/friends/all/${user.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                setUserFriends(data);
-            })
-            .catch(err => console.log(err))
-
-
-        fetch(`${API_URL}/users/${user.id}/filter`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                setMoreUsers(data);
-            })
-            .catch(err => console.log(err))
-    }, [])
 
 
     useEffect(() => {
@@ -92,54 +62,17 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat}) => 
                 )}
             </div>
 
-            <div className="new-message-input-container">
-                <input
-                        type="text"
-                        id="message"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        onChange={(e) => setUserSearchString(e.target.value)}
-                        value={userSearchString}
-                        onFocus={() => setInputFocused(true)}
-                        onBlur={() => setTimeout(() => setInputFocused(false), 150)}
-                />
+            <DropDownWithUsersComponent
+                filteredContacts={filteredContacts}
+                filteredMoreUsers={filteredMoreUsers}
+                setInputFocused={setInputFocused}
+                userSearchString={userSearchString}
+                inputFocused={inputFocused}
+                setUserSearchString={setUserSearchString}
+                addToConversation={addToConversation}
+            />
 
-                {inputFocused && (
-                    <div className="new-message-search-results">
 
-                        {filteredContacts.length > 0 && (
-                            <>
-                                <p className="sub-header-contact">Your contacts</p>
-                                {filteredContacts.map((friend) => (
-                                    <ContactCard
-                                        key={friend.id}
-                                        friend={friend?.friend || friend}
-                                        addToConversation={addToConversation}
-                                    />
-                                ))}
-                            </>
-                        )}
-
-                        {filteredMoreUsers.length > 0 && (
-                            <>
-                                <p className="sub-header-contact">Other users</p>
-                                {filteredMoreUsers.map((user) => (
-                                    <ContactCard
-                                        key={user.id}
-                                        friend={user}
-                                        addToConversation={addToConversation}
-                                    />
-                                ))}
-                            </>
-                        )}
-
-                        {filteredContacts.length === 0 && filteredMoreUsers.length === 0 && (
-                            <p className="no-results-text">No users found</p>
-                        )}
-                    </div>
-                )}
-            </div>
         </div>
     )
 }

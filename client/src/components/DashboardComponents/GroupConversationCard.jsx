@@ -20,7 +20,6 @@ export const GroupConversationCard = ({
                                           showChatWindow,
                                           groupId = 0,
                                           inspectGroupChat, setUpdatedMessage,
-                                          groupName, setGroupName,
                                           latestMessage = null,
                                           group = null,
                                       }) => {
@@ -28,8 +27,8 @@ export const GroupConversationCard = ({
     const {user} = useAuth();
     const [channel, setChannel] = useState(null);
     const [groupNameChannel, setGroupNameChannel] = useState(null);
+    const [groupName, setGroupName] = useState('');
     const [localMessage, setLocalMessage] = useState(latestMessage);
-
 
     useEffect(() => {
         setGroupName(group?.name);

@@ -109,8 +109,8 @@
 
 .dashboard-chat-window {
     display: grid;
-    grid-template-rows: 2fr 0.2fr;
-    grid-template-columns: auto 0.5fr;
+    grid-template-rows: 2fr 0.1fr;
+    grid-template-columns: 2fr 0.5fr;
     border-radius: var(--border-radius);
     overflow: hidden;
     margin: 1rem 1rem 1rem 0;
@@ -163,6 +163,10 @@
     color: var(--text-color);
     display: flex;
     flex-direction: column;
+
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
 
     p {
         color: white;
@@ -227,8 +231,8 @@
     h4 {
         display: flex;
         flex-direction: row;
-        margin: 0 1rem;
-        color: var(--secondary-color);
+        margin: 1rem;
+        color: var(--text-color);
     }
 
     h4:before, h4:after {
@@ -237,4 +241,25 @@
         border-bottom: 1px solid var(--secondary-color);
         margin: auto;
     }
+}
+
+
+.loading-messages-card {
+    height: 100px;
+    margin: 0.5rem;
+    border-radius: 15px;
+    background-color: var(--secondary-color);
+    width: 50%;
+
+    animation: pulse 2s infinite;
+
+}
+
+.loading-messages-card:nth-of-type(2) {
+    justify-self: flex-end;
+}
+
+.loading-messages-card:nth-of-type(4) {
+    justify-self: flex-end;
+    height: 150px;
 }

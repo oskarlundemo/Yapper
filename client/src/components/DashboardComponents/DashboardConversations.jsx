@@ -9,15 +9,46 @@ import {supabase} from "../../services/supabaseClient.js";
 
 export const DashboardConversations = ({inspectPrivateConversation, updatedMessage,
                                            setUpdatedMessage, inspectGroupChat,
-                                           groupName, setGroupName,
                                            showNewMessages, showChatWindow, API_URL}) => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [allConversations, setAllConversations] = useState([])
     const [loading, setLoading] = useState(true)
-    const [privateChannel, setPrivateChannel] = useState(null);
+    const [privateChannel, setPrivateChannel] = useState(null)
+    const [conversationChannel, setConversationChannel] = useState(null)
     const [groupChannel, setGroupChannel] = useState(null);
     const {user} = useAuth();
+
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-group-conversations-remove')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'GroupMembers',
+                },
+                (payload) => {
+                    const removedUser = payload.old;
+                    if (removedUser.member_id === user.id) {
+                        setAllConversations(prev =>
+                            prev.filter(conv => conv.group?.id !== removedUser.group_id)
+                        );
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
 
 
 
@@ -231,8 +262,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         allConversations.map((conversation, index) =>
                             conversation.group && conversation.group.id ? (
                                 <GroupConversationCard
-                                    groupName={groupName}
-                                    setGroupName={setGroupName}
                                     key={index}
                                     group={conversation.group}
                                     groupId={conversation.group.id}

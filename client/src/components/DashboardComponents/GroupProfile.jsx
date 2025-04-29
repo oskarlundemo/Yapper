@@ -10,7 +10,7 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 import '../../styles/Dashboard/GroupProfile.css'
 import {supabase} from "../../services/supabaseClient.js";
 
-export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setGroupName, API_URL, showGroupMembers}) => {
+export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, headerName, showGroupMembers}) => {
 
     const {user} = useAuth();
 
@@ -21,6 +21,13 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setG
     const [saveChanges, setSaveChanges] = useState(false)
     const [charsCount, setCharsCount] = useState(0)
     const [groupNameChannel, setGroupNameChannel] = useState(null);
+    const [groupName, setGroupName] = useState(group?.name);
+
+
+
+    useEffect(() => {
+        setGroupName(group?.name);
+    }, [group]);
 
     useEffect(() => {
         if (!user?.id || !group?.id) return;
@@ -38,11 +45,10 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setG
                 async (payload) => {
 
                     const group = payload.new;
-                    console.log(group)
 
                     if (group.id === group.id) {
-                        setGroupName(group.name);
                         setDescription(group.description);
+                        headerName(group.name)
                     }
                 }
             )
@@ -66,9 +72,6 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setG
         setDescription(group?.description || '')
     }, [group])
 
-    useEffect(() => {
-        setGroupName(group?.name || '')
-    }, [group])
 
 
     useEffect(() => {
@@ -160,8 +163,6 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, groupName, setG
                         </ul>
 
                     </div>
-
-
 
                 </div>
             </div>

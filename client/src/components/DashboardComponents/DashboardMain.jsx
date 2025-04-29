@@ -1,13 +1,13 @@
 import {DashboardConversations} from "./DashboardConversations.jsx";
 import {DashboardChatWindow} from "./DashboardChatWindow.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {DashboardMenu} from "./DashboardMenu.jsx";
 import {Overlay} from "./Overlay.jsx";
 import {GroupMemberPopUp} from "./GroupMemberPopUp.jsx";
 
 
-export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
+export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, setShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
 
     const [messages, setMessages] = useState([]);
     const [friend, setFriend] = useState(null);
@@ -19,12 +19,11 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentGroupInfo, setCurrentGroupInfo] = useState(null);
 
-
     const [hideOverlay, setHideOverlay] = useState(true);
     const [hideGroupPopUp, setHideGroupPopUp] = useState(true);
 
+    const [loadingMessages, setLoadingMessages] = useState(true);
 
-    const [groupName, setGroupName] = useState("");
 
     const {user} = useAuth();
 
@@ -32,9 +31,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const showUserInfo = (inspectedUser = null) => {
         setMiniBar(true);
         setSelectedUser(inspectedUser);
-        console.log(inspectedUser);
     }
-
 
     const showGroupMembers = () => {
         setHideGroupPopUp(false);
@@ -51,6 +48,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     }
 
     const inspectPrivateConversation = async (receiver_id, chatname = '') => {
+        setLoadingMessages(true);
         setGroupChat(false);
         setReceiver(receiver_id);
         setChatName(chatname);
@@ -78,16 +76,17 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             .then(data => {
                 setMessages(data.messagesWithAttachments);
                 setSelectedUser(data.otherUser);
+                setLoadingMessages(false);
             })
             .catch(err => console.log(err));
         toggleShowMessage(false);
     }
 
     const inspectGroupChat = async (receiver_id, chatname) => {
+        setLoadingMessages(true);
         setGroupChat(true);
         setReceiver(receiver_id);
         showChatWindow();
-        setGroupName(chatname);
         setChatName(chatname);
         fetch(`${API_URL}/messages/group/conversation/${user.id}/${receiver_id}`, {
             method: "GET",
@@ -99,10 +98,46 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             .then(data => {
                 setMessages(data.groupMessages);
                 setCurrentGroupInfo(data.group);
-                console.log(data);
+                setLoadingMessages(false);
             })
             .catch(err => console.log(err));
     }
+
+
+
+    const [userFriends, setUserFriends] = useState([]);
+    const [moreUsers, setMoreUsers] = useState([]);
+
+
+
+    useEffect(() => {
+        fetch(`${API_URL}/friends/all/${user.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setUserFriends(data);
+            })
+            .catch(err => console.log(err))
+
+
+        fetch(`${API_URL}/users/${user.id}/filter`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setMoreUsers(data);
+            })
+            .catch(err => console.log(err))
+    }, [])
+
 
 
     return (
@@ -110,23 +145,23 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
             <main className={'dashboard-main'}>
                 <DashboardMenu showProfile={showUserInfo} />
 
-                <DashboardConversations groupName={groupName} setGroupName={setGroupName} updatedMessage={updatedMessage}
-                                    setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat}
-                                    showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow}
+                <DashboardConversations
+                                    updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat}
+                                    showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} setShowNewMessage={setShowNewMessage}
                                     inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile}
                 />
 
-                <DashboardChatWindow setGroupName={setGroupName} groupName={groupName} currentGroupInfo={currentGroupInfo}
-                                 showGroupInfo={showGroupInfo} selectedUser={selectedUser}
-                                 showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar}
+                <DashboardChatWindow
+                                 setChatName={setChatName} currentGroupInfo={currentGroupInfo} showGroupInfo={showGroupInfo} selectedUser={selectedUser}
+                                 showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} moreUsers={moreUsers} userFriends={userFriends}
                                  setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName}
                                  friend={friend} showMessage={showMessage} showChatWindow={showChatWindow}
                                  inspectConversation={inspectPrivateConversation} receiver={receiver}
                                  showRequests={showRequests} messages={messages} setMessages={setMessages}
-                                 API_URL={API_URL} showProfile={showProfile} showGroupMembers={showGroupMembers}
+                                 API_URL={API_URL} showProfile={showProfile} showGroupMembers={showGroupMembers} loadingMessages={loadingMessages}
                 />
             </main>
-            <GroupMemberPopUp group={currentGroupInfo} hideOverlay={setHideOverlay} closePopUp={setHideGroupPopUp}  hidePopUp={hideGroupPopUp} />
+            <GroupMemberPopUp moreUsers={moreUsers} userFriends={userFriends} API_URL={API_URL} group={currentGroupInfo} hideOverlay={setHideOverlay} closePopUp={setHideGroupPopUp}  hidePopUp={hideGroupPopUp} />
             <Overlay hideOverlay={hideOverlay} setHideOverlay={setHideOverlay} clickOnOverlay={clickOnOverlay}/>
         </>
     )

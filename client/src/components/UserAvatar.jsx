@@ -15,7 +15,7 @@ export const UserAvatar = ({height, width, user = null,
         const fetchImage = async () => {
             if (!user?.avatar) {
                 setCurrentAvatar(null);
-                setFile(null);
+           //   setFile(null);
                 return;
             }
             const { data, error } = supabase.storage

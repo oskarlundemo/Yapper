@@ -8,7 +8,7 @@ import {useState} from "react";
 export const Dashboard = ({API_URL}) => {
     const [showProfile, setShowProfile] = useState(false);
     const [showRequests, setShowRequests] = useState(false);
-    const [showNewMessage, setShowNewMessage] = useState(true);
+    const [showNewMessage, setShowNewMessage] = useState(false);
     const [receiver, setReceiver] = useState(null);
 
 
@@ -32,7 +32,7 @@ export const Dashboard = ({API_URL}) => {
             <DashboardMain
                 toggleShowNewMessage={setShowNewMessage} toggleShowMessage={hideNewMessage}
                 showMessage={showNewMessage} showChatWindow={showChatWindow}
-                receiver={receiver} setReceiver={setReceiver}
+                receiver={receiver} setReceiver={setReceiver} setShowNewMessage={setShowNewMessage}
 
                 API_URL={API_URL} showProfile={showProfile} showRequests={showRequests}
                 setShowProfile={setShowProfile} showNewMessages={showNewMessages}

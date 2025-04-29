@@ -38,6 +38,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                         (message.sender_id === loggedIn.id && message.receiver_id === friend_id) ||
                         (message.sender_id === friend_id && message.receiver_id === loggedIn.id)
                     ) {
+                        console.log(message)
                         setLocalMessage(message);
                         setUpdatedMessage(message);
                     }
@@ -84,15 +85,14 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
 
 
 export const parseLatestMessage = (content) => {
-
     if (!content) {
         return;
     }
-
     if (content?.includes('giphy.com')) {
         return 'Sent a GIF '
-    }
-    else if(content?.length > 20 && content) {
+    } else if (content?.includes('.png')) {
+        return 'Sent a file'
+    } else if (content?.length > 20 && content) {
         const subString = content.substring(0, 20);
         const lastSpace = subString.lastIndexOf(' ');
         return content.substring(0, lastSpace) + '...';

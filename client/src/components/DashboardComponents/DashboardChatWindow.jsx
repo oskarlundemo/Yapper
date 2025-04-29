@@ -13,7 +13,7 @@ import {GroupProfile} from "./GroupProfile.jsx";
 
 
 export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName,
-                                        selectedUser, miniBar, setMiniBar, groupChat, setGroupName, groupName,
+                                        selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages,
                                         setGroupChat, messages, setMessages, friend, showMessage, receiver, showGroupMembers}) => {
 
     const [channel, setChannel] = useState(null);
@@ -194,10 +194,9 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                 <>
                     <div className={`dashboard-message-container ${miniBar ? '' : 'mini'}`}>
                         {showMessage ? (
-                            <NewMessage setGroupChat={setGroupChat} receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
+                            <NewMessage moreUsers={moreUsers} userFriends={userFriends} setGroupChat={setGroupChat} receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
-                            <ConversationHeader showGroupInfo={showGroupInfo} groupChat={groupChat}
-                                                groupName={groupName} chatname={chatName} />
+                            <ConversationHeader showGroupInfo={showGroupInfo} groupChat={groupChat} chatname={chatName} />
                         )}
 
                         <div className="dashboard-message-content">
@@ -205,8 +204,19 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                                 <GroupMemberInfo selectedUser={selectedUser} receivers={receivers}/>
                             ) : (
                                 <>
-                                    {renderedMessages}
-                                    <div ref={messagesEndRef} />
+                                    {loadingMessages ? (
+                                        <>
+                                            <div className="loading-messages-card"/>
+                                            <div className="loading-messages-card"/>
+                                            <div className="loading-messages-card"/>
+                                            <div className="loading-messages-card"/>
+                                        </>
+                                    ) : (
+                                        <>
+                                        {renderedMessages}
+                                        <div ref={messagesEndRef} />
+                                        </>
+                                    )}
                                 </>
                             )}
                         </div>
@@ -214,9 +224,9 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                     </div>
 
                     {groupChat ? (
-                        <GroupProfile showGroupMembers={showGroupMembers} groupName={groupName} setGroupName={setGroupName} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
+                        <GroupProfile headerName={setChatName} showGroupMembers={showGroupMembers} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
                         ) : (
-                            <UserProfile API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
+                            <UserProfile loadingMessages={loadingMessages} API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
                         )}
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
