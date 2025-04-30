@@ -12,7 +12,7 @@ import {ConversationHeader} from "./ConversationHeader.jsx";
 import {GroupProfile} from "./GroupProfile.jsx";
 
 
-export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName,
+export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName, blockedUsers, setBlockedUsers,
                                         selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages,
                                         setGroupChat, messages, setMessages, friend, showMessage, receiver, showGroupMembers}) => {
 
@@ -115,9 +115,7 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                                     "Content-Type": "application/json"
                                 }
                             })
-
                             enrichedMessage.attachments = await response.json();
-
                             const audio = new Audio('notification.mp3');
                             await audio.play();
                             setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
@@ -138,7 +136,6 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
         }
 
     }, [receiver]);
-
 
 
     const renderedMessages = [];
@@ -226,7 +223,9 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                     {groupChat ? (
                         <GroupProfile headerName={setChatName} showGroupMembers={showGroupMembers} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
                         ) : (
-                            <UserProfile loadingMessages={loadingMessages} API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar} setMiniBar={setMiniBar} />
+                            <UserProfile blockedUsers={blockedUsers} loadingMessages={loadingMessages}
+                                         API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
+                                         setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
                         )}
                     <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>

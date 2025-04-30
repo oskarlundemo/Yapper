@@ -14,7 +14,6 @@ export const MessageCard = ({content, files = null, user_id, showUserInfo, sende
         content.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);
     }, [])
 
-
     return (
         <>
             <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>

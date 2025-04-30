@@ -6,9 +6,9 @@ Prio 1
 [x] Skicka gifs
 [?] Skicka group request
 [x] Admin can lägga till och ta bort användare efter gruppen är skapad
-[] Användare kan blockera andra eller lämna gruppkonversationer
+[] Användare kan blockera andra
 [x] Användare kan lämna gruppchattar
-[]
+[] "Sent a file" när man bara skicka en fil ist för ''
 
 Prio 2
 [x] Sortera chattar efter senast aktivitet
@@ -16,8 +16,10 @@ Prio 2
 [x] Updatera chats i realtime, så när man blir vänner updateras det direkt
 [x] Inspektera chattar, så profilen kommer up till höger
 [x] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
+
 [] Se en grön cirkel om användaren är online
 
 
 Prio 3
+[] Guestbook, så användare med test kontot kan skicka meddelande eller gids
 [x] Felmeddelanden i login ska bara var 'Invalid username or password' eller '500 server error'

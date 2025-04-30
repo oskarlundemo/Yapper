@@ -18,7 +18,7 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 
 export const GroupConversationCard = ({
                                           showChatWindow,
-                                          groupId = 0,
+                                          groupId = 0, API_URL,
                                           inspectGroupChat, setUpdatedMessage,
                                           latestMessage = null,
                                           group = null,

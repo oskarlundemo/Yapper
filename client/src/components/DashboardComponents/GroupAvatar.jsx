@@ -13,7 +13,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
         const fetchImage = async () => {
             if (!group?.avatar) {
                 setCurrentAvatar(null);
-                setFile(null);
+              //setFile(null);
                 return;
             }
             const { data, error } = supabase.storage

@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {UserAvatar} from "../UserAvatar.jsx";
 
-export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, loadingMessages, API_URL}) => {
+export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlockedUsers, blockedUsers, loadingMessages, API_URL}) => {
 
     const {user} = useAuth();
 
@@ -20,6 +20,7 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, loadingMe
     useEffect(() => {
         setBio(selectedUser?.bio)
     }, [selectedUser])
+
 
 
     useEffect(() => {
@@ -47,6 +48,49 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, loadingMe
         }
     }
 
+
+    const unblockUser = async (blocked_user) => {
+        try {
+            await fetch(`${API_URL}/blocks/unblock/${user.id}/${blocked_user}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setBlockedUsers(data)
+                })
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
+
+
+    const blockUser = async (blocked_user) => {
+        try {
+            await fetch(`${API_URL}/blocks/${user.id}/${blocked_user}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setBlockedUsers(data)
+                })
+                .catch(err => console.log(err))
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+
+    const toggleDropdown = () => {
+        setShow(!show);
+    }
+
     return (
         <div className={`user-profile-container ${miniBar ? '' : 'hidden'}`}>
 
@@ -71,7 +115,6 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, loadingMe
                     ) : (
                         <h2>{selectedUser?.username || ''}</h2>
                     )}
-
 
 
                     {loadingMessages ? (
@@ -123,15 +166,48 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, loadingMe
                         <div className="loading-button"/>
                     ) : (
 
-                        (selectedUser?.id === user.id ? (
-                            <ul className={'dropdown-blocked'} >Blocked users <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-360 280-560h400L480-360Z"/></svg>
-                                <div>
-                                    <li>Kalle</li>
-                                    <li>Anna</li>
-                                </div>
-                            </ul>
+                        ((selectedUser?.id === user.id) ? (
+
+                            (blockedUsers?.length > 0 && (
+                                <ul className="dropdown-blocked">
+                                    <li className="dropdown-item">
+                                        <button className="dropdown-button" onClick={toggleDropdown}>
+                                            Blocked users
+                                            <svg
+                                                className={`drop-icon ${show ? 'rotate' : ''}`}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="24px"
+                                                viewBox="0 -960 960 960"
+                                                width="24px"
+                                                fill="#e3e3e3"
+                                            >
+                                                <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
+                                            </svg>
+                                        </button>
+
+                                        <ul className={`sub-menu ${show ? 'show' : ''}`}>
+                                            <div>
+                                                {blockedUsers.map((blockedUser, index) => (
+                                                    <li key={index} className="blocked-user-card">
+                                                        <span>{blockedUser.BlockedUser.username || 'Blocked User'}</span>
+                                                        <svg
+                                                            onClick={() => unblockUser(blockedUser.BlockedUser.id)}
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            height="24px"
+                                                            viewBox="0 -960 960 960"
+                                                            width="24px"
+                                                            fill="#e3e3e3">
+                                                            <path d="M200-440v-80h560v80H200Z" />
+                                                        </svg>
+                                                    </li>
+                                                ))}
+                                            </div>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            ))
                         ) : (
-                            <button className="block-button">
+                            <button onClick={() => blockUser(selectedUser?.id)} className="block-button">
                                 Block user
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q54 0 104-17.5t92-50.5L228-676q-33 42-50.5 92T160-480q0 134 93 227t227 93Zm252-124q33-42 50.5-92T800-480q0-134-93-227t-227-93q-54 0-104 17.5T284-732l448 448Z"/></svg>
                             </button>

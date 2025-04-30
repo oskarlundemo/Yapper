@@ -61,7 +61,6 @@ export const sendPrivateMessage = async (req, res) => {
         const receiverBody = receiverArray[0]?.id;
         const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
 
-        console.log(req.body);
 
         await prisma.$transaction(async () => {
             const message = await prisma.privateMessages.create({
@@ -86,7 +85,7 @@ export const sendPrivateMessage = async (req, res) => {
 
                         await prisma.attachedFile.create({
                             data: {
-                                message_id: message.id,
+                                private_message_id: message.id,
                                 file_id: newFile.id
                             }
                         })
@@ -140,7 +139,7 @@ export const checkFiles = async (req, res) => {
 
         const files = await prisma.attachedFile.findMany({
             where: {
-                message_id: msgId
+                private_message_id: msgId
             },
             include: {
                 file: true
@@ -301,13 +300,12 @@ export const sendGroupMessage = async (req, res) => {
 }
 
 
+
 export const getMessagesFromPrivateConversation = async (req, res) => {
 
     try {
         const sender_id = parseInt(req.params.sender_id);
         const receiver_id = parseInt(req.params.receiver_id);
-
-        console.log(req.params)
 
         const messages = await prisma.privateMessages.findMany({
             where: {
@@ -320,20 +318,15 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
                 created_at: 'asc'
             },
             include: {
-                sender: true
+                sender: true,
+                attachments: {
+                    include: {
+                        file: true,
+                    }
+                }
             }
         });
 
-        const allFiles = await prisma.attachedFile.findMany({
-            where: {
-                message_id: {
-                    in: messages.map(message => message.id)
-                }
-            },
-            include: {
-                file: true
-            }
-        });
 
         const otherUser = await prisma.users.findUnique({
             where: {
@@ -341,13 +334,7 @@ export const getMessagesFromPrivateConversation = async (req, res) => {
             }
         })
 
-        const messagesWithAttachments = messages.map(message => {
-            message.attachments = allFiles.filter(file => file.message_id === message.id);
-            return message;
-        });
-
-        res.status(200).json({messagesWithAttachments, otherUser});
-
+        res.status(200).json({messages, otherUser});
 
     } catch (err) {
         console.log(err);

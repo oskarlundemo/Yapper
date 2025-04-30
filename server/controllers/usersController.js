@@ -4,9 +4,16 @@ import {saveAvatar} from "./supabaseController.js";
 
 export const retrieveUsers = async (req, res) => {
     try {
-        const search = req.body.userSearchString?.trim();
         const userId = parseInt(req.params.user_id);
 
+        const blockedRelations = await prisma.blocks.findMany({
+            where: {
+                OR: [
+                    { blocked: userId },
+                    { blocker: userId }
+                ]
+            }
+        });
 
         const friends = await prisma.friends.findMany({
             where: {
@@ -17,6 +24,10 @@ export const retrieveUsers = async (req, res) => {
             }
         });
 
+        const blockedIds = blockedRelations.map(b =>
+            b.blocker === userId ? b.blocked : b.blocker
+        );
+
         const friendIds = friends.map(f =>
             f.user_id === userId ? f.friend_id : f.user_id
         );
@@ -24,7 +35,7 @@ export const retrieveUsers = async (req, res) => {
         const usersNotFriends = await prisma.users.findMany({
             where: {
                 id: {
-                    notIn: [userId, ...friendIds],
+                    notIn: [userId, ...friendIds, ...blockedIds],
                 },
             }
         });
@@ -78,11 +89,6 @@ export const updateAvatar = async (req, res, userProfile) => {
         res.status(500).json(`Error: ${err.message}`);
     }
 }
-
-
-
-
-
 
 export const updateUserBio = async (req, res) => {
     try {

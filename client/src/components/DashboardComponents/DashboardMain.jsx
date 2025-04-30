@@ -7,17 +7,20 @@ import {Overlay} from "./Overlay.jsx";
 import {GroupMemberPopUp} from "./GroupMemberPopUp.jsx";
 
 
-export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, setShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage, setShowProfile}) => {
+export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, setShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage}) => {
 
     const [messages, setMessages] = useState([]);
     const [friend, setFriend] = useState(null);
     const [chatName, setChatName] = useState("");
     const [groupChat, setGroupChat] = useState(false);
+    const [userFriends, setUserFriends] = useState([]);
+    const [moreUsers, setMoreUsers] = useState([]);
 
     const [updatedMessage, setUpdatedMessage] = useState(null);
     const [miniBar, setMiniBar] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentGroupInfo, setCurrentGroupInfo] = useState(null);
+    const [blockedUsers, setBlockedUsers] = useState([]);
 
     const [hideOverlay, setHideOverlay] = useState(true);
     const [hideGroupPopUp, setHideGroupPopUp] = useState(true);
@@ -74,7 +77,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         })
             .then(res => res.json())
             .then(data => {
-                setMessages(data.messagesWithAttachments);
+                setMessages(data.messages);
                 setSelectedUser(data.otherUser);
                 setLoadingMessages(false);
             })
@@ -105,12 +108,24 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
 
 
-    const [userFriends, setUserFriends] = useState([]);
-    const [moreUsers, setMoreUsers] = useState([]);
+    useEffect(() => {
+        fetch(`${API_URL}/blocks/list/${user.id}/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setBlockedUsers(data);
+            })
+            .catch(err => console.log(err));
 
+    }, [])
 
 
     useEffect(() => {
+
         fetch(`${API_URL}/friends/all/${user.id}`, {
             method: 'GET',
             headers: {
@@ -136,7 +151,8 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                 setMoreUsers(data);
             })
             .catch(err => console.log(err))
-    }, [])
+
+    }, [blockedUsers])
 
 
 
@@ -156,7 +172,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                                  showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} moreUsers={moreUsers} userFriends={userFriends}
                                  setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName}
                                  friend={friend} showMessage={showMessage} showChatWindow={showChatWindow}
-                                 inspectConversation={inspectPrivateConversation} receiver={receiver}
+                                 inspectConversation={inspectPrivateConversation} receiver={receiver} blockedUsers={blockedUsers} setBlockedUsers={setBlockedUsers}
                                  showRequests={showRequests} messages={messages} setMessages={setMessages}
                                  API_URL={API_URL} showProfile={showProfile} showGroupMembers={showGroupMembers} loadingMessages={loadingMessages}
                 />

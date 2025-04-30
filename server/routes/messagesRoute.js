@@ -45,7 +45,6 @@ messagesRoute.post('/gif/:sender_id/:receiver_id', (req, res) => {
     }
 });
 
-
 messagesRoute.get('/files/:message_id', checkFiles)
 
 messagesRoute.get('/files/group/:message_id', checkGroupFiles)

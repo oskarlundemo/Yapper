@@ -2,7 +2,7 @@
 
 
 import {Router} from 'express';
-import {retrieveUsers, updateUserBio, updateUserProfile} from "../controllers/usersController.js";
+import {retrieveUsers, updateUserProfile} from "../controllers/usersController.js";
 import multer from 'multer';
 const upload = multer()
 

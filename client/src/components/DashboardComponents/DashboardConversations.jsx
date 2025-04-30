@@ -20,6 +20,87 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
     const {user} = useAuth();
 
 
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-blocks-added')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'Blocks',
+                },
+                (payload) => {
+
+                    const block = payload.new;
+
+                    if (block.blocker === user.id) {
+                        setAllConversations(prev =>
+                            prev.filter(conv => conv.user?.id !== block.blocked)
+                        );
+                    } else if (block.blocked === user.id) {
+                        setAllConversations(prev =>
+                            prev.filter(conv => conv.user?.id !== block.blocker)
+                        );
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
+
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-blocks-removed')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'Blocks',
+                },
+                async (payload) => {
+
+                    console.log('Payload:', payload);
+                    const block = payload.old;
+                    console.log('Block:', block)
+
+
+                    const response = await fetch(`${API_URL}/blocks/remove/${block.blocker}/${block.blocked}/${user.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        console.log('response:', data);
+
+                        setAllConversations(prev => [data, ...prev]);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
+
+
+
 
     useEffect(() => {
         if (!user?.id) return;
@@ -146,9 +227,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                     });
 
                     const newGroupConversation = await response.json();
-
-                    console.log(newGroupConversation);
-
                     const audio = new Audio('notification.mp3');
                     await audio.play()
 
@@ -262,6 +340,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         allConversations.map((conversation, index) =>
                             conversation.group && conversation.group.id ? (
                                 <GroupConversationCard
+                                    API_URL={API_URL}
                                     key={index}
                                     group={conversation.group}
                                     groupId={conversation.group.id}
@@ -272,6 +351,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                                 />
                             ) : (
                                 <PrivateConversationCard
+                                    API_URL={API_URL}
                                     key={index}
                                     user={conversation.user}
                                     friend_id={conversation.user.id}

@@ -136,7 +136,8 @@ export const getAllConversations = async (req, res) => {
                         created_at: 'desc'
                     },
                     include: {
-                        sender: true
+                        sender: true,
+                        attachments: true,
                     }
                 });
 
@@ -152,6 +153,7 @@ export const getAllConversations = async (req, res) => {
                         ? {
                             content: latestMessage.content,
                             created_at: latestMessage.created_at,
+                            hasAttachments: latestMessage.attachments.length > 0,
                             sender: {
                                 id: latestMessage.sender.id,
                                 username: latestMessage.sender.username
@@ -271,6 +273,37 @@ export const getAllConversations = async (req, res) => {
     }
 }
 
+
+export const checkForAttachedFiles = async (req, res) => {
+
+    try {
+        const messageId = parseInt(req.params.message_id);
+        const message = await prisma.privateMessages.findUnique({
+            where: {
+                id: messageId
+            },
+            include: {
+                attachments: true
+            }
+        });
+
+        if (!message) {
+            return res.status(404).json({ error: 'Message not found' });
+        }
+
+        const messageWithAttachmentFlag = {
+            ...message,
+            hasAttachments: message.attachments?.length > 0
+        };
+
+        console.log(messageWithAttachmentFlag);
+
+        res.status(200).json(messageWithAttachmentFlag);
+
+    } catch (err) {
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
 
 
 
