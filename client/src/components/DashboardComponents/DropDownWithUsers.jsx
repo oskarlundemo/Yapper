@@ -32,6 +32,7 @@ export const DropDownWithUsersComponent = ({filteredContacts, setInputFocused, a
                                 <ContactCard
                                     key={friend.id}
                                     friend={friend?.friend || friend}
+                                    setUserSearchString={setUserSearchString}
                                     addToConversation={addToConversation}
                                     addToGroup={addToGroup}
                                 />

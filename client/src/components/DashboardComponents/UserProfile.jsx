@@ -9,19 +9,13 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
 
     const {user} = useAuth();
 
-    const [bio, setBio] = useState("")
+    const [bio, setBio] = useState(selectedUser?.bio || '')
     const [file, setFile] = useState(null)
     const [newAvatar, setNewAvatar] = useState(null)
     const [disabledBio, setDisabledBio] = useState(true)
     const [saveChanges, setSaveChanges] = useState(false)
     const [charsCount, setCharsCount] = useState(0)
     const [show, setShow] = useState(false)
-
-    useEffect(() => {
-        setBio(selectedUser?.bio)
-    }, [selectedUser])
-
-
 
     useEffect(() => {
         setCharsCount(bio?.length)
@@ -123,12 +117,12 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                         selectedUser?.id === user.id ? (
                             <form className="edit-user-info" onSubmit={(e) => handleSubmit(e)}>
                                 {disabledBio ? (
-                                    <p className="user-bio">{selectedUser?.bio || 'No bio'}</p>
+                                    <p className="user-bio">{bio || 'No bio'}</p>
                                 ) : (
                                     <>
                                         <textarea
                                             value={bio}
-                                            placeholder={user?.bio || 'No bio'}
+                                            placeholder={bio|| 'Tell us a bit about yourself!'}
                                             disabled={disabledBio}
                                             onChange={(e) => setBio(e.target.value)}
                                         />

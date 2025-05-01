@@ -1,16 +1,56 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {GifContainer} from "./GifContainer.jsx";
 import {FileSelect} from "../FileSelect.jsx";
 import {FileContainer} from "./FileContainer.jsx";
 import '../../styles/Dashboard/FileContainer.css'
+import {supabase} from "../../services/supabaseClient.js";
 
-export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, groupChat, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, setReceiver, setFriend, miniBar, setReceivers, groupChat, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
     const [gifs, showGifs] = useState(false);
     const [files, setFiles] = useState([]);
+    const [recipient, setRecipient] = useState(false);
+
+
+    useEffect(() => {
+        if (receivers.length > 0) {
+            setRecipient(true);
+        } else
+            setRecipient(false);
+    }, [receivers]);
+
+    useEffect(() => {
+
+        if (!user) return
+
+        const newChannel = supabase
+            .channel('friendship-chanel')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'Friends'
+                },
+                async (payload) => {
+                    const friendship = payload.new;
+
+                    if (friendship.user_id === user.id || friendship.friend_id === user.id) {
+                        setFriend(true);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+
+    }, [user?.id])
+
 
 
     const acceptFriendRequest = async () => {
@@ -27,6 +67,11 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        if (!receiver && receivers.length === 0) {
+            return; // Prevent sending if no one is selected
+        }
 
         const formData = new FormData();
 
@@ -97,6 +142,9 @@ export const DashboardMessageArea = ({receiver, friend, miniBar, setReceivers, g
                             onChange={e => setMessage(e.target.value)}
                             value={message}
                             placeholder="Aa"
+                            autoComplete="off"
+                            spellCheck={true}
+                            autoCorrect="on"
                         />
                     </form>
 

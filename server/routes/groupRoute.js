@@ -19,7 +19,6 @@ const groupRoute = Router();
 
 groupRoute.post('/update/:groupId', upload.single('avatar'), updateGroupDescription, updateGroupAvatar, updateGroupName, saveGroupAvatar);
 
-
 groupRoute.delete('/remove/:groupMemberId/:groupId', removeUserFromGroup)
 
 groupRoute.post('/add/:newUserId/:groupId', addUserToGroup)

@@ -1,0 +1,22 @@
+
+
+
+.landing-page-footer {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.author-info {
+    display: flex;
+    flex-direction: row;
+
+
+    svg {
+        height: 20px;
+        width: 20px;
+    }
+}

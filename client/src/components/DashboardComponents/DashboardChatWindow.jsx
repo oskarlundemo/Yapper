@@ -12,7 +12,7 @@ import {ConversationHeader} from "./ConversationHeader.jsx";
 import {GroupProfile} from "./GroupProfile.jsx";
 
 
-export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, showUserInfo, chatName, blockedUsers, setBlockedUsers,
+export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, showGroupInfo, showUserInfo, chatName, blockedUsers, setBlockedUsers, setFriend,
                                         selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages,
                                         setGroupChat, messages, setMessages, friend, showMessage, receiver, showGroupMembers}) => {
 
@@ -227,7 +227,7 @@ export const DashboardChatWindow = ({API_URL, currentGroupInfo, showGroupInfo, s
                                          API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
                                          setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
                         )}
-                    <DashboardMessageArea miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
+                    <DashboardMessageArea setReceiver={setReceiver} setFriend={setFriend} miniBar={miniBar} groupChat={groupChat} friend={friend} setReceivers={setReceivers} receivers={receivers} API_URL={API_URL} receiver={receiver} />
                 </>
         </section>
     );

@@ -7,7 +7,6 @@
 
 
 import '../../styles/Dashboard/ConversationCard.css'
-import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment/moment.js";
@@ -32,6 +31,7 @@ export const GroupConversationCard = ({
 
     useEffect(() => {
         setGroupName(group?.name);
+        console.log(group);
     }, []);
 
     useEffect(() => {
@@ -142,12 +142,12 @@ export const GroupConversationCard = ({
                     {user.id === localMessage.sender_id ? (
                         <>
                         <span>You: </span>
-                        {parseLatestMessage(localMessage.content)}
+                        {parseLatestMessage(localMessage)}
                         </>
                     ) : (
                         <>
                         <span>{localMessage.sender?.username || ''}: </span>
-                            {parseLatestMessage(localMessage.content)}
+                            {parseLatestMessage(localMessage)}
                         </>
                         )}
 

@@ -80,3 +80,32 @@ export const acceptRequest = async (req, res) => {
         res.status(500).send(`Error: ${err.message}`);
     }
 }
+
+
+
+export const checkFriendship = async (req, res) => {
+    try {
+        const senderId = parseInt(req.params.sender_id);
+        const receiverId = parseInt(req.params.receiver_id);
+
+        if (isNaN(senderId) || isNaN(receiverId)) {
+            return res.status(400).json({ error: "Invalid sender or receiver ID." });
+        }
+
+        const friends = await prisma.friends.findFirst({
+            where: {
+                OR: [
+                    { user_id: senderId, friend_id: receiverId },
+                    { user_id: receiverId, friend_id: senderId }
+                ]
+            }
+        });
+
+        const isFriends = !!friends;
+
+        res.status(200).json(isFriends);
+    } catch (err) {
+        console.error("Error checking friendship:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};

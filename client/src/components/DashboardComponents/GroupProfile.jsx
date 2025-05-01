@@ -19,9 +19,10 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
     const [newAvatar, setNewAvatar] = useState(null)
     const [disabledDescription, setDisabledDescription] = useState(true)
     const [saveChanges, setSaveChanges] = useState(false)
-    const [charsCount, setCharsCount] = useState(0)
+    const [descriptionCharsCount, setDescriptionCharsCount] = useState(0)
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState(group?.name);
+    const [groupNameCharCount, setGroupNameCharCount] = useState(0);
 
 
 
@@ -75,8 +76,13 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
 
 
     useEffect(() => {
-        setCharsCount(description?.length)
+        setDescriptionCharsCount(description?.length)
     }, [description])
+
+
+    useEffect(() => {
+        setGroupNameCharCount(groupName?.length)
+    }, [groupName])
 
 
     const handleSubmit = (e) => {
@@ -90,6 +96,9 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
         formData.append('description', description);
         formData.append('groupName', groupName);
 
+        console.log('Update group')
+        console.log(group)
+
         try {
             fetch(`${API_URL}/groups/update/${group.id}`, {
                 method: 'POST',
@@ -98,6 +107,19 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const handleGroupNameChange = (e) => {
+        setGroupName(e.target.value);
+    };
+
+
+    const handleDescriptionInputChange = (e) => {
+        if (description.length > 50) {
+            e.preventDefault();
+            return
+        }
+        setDescription(e.target.value);
     }
 
     return (
@@ -116,11 +138,18 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
                     {disabledDescription ? (
                         <h2>{groupName || ''}</h2>
                     ) : (
+                        <>
                         <input className={'group-name-input'}
                                type={'text'}
                                value={groupName}
-                               onChange={e => setGroupName(e.target.value)}
-                        />
+                               onChange={e => handleGroupNameChange(e)}
+                               onKeyDown={(e) => {
+                                   if (groupName.length >= 15 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                                       e.preventDefault();
+                                   }
+                               }}/>
+                            <p><span>{groupNameCharCount}</span>/15</p>
+                        </>
                     )}
                     {group?.admin_id === user.id ? (
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
@@ -132,9 +161,14 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
                                 <textarea value={description}
                                           placeholder={description}
                                           disabled={disabledDescription}
-                                          onChange={(e) => setDescription(e.target.value)}
+                                          onKeyDown={(e) => {
+                                              if (description.length >= 50 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                                                  e.preventDefault();
+                                              }
+                                          }}
+                                          onChange={(e) => handleDescriptionInputChange(e)}
                                 />
-                                    <p><span>{charsCount}</span>/50</p>
+                                    <p><span>{descriptionCharsCount}</span>/50</p>
                                 </>
                             )}
 

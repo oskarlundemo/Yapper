@@ -1,0 +1,32 @@
+
+
+
+
+.landing-page-module {
+    box-shadow: var(--default-boxshadow);
+    border-radius: var(--border-radius);
+    height: fit-content;
+
+    opacity: 0;
+    animation: landingPageAnimation 1s ease-out forwards;
+
+
+    video {
+        width: 850px;
+        height: 650px;
+        object-fit: contain;
+        aspect-ratio: 1 / 1;
+    }
+}
+
+
+@keyframes landingPageAnimation {
+    from {
+        opacity: 0;
+        transform: translate3d(0%, 30%, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0%, 0, 0);
+    }
+}

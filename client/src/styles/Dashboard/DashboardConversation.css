@@ -18,7 +18,7 @@
 
 
 .conversations-container {
-    grid-template-rows: repeat(10, 4rem);
+    grid-auto-rows: min-content;
     display: grid;
     height: 100%;
     gap: 0.5rem;

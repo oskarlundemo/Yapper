@@ -1,7 +1,6 @@
 
 
 import '../styles/Dashboard/Dashboard.css'
-import {DashboardMenu} from "../components/DashboardComponents/DashboardMenu.jsx";
 import {DashboardMain} from "../components/DashboardComponents/DashboardMain.jsx";
 import {useState} from "react";
 
@@ -19,6 +18,7 @@ export const Dashboard = ({API_URL}) => {
     const showNewMessages = () => {
         setShowNewMessage(true);
         setReceiver(null);
+        setShowProfile(false);
     }
 
     const showChatWindow = () => {

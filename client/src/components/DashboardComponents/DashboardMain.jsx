@@ -10,7 +10,7 @@ import {GroupMemberPopUp} from "./GroupMemberPopUp.jsx";
 export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, setShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage}) => {
 
     const [messages, setMessages] = useState([]);
-    const [friend, setFriend] = useState(null);
+    const [friend, setFriend] = useState(false);
     const [chatName, setChatName] = useState("");
     const [groupChat, setGroupChat] = useState(false);
     const [userFriends, setUserFriends] = useState([]);
@@ -50,14 +50,18 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         setMiniBar(true);
     }
 
-    const inspectPrivateConversation = async (receiver_id, chatname = '') => {
-        setLoadingMessages(true);
+    const inspectPrivateConversation = async (receiver_id, chatname = '', initialLoad) => {
+
+        if (!initialLoad) {
+            setLoadingMessages(true);
+        }
+
         setGroupChat(false);
         setReceiver(receiver_id);
         setChatName(chatname);
         showChatWindow();
 
-        await fetch(`${API_URL}/notifications/friends/${receiver_id}/${user.id}`, {
+        await fetch(`${API_URL}/friends/check/${receiver_id}/${user.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -85,8 +89,12 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         toggleShowMessage(false);
     }
 
-    const inspectGroupChat = async (receiver_id, chatname) => {
-        setLoadingMessages(true);
+    const inspectGroupChat = async (receiver_id, chatname, initialLoad) => {
+
+        if (!initialLoad) {
+            setLoadingMessages(true);
+        }
+
         setGroupChat(true);
         setReceiver(receiver_id);
         showChatWindow();
@@ -162,12 +170,14 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                 <DashboardMenu showProfile={showUserInfo} />
 
                 <DashboardConversations
+                    setMiniBar={setMiniBar} setReceiver={setReceiver}
                                     updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat}
                                     showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} setShowNewMessage={setShowNewMessage}
                                     inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile}
                 />
 
                 <DashboardChatWindow
+                    setFriend={setFriend} setReceiver={setReceiver}
                                  setChatName={setChatName} currentGroupInfo={currentGroupInfo} showGroupInfo={showGroupInfo} selectedUser={selectedUser}
                                  showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} moreUsers={moreUsers} userFriends={userFriends}
                                  setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName}
