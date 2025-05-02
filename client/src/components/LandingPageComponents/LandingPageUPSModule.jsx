@@ -19,7 +19,7 @@ export const LandingPageUPSModule = ({title, subtitle, media, height, width, row
                 <p>{subtitle}</p>
             </div>
 
-            <video muted={true} loop={true} autoPlay={true} style={{ height, width }} src={media} className="landing-page-video" />
+            <video muted={true} loop={true} autoPlay={true}  src={media} className="landing-page-video" />
         </section>
     )
 }

@@ -21,7 +21,6 @@ export const StartPage = ({URL}) => {
     }
 
 
-
     return (
         <main className="login-page">
             <LoginBox toggleLogin={toggleLogin} showLogin={showLogin} URL={URL} />

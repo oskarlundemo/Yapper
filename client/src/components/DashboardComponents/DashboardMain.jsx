@@ -26,14 +26,27 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const [hideGroupPopUp, setHideGroupPopUp] = useState(true);
 
     const [loadingMessages, setLoadingMessages] = useState(true);
-
+    const [loadingProfile, setLoadingProfile] = useState(false);
 
     const {user} = useAuth();
 
+    const showUserInfo = async (inspectedUser = null) => {
 
-    const showUserInfo = (inspectedUser = null) => {
         setMiniBar(true);
-        setSelectedUser(inspectedUser);
+        setLoadingProfile(true);
+
+        await fetch(`${API_URL}/users/${inspectedUser.id}/profile/info`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setSelectedUser(data);
+                setLoadingProfile(false);
+            })
+            .catch(error => console.log(error));
     }
 
     const showGroupMembers = () => {
@@ -177,7 +190,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                 />
 
                 <DashboardChatWindow
-                    setFriend={setFriend} setReceiver={setReceiver}
+                    setFriend={setFriend} setReceiver={setReceiver} loadingProfile={loadingProfile}
                                  setChatName={setChatName} currentGroupInfo={currentGroupInfo} showGroupInfo={showGroupInfo} selectedUser={selectedUser}
                                  showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} moreUsers={moreUsers} userFriends={userFriends}
                                  setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName}

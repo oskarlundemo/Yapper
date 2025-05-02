@@ -48,33 +48,36 @@ export const retrieveUsers = async (req, res) => {
 };
 
 
-
-export const updateUserProfile = async (req, res) => {
+export const getUserProfileInfo = async (req, res) => {
 
     try {
-        const userId = parseInt(req.params.user_id);
-
-        const userProfile = await prisma.users.findUnique({
+        const userInfo = await prisma.users.findUnique({
             where: {
-                id: userId,
+                id: parseInt(req.params.user_id),
             }
         })
-
-        await updateUserBio(req, res, userProfile)
-        await updateAvatar(req, res, userProfile)
-
+        res.status(200).json(userInfo);
     } catch (err) {
-        console.error('Error retrieving user profile:', err);
+        console.error('Error retrieving user profile');
+        res.status(500).json(`Error: ${err.message}`);
     }
+
+}
+
+
+export const sendProfileUpdateResponse = async (req, res) => {
+    res.status(200).json({
+        bio: req.body.bio,
+        avatarUrl: req.body.avatarUrl,
+    })
 }
 
 
 
-export const updateAvatar = async (req, res, userProfile) => {
+export const updateUserAvatar = async (req, res, userProfile) => {
     try {
         if (req.file) {
-            console.log(req.file);
-            await prisma.users.update({
+            const newAvatar = await prisma.users.update({
                 data: {
                     avatar: req.file.originalname,
                 },
@@ -83,6 +86,8 @@ export const updateAvatar = async (req, res, userProfile) => {
                 }
             })
             await saveAvatar(req, res);
+
+            req.avatarUrl = newAvatar.avatar;
         }
     } catch (err) {
         console.error('Error retrieving avatar:', err);
@@ -92,17 +97,18 @@ export const updateAvatar = async (req, res, userProfile) => {
 
 export const updateUserBio = async (req, res) => {
     try {
-        if (!req.body.bio)
-            return res.status(400).send('Bio not found');
+        if (req.body.bio) {
+            const updatedUser = await prisma.users.update({
+                data: {
+                    bio: req.body.bio,
+                },
+                where: {
+                    id: parseInt(req.params.user_id),
+                }
+            })
+            req.bio = updatedUser.bio
+        }
 
-        await prisma.users.update({
-            data: {
-                bio: req.body.bio,
-            },
-            where: {
-                id: parseInt(req.params.user_id),
-            }
-        })
     } catch (err) {
         console.error('Error retrieving user bio:', err);
         res.status(500).json(`Error: ${err.message}`);

@@ -7,12 +7,20 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
+
+    h2 {
+        font-weight: 400;
+    }
 }
 
 
 .author-info {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
 
 
     svg {

@@ -6,7 +6,7 @@ import {FileContainer} from "./FileContainer.jsx";
 import '../../styles/Dashboard/FileContainer.css'
 import {supabase} from "../../services/supabaseClient.js";
 
-export const DashboardMessageArea = ({receiver, friend, setReceiver, setFriend, miniBar, setReceivers, groupChat, receivers, API_URL}) => {
+export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFriend, miniBar, setReceivers, groupChat, receivers, API_URL}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
@@ -89,7 +89,6 @@ export const DashboardMessageArea = ({receiver, friend, setReceiver, setFriend, 
                 body: formData
             });
 
-
             setMessage("");
             setFiles([]);
             setReceivers([]);
@@ -121,7 +120,7 @@ export const DashboardMessageArea = ({receiver, friend, setReceiver, setFriend, 
         <div className={`dashboard-message-input ${miniBar ? '' : 'mini'}`}>
             <div className="message-card">
 
-                {(!friend && !groupChat) && (
+                {(!friend && !groupChat && !loadingMessages) && (
                     <div className="friend-request-alert">
                         <p>By answering to a message you automatically become friends</p>
                     </div>

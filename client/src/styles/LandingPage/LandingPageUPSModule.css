@@ -5,27 +5,60 @@
 .landing-page-module {
     box-shadow: var(--default-boxshadow);
     border-radius: var(--border-radius);
-    height: fit-content;
+    justify-self: center;
 
     opacity: 0;
     animation: landingPageAnimation 1s ease-out forwards;
+    width: fit-content;
 
 
     video {
-        width: 850px;
-        height: 650px;
+        width: 600px;
+        height: 400px;
         object-fit: contain;
         aspect-ratio: 1 / 1;
     }
 }
 
 
+.landing-page-module:first-of-type {
+    justify-self: start;
+    animation: landingPageAnimation 1s ease-out forwards;
+
+}
+
+.landing-page-module:nth-of-type(2) {
+    justify-self: end;
+    animation: landingPageAnimationTest 1s ease-out forwards;
+
+}
+
+.landing-page-module:nth-of-type(3) {
+    justify-self: start;
+    animation: landingPageAnimation 1s ease-out forwards;
+}
+
 @keyframes landingPageAnimation {
     from {
         opacity: 0;
-        transform: translate3d(0%, 30%, 0);
+        transform: translateX(100%);
+        filter: blur(10px);
     }
     to {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translate3d(0%, 0, 0);
+    }
+}
+
+@keyframes landingPageAnimationTest {
+    from {
+        filter: blur(10px);
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        filter: blur(0px);
         opacity: 1;
         transform: translate3d(0%, 0, 0);
     }

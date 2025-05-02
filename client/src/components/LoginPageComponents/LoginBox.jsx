@@ -1,7 +1,7 @@
 import {Inputfield} from "../Inputfield.jsx";
 import {useEffect, useState} from "react";
 import '../../styles/LoginPage/LoginBox.css'
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 export const LoginBox = ({showLogin, toggleLogin, URL}) => {
@@ -94,7 +94,7 @@ export const LoginBox = ({showLogin, toggleLogin, URL}) => {
                 <button className={`${isDisabled ? 'disabled' : ''}`} type="submit" disabled={isDisabled}>Sign in</button>
 
             </form>
-            <p>Don't have an account? <a onClick={toggleLogin}>Create one</a></p>
+            <p>Don't have an account? <Link to='/signup'>Create one</Link></p>
         </section>
         </>
     )

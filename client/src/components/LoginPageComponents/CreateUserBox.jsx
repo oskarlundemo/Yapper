@@ -4,10 +4,10 @@ import '../../styles/LoginPage/CreateUserBox.css'
 import {PasswordChecks} from "./PasswordChecks.jsx";
 import {EmailCheck} from "./EmailCheck.jsx";
 import {UsernameCheck} from "./UsernameCheck.jsx";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
 
-export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
+export const CreateUserBox = ({URL}) => {
 
     const navigate = useNavigate(); // Use to navigate
     const { login } = useAuth(); // Login user with authContext
@@ -72,7 +72,7 @@ export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
 
     return (
 
-        <section className={`create-user-box ${showCreate ? "hide" : ""}`}>
+        <section className={`create-user-box`}>
 
             <h2>Sign up</h2>
 
@@ -146,7 +146,7 @@ export const CreateUserBox = ({showCreate, toggleCreateUser, URL}) => {
                 <button className={`${isDisabled ? 'disabled' : ''}`} type="submit" disabled={isDisabled}>Sign Up</button>
 
             </form>
-            <p>Already have an account? <a onClick={toggleCreateUser}>Sign in</a></p>
+            <p>Already have an account? <Link to='/login'>Sign in</Link></p>
         </section>
 
 

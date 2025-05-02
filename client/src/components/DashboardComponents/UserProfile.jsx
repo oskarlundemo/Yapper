@@ -5,11 +5,11 @@ import {useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {UserAvatar} from "../UserAvatar.jsx";
 
-export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlockedUsers, blockedUsers, loadingMessages, API_URL}) => {
+export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlockedUsers, loadingProfile, blockedUsers, loadingMessages, API_URL}) => {
 
     const {user} = useAuth();
 
-    const [bio, setBio] = useState(selectedUser?.bio || '')
+    const [bio, setBio] = useState('')
     const [file, setFile] = useState(null)
     const [newAvatar, setNewAvatar] = useState(null)
     const [disabledBio, setDisabledBio] = useState(true)
@@ -17,10 +17,15 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
     const [charsCount, setCharsCount] = useState(0)
     const [show, setShow] = useState(false)
 
-    useEffect(() => {
-        setCharsCount(bio?.length)
-    }, [bio])
 
+    useEffect(() => {
+        setBio(selectedUser?.bio || '')
+    }, [selectedUser])
+
+
+    useEffect(() => {
+        setCharsCount(bio.length)
+    }, [bio])
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -37,6 +42,10 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                 method: 'POST',
                 body: formData
             })
+                .then(res => res.json())
+                .then(data => {
+                    setBio(data.bio)
+                })
         } catch (err) {
             console.log(err)
         }
@@ -81,9 +90,22 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
     }
 
 
+    const handleBioChange = (e) => {
+        if (bio.length > 50) {
+            e.preventDefault();
+            return
+        }
+        setBio(e.target.value);
+    }
+
+
     const toggleDropdown = () => {
         setShow(!show);
     }
+
+
+
+
 
     return (
         <div className={`user-profile-container ${miniBar ? '' : 'hidden'}`}>
@@ -95,7 +117,7 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                 <div className={'user-avatar'}>
 
 
-                    {loadingMessages ? (
+                    {(loadingMessages || loadingProfile ) ? (
                         <div className="loading-avatar"/>
                     ) : (
                         <UserAvatar setNewAvatar={setNewAvatar} setSaveChanges={setSaveChanges} file={file} setFile={setFile} user={selectedUser} height={100} width={100} selectPicture={true} />
@@ -104,14 +126,14 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
 
                 <div className={'user-info'}>
 
-                    {loadingMessages ? (
+                    {(loadingMessages || loadingProfile ) ? (
                         <div className="loading-username"/>
                     ) : (
                         <h2>{selectedUser?.username || ''}</h2>
                     )}
 
 
-                    {loadingMessages ? (
+                    {(loadingMessages || loadingProfile ) ? (
                         <div className="loading-body-text" />
                     ) : (
                         selectedUser?.id === user.id ? (
@@ -124,7 +146,12 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                                             value={bio}
                                             placeholder={bio|| 'Tell us a bit about yourself!'}
                                             disabled={disabledBio}
-                                            onChange={(e) => setBio(e.target.value)}
+                                            onChange={(e) => handleBioChange(e)}
+                                            onKeyDown={(e) => {
+                                                if (bio.length >= 50 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                         />
                                         <p>
                                             <span>{charsCount}</span>/50
@@ -156,7 +183,7 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                         )
                     )}
 
-                    {loadingMessages ? (
+                    {(loadingMessages || loadingProfile ) ? (
                         <div className="loading-button"/>
                     ) : (
 

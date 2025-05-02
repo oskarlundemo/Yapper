@@ -2,6 +2,7 @@
 
 
 import '../../styles/LandingPage/LandingPageFooter.css'
+import {Link} from "react-router-dom";
 
 
 export const LandingPageFooter = () => {
@@ -10,7 +11,7 @@ export const LandingPageFooter = () => {
     return (
         <footer className="landing-page-footer">
 
-            <h2>That's enough scrolling.... <a>create your account</a> instead!</h2>
+            <h2>That's enough scrolling.... <Link to='/signup'>create your account</Link> instead!</h2>
 
             <div className={'author-info'}>
                 <h3>Oskar Lundemo @ 2025</h3>

@@ -147,7 +147,8 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
                                    if (groupName.length >= 15 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                                        e.preventDefault();
                                    }
-                               }}/>
+                               }}
+                        />
                             <p><span>{groupNameCharCount}</span>/15</p>
                         </>
                     )}
