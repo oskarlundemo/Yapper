@@ -9,7 +9,7 @@
 import '../../styles/Dashboard/ConversationCard.css'
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from "moment/moment.js";
+import moment from "moment-timezone";
 import {supabase} from "../../services/supabaseClient.js";
 import {parseLatestMessage} from "./PrivateConversationCard.jsx";
 import {GroupAvatar} from "./GroupAvatar.jsx";
@@ -135,8 +135,9 @@ export const GroupConversationCard = ({
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{groupName}
                     <span>
-                        {moment(localMessage?.created_at).format("h:mm A")}
-                    </span></h3>
+                        {moment(localMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                    </span>
+                </h3>
                 <p className={'conversation-content'}>
 
                     {user.id === localMessage.sender_id ? (

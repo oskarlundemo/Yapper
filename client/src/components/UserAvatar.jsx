@@ -5,31 +5,65 @@ import {supabase} from "../services/supabaseClient.js";
 
 
 
-export const UserAvatar = ({height, width, user = null,
+export const UserAvatar = ({height, width, user = null, API_URL = '',
                                setSaveChanges = null, setNewAvatar = null,
                                selectPicture = false, file = null, setFile = null}) => {
-    const [currentAvatar, setCurrentAvatar] = useState(user?.avatar);
+    const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
+    const [testUser, setTestUser] = useState(user || null);
+    const [loadingAvatar, setLoadingAvatar] = useState(true);
+
 
     useEffect(() => {
         const fetchImage = async () => {
-            if (!user?.avatar) {
+            if (!testUser?.avatar) {
                 setCurrentAvatar(null);
-           //   setFile(null);
+                setLoadingAvatar(false);
                 return;
             }
             const { data, error } = supabase.storage
                 .from("yapper")
-                .getPublicUrl(`avatars/${user.avatar}`);
+                .getPublicUrl(`avatars/${testUser.avatar}`);
             if (error) {
                 console.error("Error getting public URL:", error);
             } else {
+                setLoadingAvatar(false);
                 setCurrentAvatar(data.publicUrl);
             }
         };
-        fetchImage();
-    }, [user]);
 
+        fetchImage();
+    }, [testUser?.avatar]);
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel(`realtime-user-avatar-update-${Math.random()}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'users',
+                },
+                async (payload) => {
+
+                    const updatedUser = payload.new;
+                    console.log('Updated', updatedUser);
+                    console.log('Logged in', loggedInUser);
+                    if (updatedUser.id === testUser.id) {
+                        setTestUser(updatedUser);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
 
     const fileInputRef = useRef(null);
 
@@ -76,12 +110,21 @@ export const UserAvatar = ({height, width, user = null,
 
                 </div>
             ) : (
-                <img
-                    className="user-avatar-select-picture-default"
-                    src={currentAvatar || "/default.jpg"}
-                    alt="user-avatar"
-                    style={{ height, width }}
-                />
+
+                (loadingAvatar ? (
+
+                    <div style={{height: height, width: width}} className="loading-avatar"></div>
+                ) : (
+                    <img
+                        key={currentAvatar}
+                        className="user-avatar-select-picture-default"
+                        src={currentAvatar || "/default.jpg"}
+                        alt="user-avatar"
+                        style={{ height, width }}
+                        onLoad={() => console.log("Image loaded:", currentAvatar)}
+                        onError={() => console.error("Failed to load avatar:", currentAvatar)}
+                    />
+                ))
             )}
         </>
     );

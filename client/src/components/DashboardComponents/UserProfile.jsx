@@ -120,7 +120,7 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
                     {(loadingMessages || loadingProfile ) ? (
                         <div className="loading-avatar"/>
                     ) : (
-                        <UserAvatar setNewAvatar={setNewAvatar} setSaveChanges={setSaveChanges} file={file} setFile={setFile} user={selectedUser} height={100} width={100} selectPicture={true} />
+                        <UserAvatar API_URL={API_URL} setNewAvatar={setNewAvatar} setSaveChanges={setSaveChanges} file={file} setFile={setFile} user={selectedUser} height={100} width={100} selectPicture={true} />
                     )}
                 </div>
 

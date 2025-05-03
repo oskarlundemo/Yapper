@@ -31,6 +31,7 @@ export const saveAvatar = async (req, res) => {
         return res.status(400).json({ message: "No file uploaded" });
     }
 
+    console.log('Saving', req.file);
     const filePath = `avatars/${req.file.originalname}`;
     const fileMimeType = req.file.mimetype;
 

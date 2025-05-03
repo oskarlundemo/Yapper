@@ -5,7 +5,7 @@ import '../../styles/Dashboard/ConversationCard.css'
 import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from "moment/moment.js";
+import moment from "moment-timezone";
 import {supabase} from "../../services/supabaseClient.js";
 
 
@@ -80,8 +80,9 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        {moment(localMessage.created_at).format("h:mm A")}
-                    </span></h3>
+                        {moment(localMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                    </span>
+                </h3>
                 <p className={'conversation-content'}>
                     {loggedIn.id === (localMessage.sender?.id || localMessage.sender_id) && <span>You: </span>}
                     {parseLatestMessage(latestMessage)}

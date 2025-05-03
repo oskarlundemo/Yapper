@@ -180,7 +180,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     return (
         <>
             <main className={'dashboard-main'}>
-                <DashboardMenu showProfile={showUserInfo} />
+                <DashboardMenu API_URL={API_URL} showProfile={showUserInfo} />
 
                 <DashboardConversations
                     setMiniBar={setMiniBar} setReceiver={setReceiver}

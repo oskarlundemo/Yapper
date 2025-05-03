@@ -334,3 +334,7 @@
         fill: var(--text-color);
     }
 }
+
+.loading-avatar {
+    animation: pulse 2s infinite;
+}

@@ -72,30 +72,31 @@ export const sendProfileUpdateResponse = async (req, res) => {
     })
 }
 
-
-
-export const updateUserAvatar = async (req, res, userProfile) => {
+export const updateUserAvatar = async (req, res, next) => {
     try {
         if (req.file) {
+            await saveAvatar(req, res);
+            const user_id = parseInt(req.params.user_id);
             const newAvatar = await prisma.users.update({
                 data: {
                     avatar: req.file.originalname,
                 },
                 where: {
-                    id: userProfile.id,
+                    id: user_id,
                 }
             })
-            await saveAvatar(req, res);
-
             req.avatarUrl = newAvatar.avatar;
+            next();
         }
+        next();
     } catch (err) {
         console.error('Error retrieving avatar:', err);
         res.status(500).json(`Error: ${err.message}`);
     }
 }
 
-export const updateUserBio = async (req, res) => {
+
+export const updateUserBio = async (req, res, next) => {
     try {
         if (req.body.bio) {
             const updatedUser = await prisma.users.update({
@@ -107,8 +108,9 @@ export const updateUserBio = async (req, res) => {
                 }
             })
             req.bio = updatedUser.bio
+            next();
         }
-
+        next();
     } catch (err) {
         console.error('Error retrieving user bio:', err);
         res.status(500).json(`Error: ${err.message}`);

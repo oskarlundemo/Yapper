@@ -1,11 +1,12 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from "moment";
+import moment from "moment-timezone";
 import {Attachment} from "./Attachment.jsx";
 
 
-export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, username = ''}) => {
+
+export const MessageCard = ({content, files = null, API_URL, user_id, showUserInfo, sender, time, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
@@ -18,12 +19,12 @@ export const MessageCard = ({content, files = null, user_id, showUserInfo, sende
         <>
             <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
                 <div onClick={() => showUserInfo(sender)} className="dashboard-message-avatar">
-                    <UserAvatar user={sender} height={30} width={30} />
+                    <UserAvatar API_URL={API_URL} user={sender} height={30} width={30} />
                 </div>
 
                 <div className={`dashboard-message-text-container ${user.id === user_id ? '' : 'other'}`}>
                     <div className={`dashboard-message-header ${user.id === user_id ? '' : 'other'}`}>
-                        <h3>{moment(time).format("h:mm A")}</h3>
+                        <h3>{moment.utc(time).tz("Europe/Stockholm").format("HH:mm")}</h3>
                         <h3>{username}</h3>
                     </div>
 

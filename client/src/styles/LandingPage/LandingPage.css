@@ -25,10 +25,10 @@
     justify-self: end;
     align-self: end;
     position: absolute;
-    left: 50%;
-    right: 100%;
+    left: 100%;
+    right: 0%;
     top: 100%;
-    bottom: 100%;
+    bottom: 0%;
     margin: 1rem;
     padding: 1rem;
     font-size: 5rem;
@@ -38,6 +38,7 @@
 }
 
 .home-button:hover {
+    cursor: pointer;
     fill: var(--accent-color);
     animation: bounce 0.4s;
 }

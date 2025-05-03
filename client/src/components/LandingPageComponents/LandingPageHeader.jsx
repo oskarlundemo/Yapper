@@ -38,7 +38,7 @@ export const LandingPageHeader = () => {
             <header className={`landing-page-header ${hasScrolledPast ? 'sticky' : ''}`}>
 
                 {hasScrolledPast ? (
-                    <>
+                    <div className={`header-backdrop`}>
                         <LandingPageNav
                             sticky={hasScrolledPast}
                         />
@@ -47,7 +47,7 @@ export const LandingPageHeader = () => {
                             imageWitdh={50}
                             imageHeight={50}
                         />
-                    </>
+                    </div>
                 ) : (
                     <>
                         <LandingPageNav />

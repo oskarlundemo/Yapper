@@ -1,7 +1,7 @@
 import '../../styles/Dashboard/DashBoardChatWindow.css';
 import {DashboardMessageArea} from "./DashboardMessageArea.jsx";
 import {MessageCard} from "./MessageCard.jsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {UserProfile} from "./UserProfile.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
@@ -9,6 +9,7 @@ import {supabase} from "../../services/supabaseClient.js";
 import {MessageSplitter} from "./MessageSplitter.jsx";
 import {GroupMemberInfo} from "./GroupMemberInfo.jsx";
 import {ConversationHeader} from "./ConversationHeader.jsx";
+import moment from 'moment-timezone';
 import {GroupProfile} from "./GroupProfile.jsx";
 
 
@@ -63,6 +64,7 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                                     }
                                 })
                                 enrichedMessage.attachments = await response.json();
+                                console.log(enrichedMessage);
                                 const audio = new Audio('notification.mp3');
                                 await audio.play();
                                 setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
@@ -138,49 +140,48 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
     }, [receiver]);
 
 
-    const renderedMessages = [];
-    let lastDate = null;
+    const renderedMessages = useMemo(() => {
+        const rendered = [];
+        let lastDate = null;
 
-    messages.forEach((message) => {
-        const currDate = new Date(message.created_at);
+        messages.forEach((message) => {
+            const currDate = moment.utc(message.created_at).tz("Europe/Stockholm");
 
-        const isNewDay =
-            !lastDate ||
-            currDate.getFullYear() !== lastDate.getFullYear() ||
-            currDate.getMonth() !== lastDate.getMonth() ||
-            currDate.getDate() !== lastDate.getDate();
+            const isNewDay =
+                !lastDate ||
+                currDate.year() !== lastDate.year() ||
+                currDate.month() !== lastDate.month() ||
+                currDate.date() !== lastDate.date();
 
-        if (isNewDay) {
-            const formattedDate = currDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            });
+            if (isNewDay) {
+                const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY'); // ex: fredag 3 maj 2025
 
-            renderedMessages.push(
-                <MessageSplitter key={`split-${message.id}`} date={formattedDate} />
+                rendered.push(
+                    <MessageSplitter key={`split-${message.id}`} date={formattedDate} />
+                );
+                lastDate = currDate;
+            }
+
+            rendered.push(
+                <MessageCard
+                    key={message.id}
+                    API_URL={API_URL}
+                    showUserInfo={showUserInfo}
+                    setMiniBar={setMiniBar}
+                    miniBar={miniBar}
+                    message={message}
+                    content={message.content}
+                    time={message.created_at}
+                    user_id={message.sender_id}
+                    sender={message.sender}
+                    username={message.sender?.username || message.Sender?.username || "Unknown"}
+                    files={message.attachments || message.AttachedFile || null}
+                />
             );
-            lastDate = currDate;
-        }
+        });
 
-        renderedMessages.push(
-            <MessageCard
-                showUserInfo={showUserInfo}
-                setMiniBar={setMiniBar}
-                miniBar={miniBar}
-                API_URL={API_URL}
-                key={message.id}
-                message={message}
-                content={message.content}
-                time={message.created_at}
-                user_id={message.sender_id}
-                sender={message.sender}
-                username={message.sender?.username || message.Sender?.username || "Unknown"}
-                files={message.attachments || message.AttachedFile || null}
-            />
-        );
-    });
+        return rendered;
+    }, [messages]);
 
 
 

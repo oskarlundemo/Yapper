@@ -7,15 +7,34 @@
     justify-self: flex-end;
     align-self: flex-end;
 
-    gap: 1rem;
+    gap: 3rem;
     margin: 1rem;
     justify-content: flex-end;
     align-items: flex-end;
     height: 100%;
 
     a {
-        height: fit-content;
-        text-wrap: nowrap;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: var(--default-transition);
+        border-radius: var(--border-radius);
+        padding: 0.5rem;
+        color: var(--text-color);
+    }
+
+    a:hover {
+        box-shadow: rgba(14, 63, 126, 0.04) 0px 0px 0px 1px, rgba(42, 51, 69, 0.04) 0px 1px 1px -0.5px, rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px, rgba(42, 51, 70, 0.04) 0px 6px 6px -3px, rgba(14, 63, 126, 0.04) 0px 12px 12px -6px, rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;        scale: 1.1;
+        cursor: pointer;
+        color: var(--accent-color);
+
+
+
+        svg {
+            fill: var(--accent-color);
+        }
     }
 }
 
@@ -53,6 +72,13 @@
     box-shadow: -5px 5px 10px 10px rgba(0, 0, 0, 0.1);
     animation: smoothIn 0.8s ease-out forwards;
 }
+
+.header-backdrop {
+    width: 100%;
+    position: relative;
+    background-color: var(--background-color);
+}
+
 
 @keyframes smoothIn {
     0% {

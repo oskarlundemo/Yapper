@@ -22,8 +22,16 @@ export const unblockUser = async (req, res) => {
 
     try {
 
-        const unblockingUser = parseInt(req.params.unblocking_user);
-        const unblockedUser = parseInt(req.params.unblocked_user);
+        // Oskar 1
+        // Axa 2
+
+        const unblockingUser = parseInt(req.params.unblocking_user); // 1
+        const unblockedUser = parseInt(req.params.unblocked_user); // 2
+        const loggedInUser = parseInt(req.params.user_id); // 2
+
+
+        // 2 ? 2 : 1 = 2
+        const updatedList = loggedInUser ? unblockedUser : unblockingUser;
 
         const block = await prisma.blocks.delete({
             where: {
@@ -44,15 +52,18 @@ export const unblockUser = async (req, res) => {
             })
         }
 
-
+        //
         const updateBlockList = await prisma.blocks.findMany({
             where: {
-                blocker: unblockingUser,
+                blocker: updatedList,
             },
             include: {
                 BlockedUser: true
-            }
+            },
         })
+
+        console.log(updateBlockList);
+
         res.status(200).json(updateBlockList);
     } catch (err) {
         res.status(500).json({ 'Server Error': err.message });
@@ -123,8 +134,7 @@ export const unblockOldUser = async (req, res) => {
         const blocker = parseInt(req.params.unblocking_user)
         const blocked = parseInt(req.params.unblocked_user)
         const loggedIn = parseInt(req.params.logged_in)
-        const respondUser = loggedIn ? blocked : blocker;
-
+        const respondUser = loggedIn === blocker ? blocked : blocker;
 
         const latestMessage = await prisma.privateMessages.findFirst({
             where: {
@@ -142,13 +152,11 @@ export const unblockOldUser = async (req, res) => {
             }
         });
 
-
         const user = await prisma.users.findUnique({
             where: {
                 id: respondUser,
             }
         })
-
 
         const formattedResponse = {
             user: user,
@@ -161,8 +169,6 @@ export const unblockOldUser = async (req, res) => {
         console.error(err);
         res.status(500).json({'Server Error': err.message});
     }
-
-
 }
 
 

@@ -4,14 +4,14 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 
 
-export const DashboardMenu = ({ showProfile }) => {
+export const DashboardMenu = ({ API_URL, showProfile }) => {
     const { logout, user } = useAuth();
 
     return (
         <nav className={'dashboard-header'}>
             <div className="header-user-container">
 
-                <UserAvatar user={user.user} width={40} height={40} />
+                <UserAvatar API_URL={API_URL} user={user.user} width={40} height={40} />
 
                 <div className="dropdown-menu">
                     <ul className="dropdown">
