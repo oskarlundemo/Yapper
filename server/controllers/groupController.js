@@ -1,6 +1,34 @@
 import {prisma} from "../prisma/index.js";
 
 
+
+
+export const getNewGroupMessage = async (req, res) => {
+
+    try {
+        const group_id = parseInt(req.params.group_id);
+
+        const groupMessage = await prisma.groupMessages.findFirst({
+            where: {
+                id: group_id,
+            },
+            include: {
+                sender: true,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        });
+
+        res.status(201).json(groupMessage);
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json(`Error: ${err.message}`);
+    }
+}
+
+
 export const updateGroupDescription = async(req,res, next) => {
     try {
         if (req.body.description) {

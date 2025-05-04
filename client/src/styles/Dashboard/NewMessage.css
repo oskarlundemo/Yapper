@@ -38,18 +38,6 @@
     }
 }
 
-.new-message-search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    border: 1px solid #ddd;
-    z-index: 1;
-    border-radius: 5px;
-    box-shadow: var(--soft-boxshadow)
-}
-
 
 .contact-card {
     display: flex;
@@ -87,11 +75,6 @@
     }
 }
 
-.sub-header-contact {
-    color: var(--secondary-color);
-    text-align: left;
-    margin: 0.5rem;
-}
 
 
 .new-conversation-info {

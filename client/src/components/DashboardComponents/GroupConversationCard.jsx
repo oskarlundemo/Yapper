@@ -7,9 +7,9 @@
 
 
 import '../../styles/Dashboard/ConversationCard.css'
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from "moment-timezone";
+import moment from 'moment-timezone';
 import {supabase} from "../../services/supabaseClient.js";
 import {parseLatestMessage} from "./PrivateConversationCard.jsx";
 import {GroupAvatar} from "./GroupAvatar.jsx";
@@ -18,7 +18,7 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 export const GroupConversationCard = ({
                                           showChatWindow,
                                           groupId = 0, API_URL,
-                                          inspectGroupChat, setUpdatedMessage,
+                                          inspectGroupChat, latestGroupMessage,
                                           latestMessage = null,
                                           group = null,
                                       }) => {
@@ -28,63 +28,40 @@ export const GroupConversationCard = ({
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState('');
     const [localMessage, setLocalMessage] = useState(latestMessage);
+    const [timeStamp, setTimeStamp] = useState(null);
 
     useEffect(() => {
         setGroupName(group?.name);
-        console.log(group);
-    }, []);
+    }, [group]);
 
     useEffect(() => {
-        if (!user?.id || !groupId) return;
+        setLocalMessage(latestMessage);
+    }, [group])
 
-        const channelName = `latestmessage-${user.id}-${groupId}`;
-        const newChannel = supabase
-            .channel(channelName)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'GroupMessages',
-                },
-                async (payload) => {
-                    const message = payload.new;
 
-                    if (message.group_id === groupId) {
-                        const {data: enrichedMessages, error} = await supabase
-                            .from('GroupMessages')
-                            .select('*, sender:sender_id(id, username)')
-                            .eq('group_id', groupId)
-                            .order('created_at', { ascending: false })
-                            .limit(1);
+    useEffect(() => {
 
-                        if (error) {
-                            console.error("Error fetching sender:", error.message);
-                            return;
-                        }
-
-                        if (enrichedMessages && enrichedMessages.length > 0) {
-                            setLocalMessage(enrichedMessages[0]);
-                            setUpdatedMessage(enrichedMessages[0]);
-                            console.log("New enriched message:", enrichedMessages[0]);
-                        } else {
-                            console.warn("No messages found for this group.");
-                        }
-                    }
+        const fetchMessageData = async () => {
+            await fetch(`${API_URL}/groups/new/message/${latestGroupMessage.id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
                 }
-            )
-            .subscribe();
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setLocalMessage(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching group data.');
+                })
+        }
 
-        setChannel((prevChannel) => {
-            if (prevChannel) {
-                supabase.removeChannel(prevChannel);
-            }
-            return newChannel;
-        });
-        return () => {
-            supabase.removeChannel(newChannel);
-        };
-    }, [user.id, groupId]);
+        if (latestGroupMessage?.group_id === groupId)
+            fetchMessageData();
+
+    }, [latestGroupMessage]);
+
 
 
     useEffect(() => {
@@ -135,12 +112,12 @@ export const GroupConversationCard = ({
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{groupName}
                     <span>
-                        {moment(localMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                        {localMessage?.created_at && moment.utc(localMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
                     </span>
                 </h3>
                 <p className={'conversation-content'}>
 
-                    {user.id === localMessage.sender_id ? (
+                    {user.id === localMessage.sender.id ? (
                         <>
                         <span>You: </span>
                         {parseLatestMessage(localMessage)}
@@ -151,7 +128,6 @@ export const GroupConversationCard = ({
                             {parseLatestMessage(localMessage)}
                         </>
                         )}
-
                 </p>
             </div>
         </div>

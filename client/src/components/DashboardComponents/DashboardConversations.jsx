@@ -1,5 +1,5 @@
 import {PrivateConversationCard} from "./PrivateConversationCard.jsx";
-import {use, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import '../../styles/Dashboard/DashboardConversation.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {GroupConversationCard} from "./GroupConversationCard.jsx";
@@ -7,19 +7,19 @@ import {LoadingExample} from "./LoadingExample.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 
 
-export const DashboardConversations = ({inspectPrivateConversation, updatedMessage, setMiniBar,
-                                           setUpdatedMessage, inspectGroupChat, setShowNewMessage,
+export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, inspectGroupChat, setShowNewMessage,
                                            showNewMessages, showChatWindow, API_URL}) => {
 
+    const {user} = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [allConversations, setAllConversations] = useState([])
     const [loading, setLoading] = useState(true)
     const [privateChannel, setPrivateChannel] = useState(null)
     const [groupChannel, setGroupChannel] = useState(null);
-    const [filteredContacts, setFilteredContacts] = useState([]);
 
 
-    const {user} = useAuth();
+    const [latestPrivateMessage, setLatestPrivateMessage] = useState(null);
+    const [latestGroupMessage, setLatestGroupMessage] = useState(null);
 
 
     const inspectLatestChat = (latestChat) => {
@@ -88,10 +88,7 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 },
                 async (payload) => {
 
-                    console.log('Payload:', payload);
                     const block = payload.old;
-                    console.log('Block:', block)
-
 
                     if (block.blocker === user.id || block.blocked === user.id) {
                         const response = await fetch(`${API_URL}/blocks/remove/${block.blocker}/${block.blocked}/${user.id}`, {
@@ -115,10 +112,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
         };
     }, [user?.id]);
 
-
-
-
-
     useEffect(() => {
         if (!user?.id) return;
 
@@ -137,7 +130,6 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                         setAllConversations(prev =>
                             prev.filter(conv => conv.group?.id !== removedUser.group_id)
                         );
-                        console.log(allConversations);
                         inspectLatestChat(allConversations[0])
                     }
                 }
@@ -273,46 +265,84 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
             .then(response => response.json())
             .then(data => {
                 setAllConversations(data)
+                console.log(data)
                 inspectLatestChat(data[0])
                 setLoading(false)
             })
             .catch(error => console.log(error));
     }, [])
 
-    useEffect(() => {
-        if (!updatedMessage) return;
-
-        setAllConversations(prevConversations => {
-            const updated = prevConversations.map(conv => {
-                if (conv.group && updatedMessage.group_id && conv.group.id === updatedMessage.group_id) {
-                    return { ...conv, latestMessage: updatedMessage };
-                }
-
-                if (!conv.group && conv.user.id === (user.id === updatedMessage.sender_id ? updatedMessage.receiver_id : updatedMessage.sender_id)) {
-                    return { ...conv, latestMessage: updatedMessage };
-                }
-
-                return conv;
-            });
-
-            return [...updated].sort((a, b) =>
-                new Date(b.latestMessage?.created_at || 0) - new Date(a.latestMessage?.created_at || 0)
-            );
-        });
-    }, [updatedMessage]);
-
 
 
     useEffect(() => {
-        const filtered = allConversations.filter((entry) =>
-            (
-                entry.user?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    entry.group?.name.toLowerCase().includes(searchQuery.toLowerCase())
+        if (!user?.id) return;
+
+        const channelName = `privateConvo-${user.id}`;
+        const newChannel = supabase
+            .channel(channelName)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'messages',
+                },
+                async (payload) => {
+                    const message = payload.new;
+                    setLatestPrivateMessage(message);
+                }
             )
-        );
-        setFilteredContacts(filtered);
-        console.log(filtered);
-    }, [searchQuery, allConversations]);
+            .subscribe();
+
+        setPrivateChannel((prevChannel) => {
+            if (prevChannel) {
+                supabase.removeChannel(prevChannel);
+            }
+            return newChannel;
+        });
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user.id]);
+
+
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const channelName = `latestmessage-${user.id}}`;
+        const newChannel = supabase
+            .channel(channelName)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'GroupMessages',
+                },
+                async (payload) => {
+                    const newGroupMessage = payload.new;
+                    setLatestGroupMessage(newGroupMessage);
+                }
+            )
+            .subscribe();
+
+        setGroupChannel((prevChannel) => {
+            if (prevChannel) {
+                supabase.removeChannel(prevChannel);
+            }
+            return newChannel;
+        });
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user.id]);
+
+
+
+
+
 
 
     const [filteredConversations, setFilteredConversations] = useState([]);
@@ -327,43 +357,11 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                 }
                 return false;
             });
-
             setFilteredConversations(filtered);
         } else {
             setFilteredConversations([]);
         }
     }, [searchQuery, allConversations]);
-
-    const conversationCards = filteredConversations.map((conversation, index) => {
-        if (conversation.group?.id) {
-            return (
-                <GroupConversationCard
-                    API_URL={API_URL}
-                    key={index}
-                    group={conversation.group}
-                    groupId={conversation.group.id}
-                    latestMessage={conversation.latestMessage}
-                    showChatWindow={showChatWindow}
-                    setUpdatedMessage={setUpdatedMessage}
-                    inspectGroupChat={inspectGroupChat}
-                />
-            );
-        } else {
-            return (
-                <PrivateConversationCard
-                    API_URL={API_URL}
-                    key={index}
-                    user={conversation.user}
-                    friend_id={conversation.user.id}
-                    username={conversation.user.username}
-                    latestMessage={conversation.latestMessage}
-                    showChatWindow={showChatWindow}
-                    setUpdatedMessage={setUpdatedMessage}
-                    inspectPrivateConversation={inspectPrivateConversation}
-                />
-            );
-        }
-    });
 
 
     return (
@@ -400,7 +398,32 @@ export const DashboardConversations = ({inspectPrivateConversation, updatedMessa
                     <p>{allConversations.length === 0 ? 'No conversations' : 'No matches found'}</p>
                 ) : (
                     <>
-                        {conversationCards}
+                        {allConversations.map((conversation, index) => (
+                            conversation.group? (
+                                <GroupConversationCard
+                                    API_URL={API_URL}
+                                    latestGroupMessage={latestGroupMessage}
+                                    key={index}
+                                    group={conversation.group}
+                                    groupId={conversation.group.id}
+                                    latestMessage={conversation.latestMessage}
+                                    showChatWindow={showChatWindow}
+                                    inspectGroupChat={inspectGroupChat}
+                                />
+                            ) : (
+                                <PrivateConversationCard
+                                    API_URL={API_URL}
+                                    latestPrivateMessage={latestPrivateMessage}
+                                    key={index}
+                                    user={conversation.user}
+                                    friend_id={conversation.user.id}
+                                    username={conversation.user.username}
+                                    latestMessage={conversation.latestMessage}
+                                    showChatWindow={showChatWindow}
+                                    inspectPrivateConversation={inspectPrivateConversation}
+                                />
+                            )
+                        ))}
                     </>
                 )}
             </div>

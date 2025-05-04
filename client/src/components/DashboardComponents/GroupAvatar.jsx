@@ -7,13 +7,17 @@ export const GroupAvatar = ({height, width, user = null, group = null,
                                setSaveChanges = null, setNewAvatar = null,
                                selectPicture = false, file = null, setFile = null}) => {
 
-    const [currentAvatar, setCurrentAvatar] = useState(group?.avatar);
+    const [currentAvatar, setCurrentAvatar] = useState(null);
+
+    useEffect(() => {
+        setCurrentAvatar(group?.avatar);
+    }, [group]);
+
 
     useEffect(() => {
         const fetchImage = async () => {
             if (!group?.avatar) {
                 setCurrentAvatar(null);
-              //setFile(null);
                 return;
             }
             const { data, error } = supabase.storage
@@ -75,6 +79,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
                 </div>
             ) : (
                 <img
+                    key={group?.id || 'default'}
                     className="user-avatar-select-picture-default"
                     src={currentAvatar || "/default.jpg"}
                     alt="user-avatar"

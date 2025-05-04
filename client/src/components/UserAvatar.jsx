@@ -10,9 +10,13 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                                selectPicture = false, file = null, setFile = null}) => {
     const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
-    const [testUser, setTestUser] = useState(user || null);
+    const [testUser, setTestUser] = useState(null);
     const [loadingAvatar, setLoadingAvatar] = useState(true);
 
+
+    useEffect(() => {
+        setTestUser(user);
+    }, [user]);
 
     useEffect(() => {
         const fetchImage = async () => {
@@ -51,8 +55,6 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                 async (payload) => {
 
                     const updatedUser = payload.new;
-                    console.log('Updated', updatedUser);
-                    console.log('Logged in', loggedInUser);
                     if (updatedUser.id === testUser.id) {
                         setTestUser(updatedUser);
                     }
@@ -112,16 +114,14 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
             ) : (
 
                 (loadingAvatar ? (
-
                     <div style={{height: height, width: width}} className="loading-avatar"></div>
                 ) : (
                     <img
-                        key={currentAvatar}
+                        key={testUser?.id || 'default'}
                         className="user-avatar-select-picture-default"
                         src={currentAvatar || "/default.jpg"}
                         alt="user-avatar"
                         style={{ height, width }}
-                        onLoad={() => console.log("Image loaded:", currentAvatar)}
                         onError={() => console.error("Failed to load avatar:", currentAvatar)}
                     />
                 ))

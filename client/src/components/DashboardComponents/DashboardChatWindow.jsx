@@ -64,7 +64,6 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                                     }
                                 })
                                 enrichedMessage.attachments = await response.json();
-                                console.log(enrichedMessage);
                                 const audio = new Audio('notification.mp3');
                                 await audio.play();
                                 setMessages((prevMessages) => [...prevMessages, enrichedMessage]);

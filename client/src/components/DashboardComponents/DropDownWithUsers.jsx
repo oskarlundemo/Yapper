@@ -1,5 +1,6 @@
 import {ContactCard} from "./ContactCard.jsx";
 
+import '../../styles/Dashboard/DropDownWithUsers.css'
 
 export const DropDownWithUsersComponent = ({filteredContacts, setInputFocused, addToConversation = null, addToGroup = null, example = '', filteredMoreUsers, inputFocused, userSearchString, setUserSearchString}) => {
 

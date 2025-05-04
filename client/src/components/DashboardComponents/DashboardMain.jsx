@@ -16,7 +16,6 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const [userFriends, setUserFriends] = useState([]);
     const [moreUsers, setMoreUsers] = useState([]);
 
-    const [updatedMessage, setUpdatedMessage] = useState(null);
     const [miniBar, setMiniBar] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [currentGroupInfo, setCurrentGroupInfo] = useState(null);
@@ -184,7 +183,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
                 <DashboardConversations
                     setMiniBar={setMiniBar} setReceiver={setReceiver}
-                                    updatedMessage={updatedMessage} setUpdatedMessage={setUpdatedMessage} messages={messages} inspectGroupChat={inspectGroupChat}
+                                    messages={messages} inspectGroupChat={inspectGroupChat}
                                     showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} setShowNewMessage={setShowNewMessage}
                                     inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile}
                 />

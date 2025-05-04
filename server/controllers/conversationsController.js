@@ -265,6 +265,10 @@ export const getAllConversations = async (req, res) => {
         const conversations = [...formattedFriends, ...formattedPending];
         const mergedPrivateAndGrops = [...conversations, ...formattedGroupChats];
 
+
+        console.log(mergedPrivateAndGrops);
+
+
         res.status(200).json(mergedPrivateAndGrops);
 
     } catch (error) {
@@ -283,6 +287,7 @@ export const checkForAttachedFiles = async (req, res) => {
                 id: messageId
             },
             include: {
+                sender: true,
                 attachments: true
             }
         });

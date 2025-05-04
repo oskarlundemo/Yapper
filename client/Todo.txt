@@ -9,6 +9,7 @@ Prio 1
 [x] Användare kan lämna gruppchattar
 [x] "Sent a file" när man bara skicka en fil ist för ''
 [] All user input genom express validator
+[] Fixa så conversationer updateras korrekt när ett nytt meddelande skickas
 
 Prio 2
 [x] Sortera chattar efter senast aktivitet
@@ -17,7 +18,7 @@ Prio 2
 [x] Inspektera chattar, så profilen kommer up till höger
 [x] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
 
-[] Se en grön cirkel om användaren är online
+
 
 
 Prio 3
