@@ -10,34 +10,31 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                                selectPicture = false, file = null, setFile = null}) => {
     const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
-    const [testUser, setTestUser] = useState(null);
     const [loadingAvatar, setLoadingAvatar] = useState(true);
 
 
     useEffect(() => {
-        setTestUser(user);
-    }, [user]);
+        fetchImage(user);
+    }, [user?.id]);
 
-    useEffect(() => {
-        const fetchImage = async () => {
-            if (!testUser?.avatar) {
-                setCurrentAvatar(null);
-                setLoadingAvatar(false);
-                return;
-            }
-            const { data, error } = supabase.storage
-                .from("yapper")
-                .getPublicUrl(`avatars/${testUser.avatar}`);
-            if (error) {
-                console.error("Error getting public URL:", error);
-            } else {
-                setLoadingAvatar(false);
-                setCurrentAvatar(data.publicUrl);
-            }
-        };
 
-        fetchImage();
-    }, [testUser?.avatar]);
+    const fetchImage = async (user) => {
+        setLoadingAvatar(true);
+        if (!user?.avatar) {
+            setCurrentAvatar(null);
+            setLoadingAvatar(false);
+            return;
+        }
+        const { data, error } = supabase.storage
+            .from("yapper")
+            .getPublicUrl(`avatars/${user.avatar}`);
+        if (error) {
+            console.error("Error getting public URL:", error);
+        } else {
+            setLoadingAvatar(false);
+            setCurrentAvatar(data.publicUrl);
+        }
+    };
 
 
     useEffect(() => {
@@ -53,10 +50,9 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                     table: 'users',
                 },
                 async (payload) => {
-
                     const updatedUser = payload.new;
-                    if (updatedUser.id === testUser.id) {
-                        setTestUser(updatedUser);
+                    if (updatedUser.id === user.id) {
+                        await fetchImage(payload.new);
                     }
                 }
             )
@@ -65,7 +61,7 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
         return () => {
             supabase.removeChannel(newChannel);
         };
-    }, [user?.id]);
+    }, [user?.id ?? null]);
 
     const fileInputRef = useRef(null);
 
@@ -117,7 +113,7 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                     <div style={{height: height, width: width}} className="loading-avatar"></div>
                 ) : (
                     <img
-                        key={testUser?.id || 'default'}
+                        key={user?.id || 'default'}
                         className="user-avatar-select-picture-default"
                         src={currentAvatar || "/default.jpg"}
                         alt="user-avatar"

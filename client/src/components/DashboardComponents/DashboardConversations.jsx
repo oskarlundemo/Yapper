@@ -17,9 +17,17 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
     const [privateChannel, setPrivateChannel] = useState(null)
     const [groupChannel, setGroupChannel] = useState(null);
 
-
     const [latestPrivateMessage, setLatestPrivateMessage] = useState(null);
     const [latestGroupMessage, setLatestGroupMessage] = useState(null);
+    const [groupInviteChannel, setGroupInviteChannel] = useState(null);
+
+
+
+
+
+    useEffect(() => {
+        setFilteredConversations(allConversations);
+    }, [allConversations]);
 
 
     const inspectLatestChat = (latestChat) => {
@@ -34,6 +42,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
             inspectPrivateConversation(latestChat.user.id, latestChat.user.username, true)
         }
     }
+
 
     useEffect(() => {
         if (!user?.id) return;
@@ -142,6 +151,100 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
     }, [user?.id]);
 
 
+    // En för när nya chattar skapas
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-new-groupchat')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'GroupChats'
+                },
+                async (payload) => {
+
+                    const newGroupChat = payload.new;
+
+                    await fetch(`${API_URL}/conversations/new/group/chat/${newGroupChat.id}/${user.id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                            setAllConversations(prev => [...prev, data]);
+                            const audio = new Audio('notification.mp3');
+                            audio.play()
+                        })
+                }
+            )
+            .subscribe();
+
+        setPrivateChannel(newChannel);
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
+
+    // En för när nya medlemmar läggs till
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const newChannel = supabase
+            .channel('realtime-conversation-group-invite')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'GroupMembers'
+                },
+                async (payload) => {
+
+                    const groupMemberEntry = payload.new;
+                    console.log(groupMemberEntry);
+
+                    if (groupMemberEntry.member_id !== user.id) return;
+
+                    console.log('Fetching groupInfo');
+
+                    const response = await fetch(`${API_URL}/conversations/new/group/invite/${groupMemberEntry.group_id}/${user.id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            setAllConversations(prev => [data, ...prev]);
+                            const audio = new Audio('notification.mp3');
+                            audio.play()
+                            console.log(data)
+                        })
+                        .catch(err => console.log(err));
+                }
+            )
+            .subscribe();
+
+        setGroupInviteChannel(newChannel);
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+    }, [user?.id]);
+
+
+
+    // En för när grupp chattar tas bort
 
 
     useEffect(() => {
@@ -162,31 +265,18 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
 
                     if (pendingRequest.receiver_id !== user.id && pendingRequest.sender_id !== user.id) return;
 
-                    const { data: enrichedMessage, error } = await supabase
-                        .from('PendingFriendRequests')
-                        .select('*, sender:sender_id (id, username)')
-                        .eq('sender_id', pendingRequest.sender_id)
-                        .eq('receiver_id', pendingRequest.receiver_id)
-                        .single();
-
-                    if (error) {
-                        console.log(error);
-                        return;
-                    }
-
-                    const response = await fetch(`${API_URL}/conversations/new/${pendingRequest.sender_id}/${pendingRequest.receiver_id}/${user.id}/`, {
+                    await fetch(`${API_URL}/conversations/new/${pendingRequest.sender_id}/${pendingRequest.receiver_id}/${user.id}/`, {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
                         }
-                    });
-
-                    const newConversation = await response.json();
-
-                    const audio = new Audio('notification.mp3');
-                    await audio.play()
-
-                    setAllConversations(prev => [newConversation, ...prev]);
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            setAllConversations(prev => [newConversation, ...prev]);
+                            const audio = new Audio('notification.mp3');
+                            audio.play()
+                        })
                 }
             )
             .subscribe();
@@ -200,60 +290,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
 
 
 
-    useEffect(() => {
-        if (!user?.id) return;
-
-        const newChannel = supabase
-            .channel('realtime-conversation-group')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'GroupMembers'
-                },
-                async (payload) => {
-
-                    const groupMemberEntry = payload.new;
-
-                    if (groupMemberEntry.member_id !== user.id) return;
-
-                    const { data: enrichedMessage, error } = await supabase
-                        .from('GroupMembers')
-                        .select('*')
-                        .eq('group_id', groupMemberEntry.group_id)
-                        .eq('member_id', user.id)
-                        .single();
-
-                    if (error) {
-                        console.log(error);
-                        return;
-                    }
-
-                    const response = await fetch(`${API_URL}/conversations/new/group/${groupMemberEntry.group_id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                        }
-                    });
-
-                    const newGroupConversation = await response.json();
-                    const audio = new Audio('notification.mp3');
-                    await audio.play()
-
-                    setAllConversations(prev => [newGroupConversation, ...prev]);
-                }
-            )
-            .subscribe();
-
-        setGroupChannel(newChannel);
-
-        return () => {
-            supabase.removeChannel(newChannel);
-        };
-    }, [user?.id]);
-
-
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/all/${user.id}`, {
@@ -265,7 +301,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
             .then(response => response.json())
             .then(data => {
                 setAllConversations(data)
-                console.log(data)
                 inspectLatestChat(data[0])
                 setLoading(false)
             })
@@ -277,7 +312,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
     useEffect(() => {
         if (!user?.id) return;
 
-        const channelName = `privateConvo-${user.id}`;
+        const channelName = `privateConversation-${user.id}`;
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -305,6 +340,10 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
             supabase.removeChannel(newChannel);
         };
     }, [user.id]);
+
+
+
+
 
 
 
@@ -340,12 +379,8 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
     }, [user.id]);
 
 
-
-
-
-
-
     const [filteredConversations, setFilteredConversations] = useState([]);
+    const [inputHasFocus, setInputHasFocus] = useState(false);
 
     useEffect(() => {
         if (allConversations.length > 0) {
@@ -381,6 +416,9 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                         id="search"
                         placeholder="Search in contacts"
                         name="search"
+                        onFocus={() => setInputHasFocus(true)}
+                        onBlur={() => setInputHasFocus(false)
+                    }
                     />
                     <svg onClick={() => setSearchQuery('')} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
                 </div>
@@ -394,13 +432,12 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                         <LoadingExample />
                         <LoadingExample />
                     </>
-                ) : filteredConversations.length === 0 ? (
-                    <p>{allConversations.length === 0 ? 'No conversations' : 'No matches found'}</p>
-                ) : (
-                    <>
-                        {allConversations.map((conversation, index) => (
-                            conversation.group? (
+                ) : inputHasFocus ? (
+                    filteredConversations.length > 0 ? (
+                        filteredConversations.map((conversation, index) =>
+                            conversation.group ? (
                                 <GroupConversationCard
+                                    setAllConversations={setAllConversations}
                                     API_URL={API_URL}
                                     latestGroupMessage={latestGroupMessage}
                                     key={index}
@@ -412,6 +449,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                                 />
                             ) : (
                                 <PrivateConversationCard
+                                    setAllConversations={setAllConversations}
                                     API_URL={API_URL}
                                     latestPrivateMessage={latestPrivateMessage}
                                     key={index}
@@ -423,12 +461,43 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                                     inspectPrivateConversation={inspectPrivateConversation}
                                 />
                             )
-                        ))}
-                    </>
+                        )
+                    ) : (
+                        <p>No matches</p>
+                    )
+                ) : allConversations.length > 0 ? (
+                    allConversations.map((conversation, index) =>
+                        conversation.group ? (
+                            <GroupConversationCard
+                                setAllConversations={setAllConversations}
+                                API_URL={API_URL}
+                                latestGroupMessage={latestGroupMessage}
+                                key={index}
+                                group={conversation.group}
+                                groupId={conversation.group.id}
+                                latestMessage={conversation.latestMessage}
+                                showChatWindow={showChatWindow}
+                                inspectGroupChat={inspectGroupChat}
+                            />
+                        ) : (
+                            <PrivateConversationCard
+                                setAllConversations={setAllConversations}
+                                API_URL={API_URL}
+                                latestPrivateMessage={latestPrivateMessage}
+                                key={index}
+                                user={conversation.user}
+                                friend_id={conversation.user.id}
+                                username={conversation.user.username}
+                                latestMessage={conversation.latestMessage}
+                                showChatWindow={showChatWindow}
+                                inspectPrivateConversation={inspectPrivateConversation}
+                            />
+                        )
+                    )
+                ) : (
+                    <p>No conversations yet</p>
                 )}
             </div>
-
-
         </aside>
     )
 }

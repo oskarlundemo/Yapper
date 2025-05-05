@@ -4,9 +4,9 @@
 
 import {Router} from 'express'
 import {
-    checkForAttachedFiles,
+    fetchNewMessageInfo,
     getAllConversations,
-    getReceiverUsername, newGroupChat, newPendingNotification,
+    getReceiverUsername, newGroupChat, newGroupInvite, newPendingNotification,
     searchForConversations
 } from "../controllers/conversationsController.js";
 
@@ -23,9 +23,11 @@ conversationRouter.get('/receiver/:receiver_id', getReceiverUsername);
 
 conversationRouter.get('/new/:sender_id/:receiver_id/:logged_in_id', newPendingNotification);
 
-conversationRouter.get('/new/group/:group_id', newGroupChat)
+conversationRouter.get('/new/group/invite/:group_id/:logged_in', newGroupInvite)
 
-conversationRouter.get('/new/private/:message_id', checkForAttachedFiles);
+conversationRouter.get('/new/group/chat/:group_id/:user_id', newGroupChat)
+
+conversationRouter.get('/new/private/:message_id/:receiver_id/:sender_id/:logged_in', fetchNewMessageInfo);
 
 
 

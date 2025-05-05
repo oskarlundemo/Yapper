@@ -70,7 +70,7 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
 
 
         if (!receiver && receivers.length === 0) {
-            return; // Prevent sending if no one is selected
+            return;
         }
 
         const formData = new FormData();

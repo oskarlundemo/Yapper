@@ -2,12 +2,14 @@
 
 
 import '../../styles/LandingPage/LandingPageUPSModule.css'
+import {useEffect, useRef, useState} from "react";
 
 
 
 export const LandingPageUPSModule = ({title, subtitle, media, height, width, row, column, delay}) => {
-    return (
 
+
+    return (
         <section style={{
             gridRow: row,
             gridColumn: column,
@@ -19,7 +21,7 @@ export const LandingPageUPSModule = ({title, subtitle, media, height, width, row
                 <p>{subtitle}</p>
             </div>
 
-            <video muted={true} loop={true} autoPlay={true}  src={media} className="landing-page-video" />
+            <video muted={true} loop={true} autoPlay={true}  src={media} className={"landing-page-video"} />
         </section>
     )
 }

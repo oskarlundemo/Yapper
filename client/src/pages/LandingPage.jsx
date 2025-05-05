@@ -25,7 +25,6 @@ export const LandingPage = ({API_URL}) => {
                     column={2}
                     delay={0}
                     media={'GroupChat2.mp4'}
-
                 />
 
                 <LandingPageUPSModule
@@ -35,7 +34,6 @@ export const LandingPage = ({API_URL}) => {
                     column={1}
                     delay={1}
                     media={'ContentPreview2.mp4'}
-
                 />
 
                 <LandingPageUPSModule
@@ -46,6 +44,8 @@ export const LandingPage = ({API_URL}) => {
                     row={3}
                     column={2}
                     delay={2}
+                    media={'gifs.mp4'}
+
                 />
 
             </main>

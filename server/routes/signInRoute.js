@@ -12,14 +12,12 @@ import { body, validationResult } from 'express-validator';
 
 
 export const validateLogin = [
-    // Validate username (ensure it's not empty)
     body('username')
         .trim()
         .notEmpty()
         .withMessage('Username is required')
         .escape(),
 
-    // Validate password (ensure it's not empty)
     body('password')
         .notEmpty()
         .withMessage('Password is required')

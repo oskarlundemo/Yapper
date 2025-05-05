@@ -2,11 +2,63 @@
 
 import {prisma} from '../prisma/index.js';
 
+
+
+
 export const newGroupChat = async (req, res) => {
 
     try {
 
-        console.log('I new group chat not');
+        const groupId = parseInt(req.params.group_id);
+        const logged_id = parseInt(req.params.user_id);
+
+
+        const groupChat = await prisma.groupChats.findUnique({
+            where: {
+                id: groupId,
+            },
+            include: {
+                GroupMembers: true
+            }
+        })
+
+        const isLoggedInUserInGroup = groupChat.GroupMembers.some(member => member.member_id === logged_id);
+
+        if (isLoggedInUserInGroup) {
+
+            const groupChatLatestMessage = await prisma.groupMessages.findFirst({
+                where: {
+                    group_id: groupId,
+                },
+                include: {
+                    sender: true
+                },
+                orderBy: {
+                    created_at: 'desc'
+                }
+            })
+
+            const formattedGroupChat = {
+                latestMessage: groupChatLatestMessage,
+                group: groupChat
+            }
+            res.status(200).json(formattedGroupChat)
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+
+
+
+export const newGroupInvite = async (req, res) => {
+
+    try {
+
+        console.log('newGroupInvite');
 
         const groupId = parseInt(req.params.group_id);
 
@@ -25,16 +77,17 @@ export const newGroupChat = async (req, res) => {
             },
             orderBy: {
                 created_at: 'desc'
-            },
-            take: 1
+            }
         })
 
-        const formattedGroupNotification = {
+        const formattedNewGroupChat = {
             group: group,
             latestMessage: groupChatLatestMessage
         }
 
-        res.status(200).json(formattedGroupNotification);
+        console.log(formattedNewGroupChat);
+
+        res.status(200).json(formattedNewGroupChat);
     } catch (err) {
         console.log(err);
         res.status(500).json({Message: 'Something went wrong'});
@@ -265,11 +318,12 @@ export const getAllConversations = async (req, res) => {
         const conversations = [...formattedFriends, ...formattedPending];
         const mergedPrivateAndGrops = [...conversations, ...formattedGroupChats];
 
+        const sortedConversations = mergedPrivateAndGrops.sort((a, b) =>
+            new Date(b.latestMessage?.created_at || 0) - new Date(a.latestMessage?.created_at || 0)
+        );
 
-        console.log(mergedPrivateAndGrops);
 
-
-        res.status(200).json(mergedPrivateAndGrops);
+        res.status(200).json(sortedConversations);
 
     } catch (error) {
         console.error(error);
@@ -278,10 +332,16 @@ export const getAllConversations = async (req, res) => {
 }
 
 
-export const checkForAttachedFiles = async (req, res) => {
+export const fetchNewMessageInfo = async (req, res) => {
 
     try {
         const messageId = parseInt(req.params.message_id);
+        const senderId = parseInt(req.params.sender_id);
+        const receiverId = parseInt(req.params.receiver_id);
+
+        const loggedInUser = parseInt(req.params.logged_in)
+        const receivingUser = loggedInUser === senderId ? receiverId : senderId;
+
         const message = await prisma.privateMessages.findUnique({
             where: {
                 id: messageId
@@ -292,18 +352,19 @@ export const checkForAttachedFiles = async (req, res) => {
             }
         });
 
-        if (!message) {
-            return res.status(404).json({ error: 'Message not found' });
+        const user = await prisma.users.findUnique({
+            where: {
+                id: receivingUser
+            }
+        })
+
+        const formattedMessage = {
+            latestMessage: message,
+            user: user,
+            hasAttachments: message.attachments.length > 0,
         }
 
-        const messageWithAttachmentFlag = {
-            ...message,
-            hasAttachments: message.attachments?.length > 0
-        };
-
-        console.log(messageWithAttachmentFlag);
-
-        res.status(200).json(messageWithAttachmentFlag);
+        res.status(200).json(formattedMessage);
 
     } catch (err) {
         res.status(500).json(`Error: ${err.message}`);

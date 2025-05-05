@@ -44,6 +44,11 @@
         height: 100%;
         flex-grow: 1;
     }
+
+
+    svg:last-of-type:hover {
+        cursor: pointer;
+    }
 }
 
 .search-bar:has(:focus-within) {

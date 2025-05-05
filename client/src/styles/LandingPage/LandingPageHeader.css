@@ -41,9 +41,11 @@
 
 .landing-page-nav.sticky {
     margin-bottom: 0;
+
+    a:hover {
+        box-shadow: none;
+    }
 }
-
-
 
 
 .landing-page-header {
@@ -51,8 +53,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-
 
     img:hover {
         animation: bounce 0.4s ease-in;

@@ -3,25 +3,24 @@
 
 import '../../styles/Dashboard/ConversationCard.css'
 import {UserAvatar} from "../UserAvatar.jsx";
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
 
 
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
-                                            inspectPrivateConversation, user,
+                                            inspectPrivateConversation, user, setAllConversations,
                                             API_URL, latestPrivateMessage = null,
                                             latestMessage = null, username = ''}) => {
 
     const {user: loggedIn} = useAuth();
     const [channel, setChannel] = useState(null);
-    const [localMessage, setLocalMessage] = useState(latestMessage);
 
 
     useEffect( () => {
         const fetchMessageData = async () => {
-            await fetch(`${API_URL}/conversations/new/private/${latestPrivateMessage.id}`, {
+            await fetch(`${API_URL}/conversations/new/private/${latestPrivateMessage.id}/${latestPrivateMessage.receiver_id}/${latestPrivateMessage.sender_id}/${loggedIn.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,7 +28,14 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             })
                 .then(response => response.json())
                 .then(data => {
-                    setLocalMessage(data);
+                    setAllConversations(prev =>
+                        [
+                            ...prev.filter(conv => conv.user?.id !== data.user.id),
+                            data
+                        ].sort((a, b) =>
+                            new Date(b.latestMessage?.created_at || 0) - new Date(a.latestMessage?.created_at || 0)
+                        )
+                    );
                 })
                 .catch(error => console.log(error))
         }
@@ -55,12 +61,12 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        {moment(localMessage?.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                        {moment(latestMessage?.created_at).tz("Europe/Stockholm").format("HH:mm")}
                     </span>
                 </h3>
                 <p className={'conversation-content'}>
-                    {loggedIn.id === (localMessage?.sender?.id || localMessage?.sender_id) && <span>You: </span>}
-                    {parseLatestMessage(localMessage)}
+                    {loggedIn.id === (latestMessage?.sender?.id || latestMessage?.sender_id) && <span>You: </span>}
+                    {parseLatestMessage(latestMessage)}
                 </p>
             </div>
         </div>

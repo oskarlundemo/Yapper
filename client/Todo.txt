@@ -9,7 +9,9 @@ Prio 1
 [x] Användare kan lämna gruppchattar
 [x] "Sent a file" när man bara skicka en fil ist för ''
 [] All user input genom express validator
-[] Fixa så conversationer updateras korrekt när ett nytt meddelande skickas
+[x] Fixa så conversationer updateras korrekt när ett nytt meddelande skickas
+[] Switcha allt från supabase client till fetch istället, enhetligt
+[] Inleda konversation med GIFS!
 
 Prio 2
 [x] Sortera chattar efter senast aktivitet
@@ -17,8 +19,6 @@ Prio 2
 [x] Updatera chats i realtime, så när man blir vänner updateras det direkt
 [x] Inspektera chattar, så profilen kommer up till höger
 [x] Dela in chattarna i dagar så om man skriver över ett dygn visas ----- 10 Augusti ------
-
-
 
 
 Prio 3

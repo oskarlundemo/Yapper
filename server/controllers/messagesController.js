@@ -13,6 +13,7 @@ export const sendGifGroupChat = async (req, res) => {
         const receiver = parseInt(req.params.receiver_id);
         const gif = req.body.gif;
 
+
         await prisma.groupMessages.create({
             data: {
                 sender_id: sender,
@@ -233,7 +234,7 @@ export const createGroupChat = async (req, res) => {
                 })
             }
 
-            const messageRecord = await prisma.groupMessages.create({
+            await prisma.groupMessages.create({
                 data: {
                     sender_id: sender_id,
                     group_id: group.id,
@@ -255,7 +256,6 @@ export const createGroupChat = async (req, res) => {
 export const sendGroupMessage = async (req, res) => {
 
     try {
-        console.log('Skicka grupp')
 
         const sender_id = parseInt(req.params.sender_id);
         const receiver = parseInt(req.params.receiver_id)

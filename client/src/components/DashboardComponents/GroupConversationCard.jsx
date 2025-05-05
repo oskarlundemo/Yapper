@@ -18,25 +18,19 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 export const GroupConversationCard = ({
                                           showChatWindow,
                                           groupId = 0, API_URL,
-                                          inspectGroupChat, latestGroupMessage,
+                                          inspectGroupChat, latestGroupMessage, setAllConversations,
                                           latestMessage = null,
                                           group = null,
                                       }) => {
 
     const {user} = useAuth();
-    const [channel, setChannel] = useState(null);
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState('');
-    const [localMessage, setLocalMessage] = useState(latestMessage);
-    const [timeStamp, setTimeStamp] = useState(null);
 
     useEffect(() => {
         setGroupName(group?.name);
     }, [group]);
 
-    useEffect(() => {
-        setLocalMessage(latestMessage);
-    }, [group])
 
 
     useEffect(() => {
@@ -50,7 +44,14 @@ export const GroupConversationCard = ({
             })
                 .then(response => response.json())
                 .then(data => {
-                    setLocalMessage(data);
+                    setAllConversations(prev =>
+                        [
+                            ...prev.filter(conv => conv.group?.id !== data.group.id),
+                            data
+                        ].sort((a, b) =>
+                            new Date(b.latestMessage?.created_at || 0) - new Date(a.latestMessage?.created_at || 0)
+                        )
+                    );
                 })
                 .catch(error => {
                     console.error('Error fetching group data.');
@@ -112,20 +113,20 @@ export const GroupConversationCard = ({
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{groupName}
                     <span>
-                        {localMessage?.created_at && moment.utc(localMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                        {latestMessage?.created_at && moment.utc(latestMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
                     </span>
                 </h3>
                 <p className={'conversation-content'}>
 
-                    {user.id === localMessage.sender.id ? (
+                    {user.id === latestMessage?.sender?.id ? (
                         <>
                         <span>You: </span>
-                        {parseLatestMessage(localMessage)}
+                        {parseLatestMessage(latestMessage)}
                         </>
                     ) : (
                         <>
-                        <span>{localMessage.sender?.username || ''}: </span>
-                            {parseLatestMessage(localMessage)}
+                        <span>{latestMessage?.sender?.username || ''}: </span>
+                            {parseLatestMessage(latestMessage)}
                         </>
                         )}
                 </p>
