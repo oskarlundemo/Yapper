@@ -11,8 +11,13 @@ export const sendGifGroupChat = async (req, res) => {
     try {
         const sender = parseInt(req.params.sender_id);
         const receiver = parseInt(req.params.receiver_id);
-        const gif = req.body.gif;
 
+        if (!receiver && req.body.receivers.length > 1) {
+            await createGroupChat(req, res)
+            return;
+        }
+
+        const gif = req.body.gif;
 
         await prisma.groupMessages.create({
             data: {
@@ -27,6 +32,7 @@ export const sendGifGroupChat = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 }
+
 
 
 export const sendGifPrivateConversation = async (req, res) => {
@@ -189,7 +195,9 @@ export const createGroupChat = async (req, res) => {
     try {
 
         const sender_id = parseInt(req.params.sender_id);
-        const receivers = JSON.parse(req.body.receivers);
+        const receivers = typeof req.body.receivers === 'string' ? JSON.parse(req.body.receivers) : req.body.receivers;
+
+
         let groupName = req.body.name;
 
         const result = await prisma.$transaction(async (prisma) => {
@@ -238,7 +246,7 @@ export const createGroupChat = async (req, res) => {
                 data: {
                     sender_id: sender_id,
                     group_id: group.id,
-                    content: req.body.message,
+                    content: req.body.message ? req.body.message : req.body.gif.images.original.url
                 }
             });
 

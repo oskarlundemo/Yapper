@@ -1,21 +1,25 @@
 import {useEffect, useState} from "react";
 import '../../styles/Dashboard/GifContainer.css'
 
-export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, sender, receiver }) => {
+export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, setReceivers, receivers, sender, receiver }) => {
     const [gifs, setGifs] = useState([]);
     const [gifSearch, setGifSearch] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const apiKey = import.meta.env.VITE_GIPHY_API_KEY;
     const limit = 10;
 
     useEffect( () => {
         const setTrendingGifs = async () => {
+            setLoading(true);
             try {
                 const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=${limit}`);
                 const data = await response.json();
                 setGifs(data.data);
+                setLoading(false);
             } catch (err) {
                 console.log(err);
+                setLoading(false);
             }
         }
         setTrendingGifs();
@@ -24,9 +28,11 @@ export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, sender
 
     const fetchGifs = async (query) => {
         try {
+            setLoading(true);
             const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${query}&limit=${limit}`);
             const data = await response.json();
             setGifs(data.data);
+            setLoading(false);
         } catch (error) {
             console.error("Failed to fetch gifs", error);
         }
@@ -35,23 +41,25 @@ export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, sender
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetchGifs(gifSearch);
+        if (gifSearch.trim().length > 0)
+            fetchGifs(gifSearch);
     }
 
     const sendGif = async (gif) => {
         setShowGifs(false);
+        console.log(receivers);
         try {
             await fetch(`${API_URL}/messages/gif/${sender}/${receiver}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ gif, groupChat }),
+                body: JSON.stringify({ gif, groupChat, receivers}),
             });
+            setReceivers([]);
         } catch (err) {
             console.error("Message send error:", err);
         }
-
     }
 
     return (
@@ -71,17 +79,30 @@ export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, sender
             </div>
 
             <div className="gifContainer-search-result">
-                {gifs.length > 0 ? (
-                    gifs.map((gif, index) => (
-                        <img
-                            onClick={() => sendGif(gif)}
-                            key={index}
-                            src={gif.images.fixed_height.url}
-                            alt={gif.title}
-                        />
-                    ))
+
+
+                {loading ? (
+                    <>
+                        <div  className="loading-gif"/>
+                        <div  className="loading-gif"/>
+                        <div  className="loading-gif"/>
+                        <div  className="loading-gif"/>
+                        <div  className="loading-gif"/>
+
+                    </>
                 ) : (
-                    <p>No gifs found 😔</p>
+                    (gifs.length > 0 ? (
+                            gifs.map((gif, index) => (
+                                <img
+                                    onClick={() => sendGif(gif)}
+                                    key={index}
+                                    src={gif.images.fixed_height.url}
+                                    alt={gif.title}
+                                />
+                            ))
+                        ) : (
+                            <p>No gifs found 😔</p>
+                        ))
                 )}
             </div>
         </div>

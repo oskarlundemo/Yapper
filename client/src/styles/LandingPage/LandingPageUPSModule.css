@@ -8,28 +8,36 @@
     justify-self: center;
 
     opacity: 0;
-    animation: landingPageAnimation 1s ease-out forwards;
     width: fit-content;
+    padding: 1rem 2rem;
 
 
-    video {
-        width: 600px;
-        height: 400px;
-        object-fit: contain;
-        aspect-ratio: 1 / 1;
+    h3 {
+        font-weight: 400;
     }
+
+    span {
+        font-size: 1.8rem;
+        text-decoration: none;
+    }
+}
+
+.mock-chat-window {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    overflow: hidden;
 }
 
 
 .landing-page-module:first-of-type {
     justify-self: start;
     animation: landingPageAnimation 1s ease-out forwards;
-
 }
 
 .landing-page-module:nth-of-type(2) {
     justify-self: end;
-    animation: landingPageAnimationTest 1s ease-out forwards;
+    animation: landingPageAnimation 1s ease-out forwards;
 
 }
 
@@ -41,25 +49,12 @@
 @keyframes landingPageAnimation {
     from {
         opacity: 0;
-        transform: translateX(100%);
-        filter: blur(10px);
+        filter: blur(5px);
     }
-    to {
-        opacity: 1;
-        filter: blur(0px);
-        transform: translate3d(0%, 0, 0);
-    }
-}
 
-@keyframes landingPageAnimationTest {
-    from {
-        filter: blur(10px);
-        opacity: 0;
-        transform: translateX(-100%);
-    }
     to {
-        filter: blur(0px);
         opacity: 1;
+        filter: blur(0px);
         transform: translate3d(0%, 0, 0);
     }
 }

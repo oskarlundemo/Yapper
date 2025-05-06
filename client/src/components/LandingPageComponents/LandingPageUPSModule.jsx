@@ -2,26 +2,29 @@
 
 
 import '../../styles/LandingPage/LandingPageUPSModule.css'
-import {useEffect, useRef, useState} from "react";
 
 
 
-export const LandingPageUPSModule = ({title, subtitle, media, height, width, row, column, delay}) => {
+export const LandingPageUPSModule = ({title, moduleWidth = 500, children, subtitle, media, height, width, row, column, delay}) => {
 
 
     return (
         <section style={{
             gridRow: row,
             gridColumn: column,
-            animationDelay: `${delay}s`
+            animationDelay: `${delay}s`,
+            width: moduleWidth,
         }} className="landing-page-module">
 
             <div className="landing-page-text">
                 <h2>{title}</h2>
-                <p>{subtitle}</p>
+                <h3>{subtitle}</h3>
             </div>
 
-            <video muted={true} loop={true} autoPlay={true}  src={media} className={"landing-page-video"} />
+            <div className="mock-chat-window">
+                {children}
+            </div>
+
         </section>
     )
 }

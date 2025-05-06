@@ -85,8 +85,6 @@ export const newGroupInvite = async (req, res) => {
             latestMessage: groupChatLatestMessage
         }
 
-        console.log(formattedNewGroupChat);
-
         res.status(200).json(formattedNewGroupChat);
     } catch (err) {
         console.log(err);
@@ -173,6 +171,10 @@ export const getAllConversations = async (req, res) => {
             }
         });
 
+        console.log(user_id);
+
+        console.log(pendingRequests);
+
 
         const formattedFriends = await Promise.all(
             friends.map(async (relation) => {
@@ -257,6 +259,8 @@ export const getAllConversations = async (req, res) => {
                 };
             })
         );
+
+        console.log(formattedPending);
 
         const usersGroupChat = await prisma.groupMembers.findMany({
             where: {

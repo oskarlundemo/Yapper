@@ -12,20 +12,10 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
     const [message, setMessage] = useState('');
     const [gifs, showGifs] = useState(false);
     const [files, setFiles] = useState([]);
-    const [recipient, setRecipient] = useState(false);
 
 
     useEffect(() => {
-        if (receivers.length > 0) {
-            setRecipient(true);
-        } else
-            setRecipient(false);
-    }, [receivers]);
-
-    useEffect(() => {
-
         if (!user) return
-
         const newChannel = supabase
             .channel('friendship-chanel')
             .on(
@@ -37,7 +27,6 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
                 },
                 async (payload) => {
                     const friendship = payload.new;
-
                     if (friendship.user_id === user.id || friendship.friend_id === user.id) {
                         setFriend(true);
                     }
@@ -48,15 +37,11 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
         return () => {
             supabase.removeChannel(newChannel);
         };
-
     }, [user?.id])
 
 
-
     const acceptFriendRequest = async () => {
-
         if (!receiver) return;
-
         await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
             method: "GET",
             headers: {
@@ -101,7 +86,6 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
         }
         setMessage("");
         setReceivers([]);
-
     };
 
 
@@ -151,7 +135,7 @@ export const DashboardMessageArea = ({receiver, friend, loadingMessages, setFrie
 
                         <svg onClick={(e) => handleSubmit(e)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
 
-                        <GifContainer groupChat={groupChat} API_URL={API_URL} receiver={receiver} sender={user.id} showGifs={gifs} setShowGifs={showGifs} />
+                        <GifContainer receivers={receivers} setReceivers={setReceivers} groupChat={groupChat} API_URL={API_URL} receiver={receiver} sender={user.id} showGifs={gifs} setShowGifs={showGifs} />
 
                         <FileSelect handleFileAdd={handleFileAdd} />
 

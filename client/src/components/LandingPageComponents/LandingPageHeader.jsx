@@ -35,36 +35,31 @@ export const LandingPageHeader = () => {
 
     return (
         <>
-            <header className={`landing-page-header ${hasScrolledPast ? 'sticky' : ''}`}>
+            {hasScrolledPast && (
+                <header className={'landing-page-header sticky'}>
+                    <LandingPageNav
+                        sticky={hasScrolledPast}
+                    />
+                    <YapperLogo
+                        titleSize={4}
+                        imageWitdh={50}
+                        imageHeight={50}
+                    />
+                </header>
+            )}
 
-                {hasScrolledPast ? (
-                    <div className={`header-backdrop`}>
-                        <LandingPageNav
-                            sticky={hasScrolledPast}
-                        />
-                        <YapperLogo
-                            titleSize={4}
-                            imageWitdh={50}
-                            imageHeight={50}
-                        />
-                    </div>
-                ) : (
-                    <>
-                        <LandingPageNav />
-
-                        <YapperLogo
-                            titleSize={8}
-                            imageWitdh={150}
-                            imageHeight={150}
-                            subTitle={'Stop talking, start yappin!'}
-                            typeWriterAnimation={true}
-                            />
-                    </>
-                )}
-            </header>
+                <header className={`landing-page-header ${hasScrolledPast ? 'hide-header' : ''}  `}>
+                    <LandingPageNav />
+                    <YapperLogo
+                        titleSize={8}
+                        imageWitdh={150}
+                        imageHeight={150}
+                        subTitle={'Stop talking, start yappin!'}
+                        typeWriterAnimation={true}
+                    />
+                </header>
 
             <div ref={logoRef} style={{ position: 'absolute', top: '250px' }} />
-
         </>
     )
 

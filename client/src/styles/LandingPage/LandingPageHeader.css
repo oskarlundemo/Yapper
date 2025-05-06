@@ -30,8 +30,6 @@
         cursor: pointer;
         color: var(--accent-color);
 
-
-
         svg {
             fill: var(--accent-color);
         }
@@ -40,7 +38,7 @@
 
 
 .landing-page-nav.sticky {
-    margin-bottom: 0;
+    margin: 1rem;
 
     a:hover {
         box-shadow: none;
@@ -67,10 +65,25 @@
 }
 
 
+.hide-header {
+    opacity: 0;
+}
+
 .landing-page-header.sticky {
     background-color: var(--background-color);
     box-shadow: -5px 5px 10px 10px rgba(0, 0, 0, 0.1);
     animation: smoothIn 0.8s ease-out forwards;
+
+    div {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+
+        h1 {
+            text-shadow: none;
+        }
+    }
 }
 
 .header-backdrop {

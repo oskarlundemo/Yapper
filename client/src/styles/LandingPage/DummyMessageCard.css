@@ -1,0 +1,144 @@
+
+
+.dummy-message-card.sender {
+    animation: floatInLeft 2s;
+}
+
+.dummy-message-card.sender {
+    align-items: flex-end;
+}
+
+
+.dummy-message-card {
+    img {
+        width: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+    }
+}
+
+.dummy-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dummy-header.sender {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+
+.dummy-message.sender {
+    border-radius: var(--border-radius);
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.5rem;
+    width: fit-content;
+    text-align: right;
+}
+
+.dummy-message {
+    width: fit-content;
+    border-radius: var(--border-radius);
+    background-color: var(--secondary-color);
+    text-align: left;
+    padding: 0.5rem;
+
+    div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        p {
+            text-decoration: underline;
+        }
+    }
+}
+
+.dummy-message-gif {
+    width: 50% !important;
+    height: 50% !important;
+}
+
+
+
+.dummy-message-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+    }
+}
+
+
+.dummy-message-card:not(.sender) {
+    animation: floatInOutLeft 8s 3s ease-in-out infinite;
+    opacity: 0;
+}
+
+
+.dummy-message-card.sender {
+    animation: floatInOutRight 8s 3s ease-in-out infinite;
+}
+
+
+@keyframes floatInOutRight {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+        filter: blur(5px);
+    }
+    25% {
+        opacity: 1;
+        transform: translateX(0%);
+        filter: blur(0);
+    }
+    75% {
+        opacity: 1;
+        transform: translateX(0%);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+        filter: blur(5px);
+    }
+}
+
+
+@keyframes floatInOutLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+        filter: blur(5px);
+    }
+    25% {
+        opacity: 1;
+        transform: translateX(0%);
+        filter: blur(0);
+    }
+    75% {
+        opacity: 1;
+        transform: translateX(0%);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+        filter: blur(5px);
+    }
+}
+
+
+

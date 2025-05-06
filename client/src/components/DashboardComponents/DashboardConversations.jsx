@@ -177,7 +177,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                     })
                         .then(res => res.json())
                         .then(data => {
-                            console.log(data);
                             setAllConversations(prev => [...prev, data]);
                             const audio = new Audio('notification.mp3');
                             audio.play()
@@ -211,11 +210,8 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                 async (payload) => {
 
                     const groupMemberEntry = payload.new;
-                    console.log(groupMemberEntry);
 
                     if (groupMemberEntry.member_id !== user.id) return;
-
-                    console.log('Fetching groupInfo');
 
                     const response = await fetch(`${API_URL}/conversations/new/group/invite/${groupMemberEntry.group_id}/${user.id}`, {
                         method: 'GET',
@@ -244,9 +240,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
 
 
 
-    // En för när grupp chattar tas bort
-
-
     useEffect(() => {
         if (!user?.id) return;
 
@@ -262,6 +255,9 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                 async (payload) => {
 
                     const pendingRequest = payload.new;
+                    console.log('Fetching pendingRequest');
+                    console.log(payload.new);
+
 
                     if (pendingRequest.receiver_id !== user.id && pendingRequest.sender_id !== user.id) return;
 
