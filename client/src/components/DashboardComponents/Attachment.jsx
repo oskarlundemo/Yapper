@@ -3,6 +3,7 @@
 
 import '../../styles/Dashboard/Attachments.css'
 import {supabase} from "../../services/supabaseClient.js";
+import {use, useEffect} from "react";
 
 
 export const Attachment = ({file}) => {

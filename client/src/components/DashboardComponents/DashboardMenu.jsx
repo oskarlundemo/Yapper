@@ -4,7 +4,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 
 
-export const DashboardMenu = ({ API_URL, showProfile }) => {
+export const DashboardMenu = ({ API_URL, showProfile, setShowGroupProfile }) => {
     const { logout, user } = useAuth();
 
     return (
@@ -15,7 +15,7 @@ export const DashboardMenu = ({ API_URL, showProfile }) => {
 
                 <div className="dropdown-menu">
                     <ul className="dropdown">
-                        <li onClick={() => showProfile(user.user)}>Profile</li>
+                        <li onClick={() => {showProfile(user.user); setShowGroupProfile(false)}}>Profile</li>
                         <li onClick={logout}>Log out</li>
                     </ul>
                 </div>

@@ -47,7 +47,6 @@ export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, setRec
 
     const sendGif = async (gif) => {
         setShowGifs(false);
-        console.log(receivers);
         try {
             await fetch(`${API_URL}/messages/gif/${sender}/${receiver}`, {
                 method: "POST",

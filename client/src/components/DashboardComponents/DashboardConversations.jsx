@@ -7,7 +7,7 @@ import {LoadingExample} from "./LoadingExample.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 
 
-export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, inspectGroupChat, setShowNewMessage,
+export const DashboardConversations = ({inspectPrivateConversation, setLoadingMessage, setMiniBar, inspectGroupChat, setShowNewMessage,
                                            showNewMessages, showChatWindow, API_URL}) => {
 
     const {user} = useAuth();
@@ -296,9 +296,11 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 setAllConversations(data)
                 inspectLatestChat(data[0])
                 setLoading(false)
+                setLoadingMessage(false)
             })
             .catch(error => console.log(error));
     }, [])
@@ -336,9 +338,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
             supabase.removeChannel(newChannel);
         };
     }, [user.id]);
-
-
-
 
 
 
@@ -455,6 +454,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setMiniBar, 
                                     latestMessage={conversation.latestMessage}
                                     showChatWindow={showChatWindow}
                                     inspectPrivateConversation={inspectPrivateConversation}
+
                                 />
                             )
                         )

@@ -4,7 +4,7 @@ import {Router} from 'express';
 import multer from 'multer';
 const upload = multer()
 import {
-    checkFiles, checkGroupFiles,
+    newPrivateMessage, newGroupMessage,
     createGroupChat,
     getMessagesFromGroupConversation,
     getMessagesFromPrivateConversation, sendGifGroupChat, sendGifPrivateConversation,
@@ -19,7 +19,6 @@ import {body, validationResult} from 'express-validator';
 export const validateMessage = [
     body('message')
         .trim()
-        .notEmpty()
         .escape()
 ]
 
@@ -59,9 +58,9 @@ messagesRoute.post('/gif/:sender_id/:receiver_id', (req, res) => {
     }
 });
 
-messagesRoute.get('/files/:message_id', checkFiles)
+messagesRoute.get('/new/private/:message_id', newPrivateMessage)
 
-messagesRoute.get('/files/group/:message_id', checkGroupFiles)
+messagesRoute.get('/new/group/:group_id/:message_id', newGroupMessage)
 
 
 export default messagesRoute;

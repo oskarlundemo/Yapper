@@ -1,10 +1,5 @@
-
-
-
-
 import {prisma} from '../prisma/index.js';
 import {saveFiles} from "./supabaseController.js";
-
 
 
 export const sendGifGroupChat = async (req, res) => {
@@ -139,10 +134,19 @@ export const sendPrivateMessage = async (req, res) => {
 }
 
 
-export const checkFiles = async (req, res) => {
+export const newPrivateMessage = async (req, res) => {
 
     try {
         const msgId = parseInt(req.params.message_id);
+
+        const message = await prisma.privateMessages.findUnique({
+            where: {
+                id: msgId
+            }, include: {
+                attachments: true,
+                sender: true
+            }
+        })
 
         const files = await prisma.attachedFile.findMany({
             where: {
@@ -152,41 +156,46 @@ export const checkFiles = async (req, res) => {
                 file: true
             }
         })
-        if (!files) {
-            res.status(404).send('No files found.');
-        } else {
-            res.status(200).json(files);
-        }
+
+        if (files)
+            message.attachments = files;
+
+        res.status(200).json(message);
+
     } catch (err) {
         res.status(500).send('Internal Server Error');
     }
 }
 
 
-export const checkGroupFiles = async (req, res) => {
+export const newGroupMessage = async (req, res) => {
 
     try {
-        const msgId = parseInt(req.params.message_id);
+        const group_id = parseInt(req.params.group_id);
+        const message_id = parseInt(req.params.message_id);
 
-        const files = await prisma.attachedFile.findMany({
+        const groupMessage = await prisma.groupMessages.findFirst({
             where: {
-                group_message_id: msgId
+                group_id: group_id,
+                id: message_id
             },
             include: {
-                file: true
+                sender: true,
+                AttachedFile: {
+                    include: {
+                        file: true
+                    }
+                }
             }
-        })
+        });
 
-        if (!files) {
-            res.status(404).send('No files found.');
-        } else {
-            res.status(200).json(files);
-        }
+        groupMessage.hasAttachments = groupMessage?.AttachedFile.length > 0;
+
+        res.status(200).json(groupMessage);
+
     } catch (err) {
         res.status(500).send('Internal Server Error');
     }
-
-
 }
 
 
@@ -196,7 +205,6 @@ export const createGroupChat = async (req, res) => {
 
         const sender_id = parseInt(req.params.sender_id);
         const receivers = typeof req.body.receivers === 'string' ? JSON.parse(req.body.receivers) : req.body.receivers;
-
 
         let groupName = req.body.name;
 
@@ -268,6 +276,7 @@ export const sendGroupMessage = async (req, res) => {
         const sender_id = parseInt(req.params.sender_id);
         const receiver = parseInt(req.params.receiver_id)
 
+
         const message = await prisma.groupMessages.create({
             data: {
                 sender_id: sender_id,
@@ -277,7 +286,7 @@ export const sendGroupMessage = async (req, res) => {
         });
 
 
-        if (req.files) {
+        if (req.files.length > 0) {
             await prisma.$transaction(async () => {
                 const files = req.files;
                 for (const file of files) {
@@ -297,6 +306,7 @@ export const sendGroupMessage = async (req, res) => {
                     })
                 }
 
+                console.log('Skickades med filer')
                 await saveFiles(req, res);
             })
         }

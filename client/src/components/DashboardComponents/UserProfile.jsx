@@ -1,7 +1,7 @@
 
 
 import {useAuth} from "../../context/AuthContext.jsx";
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {UserAvatar} from "../UserAvatar.jsx";
 
@@ -17,9 +17,9 @@ export const UserProfile = ({miniBar, setMiniBar, selectedUser = null, setBlocke
     const [charsCount, setCharsCount] = useState(0)
     const [show, setShow] = useState(false)
 
-
     useEffect(() => {
         setBio(selectedUser?.bio || '')
+        console.log(selectedUser)
     }, [selectedUser])
 
 

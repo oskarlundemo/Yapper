@@ -17,7 +17,6 @@ export const GroupMemberPopUp = ({group, API_URL, hidePopUp, closePopUp, moreUse
 
 
     const [groupMembers, setGroupMembers] = useState(null);
-    const [addUserInput, setAddUserInput] = useState("");
     const {user} = useAuth();
 
 

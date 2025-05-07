@@ -11,12 +11,11 @@ import moment from "moment-timezone";
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                                             inspectPrivateConversation, user, setAllConversations,
-                                            API_URL, latestPrivateMessage = null,
+                                            API_URL, latestPrivateMessage = null, hasAttachments = false,
                                             latestMessage = null, username = ''}) => {
 
     const {user: loggedIn} = useAuth();
     const [channel, setChannel] = useState(null);
-
 
     useEffect( () => {
         const fetchMessageData = async () => {
@@ -28,6 +27,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.user?.id !== data.user.id),
@@ -66,7 +66,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                 </h3>
                 <p className={'conversation-content'}>
                     {loggedIn.id === (latestMessage?.sender?.id || latestMessage?.sender_id) && <span>You: </span>}
-                    {parseLatestMessage(latestMessage)}
+                    {parseLatestMessage(latestMessage, hasAttachments)}
                 </p>
             </div>
         </div>
@@ -74,9 +74,9 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
 }
 
 
-export const parseLatestMessage = (message) => {
+export const parseLatestMessage = (message, hasAttachments) => {
 
-    if (message.hasAttachments) {
+    if (message.hasAttachments || hasAttachments) {
         return 'Sent a file'
     } else if(message.content?.includes('giphy.com')) {
         return 'Sent a GIF '

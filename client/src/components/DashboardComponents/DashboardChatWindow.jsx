@@ -14,8 +14,8 @@ import {GroupProfile} from "./GroupProfile.jsx";
 
 
 export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, showGroupInfo, loadingProfile, showUserInfo, chatName, blockedUsers, setBlockedUsers, setFriend,
-                                        selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages,
-                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, showGroupMembers}) => {
+                                        selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages, showGroupProfile,
+                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, setShowGroupProfile, showGroupMembers}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
@@ -49,25 +49,20 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                             (newMessage.sender_id === user.id && newMessage.receiver_id === receiver) ||
                             (newMessage.sender_id === receiver && newMessage.receiver_id === user.id)
                         ) {
-                            const { data: enrichedMessage, error } = await supabase
-                                .from("messages")
-                                .select(`*, sender:sender_id (id, username, avatar)`)
-                                .eq("id", newMessage.id)
-                                .single();
-                            if (error) {
-                                console.error("Error enriching message:", error.message);
-                            } else {
-                                const response = await fetch(`${API_URL}/messages/files/${newMessage.id}`, {
-                                    method: "GET",
-                                    headers: {
-                                        "Content-Type": "application/json"
-                                    }
+                            await fetch(`${API_URL}/messages/new/private/${newMessage.id}`, {
+                                method: "GET",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                }
+                            })
+                                .then(res => res.json())
+                                .then(async data => {
+                                    console.log(data);
+                                    setMessages((prevMessages) => [...prevMessages, data]);
+                                    const audio = new Audio('notification.mp3');
+                                    await audio.play();
                                 })
-                                enrichedMessage.attachments = await response.json();
-                                const audio = new Audio('notification.mp3');
-                                await audio.play();
-                                setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
-                            }
+                                .catch(err => console.log(err));
                         }
                     }
                 )
@@ -97,29 +92,20 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                     async (payload) => {
                         const newMessage = payload.new;
 
-                        const { data: enrichedMessage, error } = await supabase
-                                .from("GroupMessages")
-                                .select(`*, sender:sender_id ( id, username, avatar)`)
-                                .eq("group_id", receiver)
-                                .order("created_at", { ascending: false })
-                                .limit(1)
-                                .single();
-
-                            if (error) {
-                                console.error("Error enriching message:", error.message);
-                                return;
+                        await fetch(`${API_URL}/messages/new/group/${newMessage.group_id}/${newMessage.id}`, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json"
                             }
-
-                            const response = await fetch(`${API_URL}/messages/files/group/${newMessage.id}`, {
-                                method: "GET",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                }
+                        })
+                            .then(res => res.json())
+                            .then(async data => {
+                                console.log(data);
+                                setMessages((prevMessages) => [...prevMessages, data]);
+                                const audio = new Audio('notification.mp3');
+                                await audio.play();
                             })
-                            enrichedMessage.attachments = await response.json();
-                            const audio = new Audio('notification.mp3');
-                            await audio.play();
-                            setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
+                            .catch(err => console.log(err));
                     }
                 )
                 .subscribe();
@@ -153,7 +139,7 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                 currDate.date() !== lastDate.date();
 
             if (isNewDay) {
-                const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY'); // ex: fredag 3 maj 2025
+                const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY');
 
                 rendered.push(
                     <MessageSplitter key={`split-${message.id}`} date={formattedDate} />
@@ -174,7 +160,8 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                     user_id={message.sender_id}
                     sender={message.sender}
                     username={message.sender?.username || message.Sender?.username || "Unknown"}
-                    files={message.attachments || message.AttachedFile || null}
+                    files={message.attachments || []}
+                    setShowGroupProfile={setShowGroupProfile}
                 />
             );
         });
@@ -220,13 +207,16 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
 
                     </div>
 
-                    {groupChat ? (
-                        <GroupProfile headerName={setChatName} showGroupMembers={showGroupMembers} API_URL={API_URL} group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
-                        ) : (
-                            <UserProfile loadingProfile={loadingProfile} blockedUsers={blockedUsers} loadingMessages={loadingMessages}
-                                         API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
-                                         setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
-                        )}
+                    {groupChat && showGroupProfile ? (
+                        <GroupProfile
+                            setMinibar={setMiniBar} headerName={setChatName}
+                            showGroupMembers={showGroupMembers} API_URL={API_URL}
+                            group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
+                    ) : (
+                        <UserProfile loadingProfile={loadingProfile} blockedUsers={blockedUsers} loadingMessages={loadingMessages}
+                                     API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
+                                     setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
+                    )}
                     <DashboardMessageArea
                         setReceiver={setReceiver} setFriend={setFriend}
                         miniBar={miniBar} groupChat={groupChat} friend={friend}

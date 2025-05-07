@@ -14,7 +14,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
 
     const {user} = useAuth();
 
-    const [description, setDescription] = useState(group?.description || '');
+    const [description, setDescription] = useState('');
     const [file, setFile] = useState(null)
     const [newAvatar, setNewAvatar] = useState(null)
     const [disabledDescription, setDisabledDescription] = useState(true)
@@ -23,6 +23,20 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState(group?.name);
     const [groupNameCharCount, setGroupNameCharCount] = useState(0);
+
+    useEffect(() => {
+        setDescriptionCharsCount(description.length);
+    }, [description]);
+
+
+    useEffect(() => {
+        if (group?.description && group.description !== 'null') {
+            setDescription(group.description);
+        } else {
+            setDescription('No description');
+        }
+        setGroupName(group?.name || '');
+    }, [group]);
 
 
 
@@ -85,7 +99,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
     }, [groupName])
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         setSaveChanges(false);
@@ -100,7 +114,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
         console.log(group)
 
         try {
-            fetch(`${API_URL}/groups/update/${group.id}`, {
+            await fetch(`${API_URL}/groups/update/${group.id}`, {
                 method: 'POST',
                 body: formData
             })
@@ -156,7 +170,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
                             {disabledDescription ? (
-                                <p className={'user-bio'}>{ description || 'No description'}</p>
+                                <p className={'user-bio'}>{description}</p>
                             ) : (
                                 <>
                                 <textarea value={description}
@@ -188,7 +202,7 @@ export const GroupProfile = ({miniBar, setMiniBar, group = null, API_URL, header
                             )}
                         </form>
                     ) : (
-                        <p>{description || 'No description'}</p>
+                        <p>{description}</p>
                     )}
 
 

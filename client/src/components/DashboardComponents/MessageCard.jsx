@@ -1,24 +1,27 @@
 import {UserAvatar} from "../UserAvatar.jsx";
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
 import {Attachment} from "./Attachment.jsx";
 
 
 
-export const MessageCard = ({content, files = null, API_URL, user_id, showUserInfo, sender, time, username = ''}) => {
+export const MessageCard = ({content, files = null, setShowGroupProfile, API_URL, user_id, showUserInfo, sender, time, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
 
     useEffect(() => {
-        content.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);
+        content?.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);
     }, [])
 
     return (
         <>
             <div className={`dashboard-message ${user.id === user_id ? '' : 'other'}`}>
-                <div onClick={() => showUserInfo(sender)} className="dashboard-message-avatar">
+                <div onClick={() => {
+                    showUserInfo(sender);
+                    setShowGroupProfile(false);
+                }} className="dashboard-message-avatar">
                     <UserAvatar API_URL={API_URL} user={sender} height={30} width={30} />
                 </div>
 

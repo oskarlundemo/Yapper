@@ -25,7 +25,9 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
     const [hideGroupPopUp, setHideGroupPopUp] = useState(true);
 
     const [loadingMessages, setLoadingMessages] = useState(true);
-    const [loadingProfile, setLoadingProfile] = useState(false);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+    const [showGroupProfile, setShowGroupProfile] = useState(true);
+
 
     const {user} = useAuth();
 
@@ -42,6 +44,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setSelectedUser(data);
                 setLoadingProfile(false);
             })
@@ -60,6 +63,7 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
     const showGroupInfo = () => {
         setMiniBar(true);
+        setShowGroupProfile(true);
     }
 
     const inspectPrivateConversation = async (receiver_id, chatname = '', initialLoad) => {
@@ -176,20 +180,21 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
 
 
+
     return (
         <>
             <main className={'dashboard-main'}>
-                <DashboardMenu API_URL={API_URL} showProfile={showUserInfo} />
+                <DashboardMenu setShowGroupProfile={setShowGroupProfile} API_URL={API_URL} showProfile={showUserInfo} />
 
                 <DashboardConversations
-                    setMiniBar={setMiniBar} setReceiver={setReceiver}
+                    setMiniBar={setMiniBar} setReceiver={setReceiver} setLoadingMessage={setLoadingMessages}
                                     messages={messages} inspectGroupChat={inspectGroupChat}
                                     showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage} showChatWindow={showChatWindow} setShowNewMessage={setShowNewMessage}
                                     inspectPrivateConversation={inspectPrivateConversation} API_URL={API_URL} showProfile={showProfile}
                 />
 
                 <DashboardChatWindow
-                    setFriend={setFriend} setReceiver={setReceiver} loadingProfile={loadingProfile}
+                    setFriend={setFriend} setReceiver={setReceiver} loadingProfile={loadingProfile} showGroupProfile={showGroupProfile} setShowGroupProfile={setShowGroupProfile}
                                  setChatName={setChatName} currentGroupInfo={currentGroupInfo} showGroupInfo={showGroupInfo} selectedUser={selectedUser}
                                  showUserInfo={showUserInfo} miniBar={miniBar} setMiniBar={setMiniBar} moreUsers={moreUsers} userFriends={userFriends}
                                  setGroupChat={setGroupChat} groupChat={groupChat} chatName={chatName}

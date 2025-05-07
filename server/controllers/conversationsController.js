@@ -25,7 +25,6 @@ export const newGroupChat = async (req, res) => {
         const isLoggedInUserInGroup = groupChat.GroupMembers.some(member => member.member_id === logged_id);
 
         if (isLoggedInUserInGroup) {
-
             const groupChatLatestMessage = await prisma.groupMessages.findFirst({
                 where: {
                     group_id: groupId,
@@ -58,10 +57,7 @@ export const newGroupInvite = async (req, res) => {
 
     try {
 
-        console.log('newGroupInvite');
-
         const groupId = parseInt(req.params.group_id);
-
         const group = await prisma.groupChats.findUnique({
             where: {
                 id: groupId,
@@ -171,10 +167,6 @@ export const getAllConversations = async (req, res) => {
             }
         });
 
-        console.log(user_id);
-
-        console.log(pendingRequests);
-
 
         const formattedFriends = await Promise.all(
             friends.map(async (relation) => {
@@ -260,7 +252,6 @@ export const getAllConversations = async (req, res) => {
             })
         );
 
-        console.log(formattedPending);
 
         const usersGroupChat = await prisma.groupMembers.findMany({
             where: {
@@ -273,6 +264,11 @@ export const getAllConversations = async (req, res) => {
                         GroupMessages: {
                             include: {
                                 sender: true,
+                                attachments: {
+                                    include: {
+                                        file: true,
+                                    }
+                                },
                             },
                             orderBy: {
                                 created_at: 'desc'
@@ -288,6 +284,9 @@ export const getAllConversations = async (req, res) => {
                 }
             }
         });
+
+
+
 
 
         const formattedGroupChats = usersGroupChat.map((chat) => {
@@ -309,6 +308,7 @@ export const getAllConversations = async (req, res) => {
                     ? {
                         content: latestMessage.content,
                         created_at: latestMessage.created_at,
+                        hasAttachments: latestMessage.attachments?.length > 0,
                         sender: {
                             id: latestMessage.sender.id,
                             username: latestMessage.sender.username,
@@ -352,9 +352,15 @@ export const fetchNewMessageInfo = async (req, res) => {
             },
             include: {
                 sender: true,
-                attachments: true
             }
         });
+
+
+        const attachments = await prisma.attachedFile.findMany({
+            where: {
+                private_message_id: messageId
+            }
+        })
 
         const user = await prisma.users.findUnique({
             where: {
@@ -362,10 +368,11 @@ export const fetchNewMessageInfo = async (req, res) => {
             }
         })
 
+        message.hasAttachments = attachments.length > 0
+
         const formattedMessage = {
             latestMessage: message,
             user: user,
-            hasAttachments: message.attachments.length > 0,
         }
 
         res.status(200).json(formattedMessage);

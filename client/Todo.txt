@@ -11,7 +11,7 @@ Prio 1
 [] All user input genom express validator
 [x] Fixa så conversationer updateras korrekt när ett nytt meddelande skickas
 [] Switcha allt från supabase client till fetch istället, enhetligt
-[] Inleda konversation med GIFS!
+[x] Inleda konversation med GIFS!
 
 Prio 2
 [x] Sortera chattar efter senast aktivitet
