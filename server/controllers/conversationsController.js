@@ -264,11 +264,7 @@ export const getAllConversations = async (req, res) => {
                         GroupMessages: {
                             include: {
                                 sender: true,
-                                attachments: {
-                                    include: {
-                                        file: true,
-                                    }
-                                },
+                                AttachedFile: true,
                             },
                             orderBy: {
                                 created_at: 'desc'
@@ -284,8 +280,6 @@ export const getAllConversations = async (req, res) => {
                 }
             }
         });
-
-
 
 
 
@@ -308,7 +302,7 @@ export const getAllConversations = async (req, res) => {
                     ? {
                         content: latestMessage.content,
                         created_at: latestMessage.created_at,
-                        hasAttachments: latestMessage.attachments?.length > 0,
+                        hasAttachments: latestMessage.AttachedFile,
                         sender: {
                             id: latestMessage.sender.id,
                             username: latestMessage.sender.username,
@@ -336,7 +330,7 @@ export const getAllConversations = async (req, res) => {
 }
 
 
-export const fetchNewMessageInfo = async (req, res) => {
+export const fetchNewPrivateMessageInfo = async (req, res) => {
 
     try {
         const messageId = parseInt(req.params.message_id);

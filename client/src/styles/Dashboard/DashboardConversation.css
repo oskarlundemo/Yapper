@@ -54,3 +54,17 @@
 .search-bar:has(:focus-within) {
     border: 1.5px solid var(--accent-color);
 }
+
+
+
+
+@media screen and (max-width: 800px) {
+
+    .dashboard-conversation {
+        margin: 0;
+        border-radius: 0;
+        height: 100%;
+    }
+}
+
+

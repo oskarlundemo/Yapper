@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {supabase} from "../services/supabaseClient.js";
+import {useDynamicStyles} from "../context/DynamicStyles.jsx";
 
 
 
@@ -16,6 +17,9 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
     useEffect(() => {
         fetchImage(user);
     }, [user?.id]);
+
+
+    const {clickOnProfile} = useDynamicStyles();
 
 
     const fetchImage = async (user) => {

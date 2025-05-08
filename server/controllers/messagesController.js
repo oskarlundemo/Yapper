@@ -189,7 +189,7 @@ export const newGroupMessage = async (req, res) => {
             }
         });
 
-        groupMessage.hasAttachments = groupMessage?.AttachedFile.length > 0;
+        groupMessage.hasAttachments = !!groupMessage?.AttachedFile;
 
         res.status(200).json(groupMessage);
 
@@ -306,7 +306,6 @@ export const sendGroupMessage = async (req, res) => {
                     })
                 }
 
-                console.log('Skickades med filer')
                 await saveFiles(req, res);
             })
         }

@@ -11,15 +11,18 @@ import {GroupMemberInfo} from "./GroupMemberInfo.jsx";
 import {ConversationHeader} from "./ConversationHeader.jsx";
 import moment from 'moment-timezone';
 import {GroupProfile} from "./GroupProfile.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 
-export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, showGroupInfo, loadingProfile, showUserInfo, chatName, blockedUsers, setBlockedUsers, setFriend,
-                                        selectedUser, miniBar, setMiniBar, groupChat, setChatName, moreUsers, userFriends, loadingMessages, showGroupProfile,
-                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, setShowGroupProfile, showGroupMembers}) => {
+export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUserInfo, chatName, setFriend,
+                                        selectedUser, groupChat, moreUsers, userFriends, loadingMessages,
+                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, setShowGroupProfile}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
+    const {showMinibar, setShowMiniBar} = useDynamicStyles();
+
 
     const messagesEndRef = useRef(null);
 
@@ -152,15 +155,13 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
                     key={message.id}
                     API_URL={API_URL}
                     showUserInfo={showUserInfo}
-                    setMiniBar={setMiniBar}
-                    miniBar={miniBar}
                     message={message}
                     content={message.content}
                     time={message.created_at}
                     user_id={message.sender_id}
                     sender={message.sender}
                     username={message.sender?.username || message.Sender?.username || "Unknown"}
-                    files={message.attachments || []}
+                    files={message.attachments || message.AttachedFile || []}
                     setShowGroupProfile={setShowGroupProfile}
                 />
             );
@@ -171,15 +172,19 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
 
 
 
+    const {showChatWindow} = useDynamicStyles();
 
     return (
 
-        <section className={`dashboard-chat-window`}>
+        <section className={`dashboard-chat-window ${showMinibar ? "" : "stretch"} ${showChatWindow ? '' : 'hide'} } `}>
                 <>
-                    <div className={`dashboard-message-container ${miniBar ? '' : 'mini'}`}>
+                    <div className={`dashboard-message-container`}>
                         {showMessage ? (
-                            <NewMessage moreUsers={moreUsers} userFriends={userFriends} setGroupChat={setGroupChat} receivers={receivers} setReceivers={setReceivers} API_URL={API_URL} />
+                            <NewMessage moreUsers={moreUsers} userFriends={userFriends}
+                                        setGroupChat={setGroupChat} receivers={receivers}
+                                        setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
+
                             <ConversationHeader loadingMessages={loadingMessages} showGroupInfo={showGroupInfo} groupChat={groupChat} chatname={chatName} />
                         )}
 
@@ -207,19 +212,9 @@ export const DashboardChatWindow = ({API_URL, setReceiver, currentGroupInfo, sho
 
                     </div>
 
-                    {groupChat && showGroupProfile ? (
-                        <GroupProfile
-                            setMinibar={setMiniBar} headerName={setChatName}
-                            showGroupMembers={showGroupMembers} API_URL={API_URL}
-                            group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
-                    ) : (
-                        <UserProfile loadingProfile={loadingProfile} blockedUsers={blockedUsers} loadingMessages={loadingMessages}
-                                     API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
-                                     setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
-                    )}
                     <DashboardMessageArea
                         setReceiver={setReceiver} setFriend={setFriend}
-                        miniBar={miniBar} groupChat={groupChat} friend={friend}
+                        groupChat={groupChat} friend={friend}
                         setReceivers={setReceivers} receivers={receivers} loadingMessages={loadingMessages}
                         API_URL={API_URL} receiver={receiver} />
                 </>

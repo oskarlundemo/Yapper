@@ -3,6 +3,7 @@ import '../../styles/Dashboard/NewMessage.css'
 import {useAuth} from "../../context/AuthContext.jsx";
 import {ContactCard} from "./ContactCard.jsx";
 import {DropDownWithUsersComponent} from "./DropDownWithUsers.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
 
@@ -10,8 +11,9 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat, user
     const [inputFocused, setInputFocused] = useState(false);
     const [filteredMoreUsers, setFilteredMoreUsers] = useState([]);
     const [filteredContacts, setFilteredContacts] = useState([]);
-    const {user} = useAuth()
+    const {phoneUI} = useDynamicStyles();
 
+    const {clickOnBack} = useDynamicStyles();
 
     useEffect(() => {
         const filtered = userFriends.filter((entry) =>
@@ -47,7 +49,11 @@ export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat, user
 
 
     return (
-        <div className="new-message">
+        <div className={`new-message ${phoneUI ? 'phone' : ''}`}>
+
+            {phoneUI && (
+                <svg className={'back-arrow'} onClick={() => clickOnBack()} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+            )}
 
             <h2>To:</h2>
 

@@ -6,16 +6,19 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 
 
 export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                                             inspectPrivateConversation, user, setAllConversations,
-                                            API_URL, latestPrivateMessage = null, hasAttachments = false,
+                                            API_URL, latestPrivateMessage = null,
                                             latestMessage = null, username = ''}) => {
 
     const {user: loggedIn} = useAuth();
     const [channel, setChannel] = useState(null);
+
+    const {clickOnChat} = useDynamicStyles();
 
     useEffect( () => {
         const fetchMessageData = async () => {
@@ -27,7 +30,6 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.user?.id !== data.user.id),
@@ -53,6 +55,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
         <div onClick={() => {
             showChatWindow();
             inspectPrivateConversation(friend_id, username);
+            clickOnChat();
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
                 <UserAvatar user={user} username={username} height={40} width={40} />
@@ -66,7 +69,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
                 </h3>
                 <p className={'conversation-content'}>
                     {loggedIn.id === (latestMessage?.sender?.id || latestMessage?.sender_id) && <span>You: </span>}
-                    {parseLatestMessage(latestMessage, hasAttachments)}
+                    {parseLatestMessage(latestMessage)}
                 </p>
             </div>
         </div>
@@ -74,9 +77,9 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
 }
 
 
-export const parseLatestMessage = (message, hasAttachments) => {
+export const parseLatestMessage = (message) => {
 
-    if (message.hasAttachments || hasAttachments) {
+    if (message.hasAttachments) {
         return 'Sent a file'
     } else if(message.content?.includes('giphy.com')) {
         return 'Sent a GIF '

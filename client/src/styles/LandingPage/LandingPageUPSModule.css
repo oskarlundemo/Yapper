@@ -9,7 +9,7 @@
 
     opacity: 0;
     width: fit-content;
-    padding: 1rem 2rem;
+    padding: 1rem 0rem;
 
 
     h3 {
@@ -27,23 +27,20 @@
     flex-direction: column;
     gap: 2rem;
     overflow: hidden;
+    padding: 1rem;
 }
 
 
-.landing-page-module:first-of-type {
+.landing-page-module:nth-of-type(odd) {
     justify-self: start;
     animation: landingPageAnimation 1s ease-out forwards;
+    margin-left: 2rem;
 }
 
-.landing-page-module:nth-of-type(2) {
+.landing-page-module:nth-of-type(even) {
     justify-self: end;
     animation: landingPageAnimation 1s ease-out forwards;
-
-}
-
-.landing-page-module:nth-of-type(3) {
-    justify-self: start;
-    animation: landingPageAnimation 1s ease-out forwards;
+    margin-right: 2rem;
 }
 
 @keyframes landingPageAnimation {

@@ -3,6 +3,7 @@ import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
 import {Attachment} from "./Attachment.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 
 
@@ -10,6 +11,8 @@ export const MessageCard = ({content, files = null, setShowGroupProfile, API_URL
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
+
+    const {clickOnProfile} = useDynamicStyles();
 
     useEffect(() => {
         content?.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);
@@ -21,6 +24,7 @@ export const MessageCard = ({content, files = null, setShowGroupProfile, API_URL
                 <div onClick={() => {
                     showUserInfo(sender);
                     setShowGroupProfile(false);
+                    clickOnProfile();
                 }} className="dashboard-message-avatar">
                     <UserAvatar API_URL={API_URL} user={sender} height={30} width={30} />
                 </div>

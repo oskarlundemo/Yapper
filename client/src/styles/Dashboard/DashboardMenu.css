@@ -78,5 +78,21 @@
 }
 
 .dropdown li:hover {
-    background-color: var(--background-color); /* Change background on hover */
+    background-color: var(--background-color);
+}
+
+
+@media screen and (max-width: 800px) {
+
+    .dashboard-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    .dashboard-header {
+        display: none !important;
+    }
+
 }

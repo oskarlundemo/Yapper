@@ -13,6 +13,7 @@ import moment from 'moment-timezone';
 import {supabase} from "../../services/supabaseClient.js";
 import {parseLatestMessage} from "./PrivateConversationCard.jsx";
 import {GroupAvatar} from "./GroupAvatar.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 
 export const GroupConversationCard = ({
@@ -32,6 +33,7 @@ export const GroupConversationCard = ({
     }, [group]);
 
 
+    const {clickOnChat} = useDynamicStyles();
 
     useEffect(() => {
 
@@ -44,6 +46,7 @@ export const GroupConversationCard = ({
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.group?.id !== data.group.id),
@@ -105,6 +108,7 @@ export const GroupConversationCard = ({
         <div onClick={() => {
             showChatWindow();
             inspectGroupChat(groupId, groupName);
+            clickOnChat();
         }}  className="conversation-card">
             <div className="conversation-card-avatar">
                 <GroupAvatar group={group} height={40} width={40} />

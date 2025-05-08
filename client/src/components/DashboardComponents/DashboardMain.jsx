@@ -5,6 +5,8 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {DashboardMenu} from "./DashboardMenu.jsx";
 import {Overlay} from "./Overlay.jsx";
 import {GroupMemberPopUp} from "./GroupMemberPopUp.jsx";
+import {GroupProfile} from "./GroupProfile.jsx";
+import {UserProfile} from "./UserProfile.jsx";
 
 
 export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, showNewMessages, setShowNewMessage, toggleShowMessage, showRequests, showProfile, showMessage}) => {
@@ -203,6 +205,19 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
                                  showRequests={showRequests} messages={messages} setMessages={setMessages}
                                  API_URL={API_URL} showProfile={showProfile} showGroupMembers={showGroupMembers} loadingMessages={loadingMessages}
                 />
+
+
+                {groupChat && showGroupProfile ? (
+                    <GroupProfile
+                        setMinibar={setMiniBar} headerName={setChatName}
+                        showGroupMembers={showGroupMembers} API_URL={API_URL}
+                        group={currentGroupInfo} miniBar={miniBar} setMiniBar={setMiniBar} />
+                ) : (
+                    <UserProfile loadingProfile={loadingProfile} blockedUsers={blockedUsers} loadingMessages={loadingMessages}
+                                 API_URL={API_URL} selectedUser={selectedUser} miniBar={miniBar}
+                                 setMiniBar={setMiniBar} setBlockedUsers={setBlockedUsers} />
+                )}
+
             </main>
             <GroupMemberPopUp moreUsers={moreUsers} userFriends={userFriends} API_URL={API_URL} group={currentGroupInfo} hideOverlay={setHideOverlay} closePopUp={setHideGroupPopUp}  hidePopUp={hideGroupPopUp} />
             <Overlay hideOverlay={hideOverlay} setHideOverlay={setHideOverlay} clickOnOverlay={clickOnOverlay}/>

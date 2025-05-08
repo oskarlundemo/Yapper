@@ -4,7 +4,7 @@
 
 import {Router} from 'express'
 import {
-    fetchNewMessageInfo,
+    fetchNewPrivateMessageInfo,
     getAllConversations,
     getReceiverUsername, newGroupChat, newGroupInvite, newPendingNotification,
     searchForConversations
@@ -27,7 +27,7 @@ conversationRouter.get('/new/group/invite/:group_id/:logged_in', newGroupInvite)
 
 conversationRouter.get('/new/group/chat/:group_id/:user_id', newGroupChat)
 
-conversationRouter.get('/new/private/:message_id/:receiver_id/:sender_id/:logged_in', fetchNewMessageInfo);
+conversationRouter.get('/new/private/:message_id/:receiver_id/:sender_id/:logged_in', fetchNewPrivateMessageInfo);
 
 
 

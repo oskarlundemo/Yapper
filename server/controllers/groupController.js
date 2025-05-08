@@ -7,8 +7,6 @@ export const getNewGroupMessage = async (req, res) => {
 
     try {
         const message_id = parseInt(req.params.message_id);
-        console.log(message_id);
-        console.log('I backend');
 
         const latestMessage = await prisma.groupMessages.findFirst({
             where: {
@@ -17,11 +15,14 @@ export const getNewGroupMessage = async (req, res) => {
             include: {
                 sender: true,
                 group: true,
+                AttachedFile: true
             },
             orderBy: {
                 created_at: 'desc',
             },
         });
+
+        latestMessage.hasAttachments = !!latestMessage.AttachedFile;
 
         const formattedGroupMessage = {
             latestMessage: latestMessage,

@@ -20,6 +20,19 @@
     }
 }
 
+.new-message.phone {
+    box-shadow: -5px 5px 10px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    z-index: 10;
+
+    svg {
+        margin: 1rem;
+    }
+    h2 {
+        margin: 0;
+    }
+}
+
 .username-container {
     display: flex;
     align-items: center;
