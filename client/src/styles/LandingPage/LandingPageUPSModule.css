@@ -8,7 +8,6 @@
     justify-self: center;
 
     opacity: 0;
-    width: fit-content;
     padding: 1rem 0rem;
 
 
@@ -32,15 +31,16 @@
 
 
 .landing-page-module:nth-of-type(odd) {
-    justify-self: start;
+    align-self: flex-end;
     animation: landingPageAnimation 1s ease-out forwards;
-    margin-left: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .landing-page-module:nth-of-type(even) {
+    align-self: flex-start;
     justify-self: end;
     animation: landingPageAnimation 1s ease-out forwards;
-    margin-right: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes landingPageAnimation {
@@ -55,3 +55,6 @@
         transform: translate3d(0%, 0, 0);
     }
 }
+
+
+
