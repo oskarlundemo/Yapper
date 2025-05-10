@@ -8,7 +8,7 @@ import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 export const DashboardMenu = ({ API_URL, showProfile, setShowGroupProfile }) => {
     const { logout, user } = useAuth();
 
-    const {showUser} = useDynamicStyles();
+    const {showUser, clickOnProfile} = useDynamicStyles();
 
     return (
         <nav className={`dashboard-header ${showUser ? '' : 'hide'}`}>
@@ -18,7 +18,7 @@ export const DashboardMenu = ({ API_URL, showProfile, setShowGroupProfile }) => 
 
                 <div className="dropdown-menu">
                     <ul className="dropdown">
-                        <li onClick={() => {showProfile(user.user); setShowGroupProfile(false)}}>Profile</li>
+                        <li onClick={() => {showProfile(user.user); clickOnProfile(); setShowGroupProfile(false)}}>Profile</li>
                         <li onClick={logout}>Log out</li>
                     </ul>
                 </div>

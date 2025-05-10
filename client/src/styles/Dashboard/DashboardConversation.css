@@ -1,5 +1,7 @@
 
 
+
+
 .conversation-search-header {
     display: flex;
     flex-direction: row;
@@ -13,7 +15,9 @@
 }
 
 .conversation-search-area {
-   padding: 1rem;
+    margin: 0 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 

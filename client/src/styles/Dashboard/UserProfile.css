@@ -12,15 +12,20 @@
     margin: 1rem 1rem 1rem 0;
     gap: 4rem;
     grid-area: 1 / 4 / 2 / 5;
-    border-radius: var(--border-radius);
-    box-shadow: var(--soft-boxshadow);
+    border-radius: 0 10px 10px 0;
+    box-shadow: var(--soft-boxshadow-no-left);
+}
 
+
+.cross-icon {
+    margin: 1rem;
+    transform: var(--default-transition);
+    align-self: flex-end;
 }
 
 .cross-icon:hover {
     cursor: pointer;
     fill: var(--error-color);
-    align-self: flex-end;
 }
 
 

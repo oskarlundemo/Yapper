@@ -102,3 +102,18 @@
         margin-left: -10px;
     }
 }
+
+
+@media screen and (max-width: 800px) {
+
+
+    .username-container {
+        padding: 0;
+
+
+        svg {
+            margin: 0 !important;
+        }
+    }
+
+}

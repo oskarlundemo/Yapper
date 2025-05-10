@@ -5,7 +5,7 @@ import {ContactCard} from "./ContactCard.jsx";
 import {DropDownWithUsersComponent} from "./DropDownWithUsers.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
-export const NewMessage = ({API_URL, receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
+export const NewMessage = ({receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
 
     const [userSearchString, setUserSearchString] = useState("");
     const [inputFocused, setInputFocused] = useState(false);
