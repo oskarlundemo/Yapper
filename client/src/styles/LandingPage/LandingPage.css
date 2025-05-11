@@ -142,5 +142,7 @@
 
     .landing-page-main {
         max-width: 1200px;
+        min-width: 520px;
     }
 }
+

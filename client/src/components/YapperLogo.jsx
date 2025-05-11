@@ -1,5 +1,5 @@
 
-export const YapperLogo = ({titleSize = '', fixedHeight = '', fixedImage = '',
+export const YapperLogo = ({titleSize = '', margin = 0, fixedHeight = '', fixedImage = '',
                                subTitleSize = '', imageWidth = 0,
                                typeWriterAnimation = false, imageHeight = 0,
                                subTitle = ''}) => {
@@ -9,6 +9,7 @@ export const YapperLogo = ({titleSize = '', fixedHeight = '', fixedImage = '',
                 <div className="yapper-logo__title">
                     <h1 style={{
                         fontSize: titleSize ? titleSize : fixedHeight,
+                        margin: margin ? margin : '0rem',
                     }} className="landing-page-title">Yapper</h1>
                     <img
                         style={{

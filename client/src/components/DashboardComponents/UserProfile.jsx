@@ -187,7 +187,12 @@ export const UserProfile = ({selectedUser = null, setBlockedUsers, loadingProfil
                                 )}
                             </form>
                         ) : (
-                            <p>{selectedUser?.bio || 'No bio'}</p>
+                            <p
+                                style={{
+                                    textAlign: selectedUser?.bio ? 'left' : 'center',
+                                }}>
+                                {selectedUser?.bio || 'No bio'}
+                            </p>
                         )
                     )}
 

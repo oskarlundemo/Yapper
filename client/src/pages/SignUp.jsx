@@ -1,8 +1,8 @@
-import {LoginBox} from "../components/LoginPageComponents/LoginBox.jsx";
 import {CreateUserBox} from "../components/LoginPageComponents/CreateUserBox.jsx";
-import {useState} from "react";
 import {YapperLogo} from "../components/YapperLogo.jsx";
 import {Link} from "react-router-dom";
+import '../styles/LoginPage/CreateUserBox.css'
+
 
 
 export const SignUp = ({URL}) => {
@@ -10,9 +10,10 @@ export const SignUp = ({URL}) => {
     return (
         <main className="login-page">
             <YapperLogo
-                titleSize={4}
-                imageWitdh={50}
-                imageHeight={50}
+                fixedHeight={'3rem'}
+                subTitleSize="clamp(3rem, 4vw, 5rem)"
+                imageWidth="clamp(60px, 60px, 60px)"
+                imageHeight="clamp(60px, 60px, 60px)"
             />
             <CreateUserBox URL={URL} />
 

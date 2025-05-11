@@ -2,10 +2,13 @@
 
 
 import '../../styles/LandingPage/LandingPageUPSModule.css'
+import {useEffect, useRef, useState} from "react";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 
 
-export const LandingPageUPSModule = ({title, moduleWidth = 500, children, subtitle, media, height, width, row, column, delay}) => {
+export const LandingPageUPSModule = ({title, moduleWidth = 500, children, subtitle, row, column, delay}) => {
+
 
 
     return (
@@ -20,6 +23,8 @@ export const LandingPageUPSModule = ({title, moduleWidth = 500, children, subtit
                 <h2>{title}</h2>
                 <h3>{subtitle}</h3>
             </div>
+
+
 
             <div className="mock-chat-window">
                 {children}

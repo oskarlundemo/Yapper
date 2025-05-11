@@ -4,6 +4,7 @@
 
 
 .login-box {
+    text-align: center;
     box-shadow: var(--default-boxshadow);
     padding: 2rem 1rem;
     border-radius: var(--border-radius);

@@ -160,7 +160,7 @@
     border-radius: 10px 0px 0 10px;
     overflow: hidden;
     grid-area: 1 / 3 / 2 / 4;
-    box-shadow: var(--soft-boxshadow-no-right);
+    box-shadow: var(--boxshadow-left);
     margin: 1rem 0;
 }
 

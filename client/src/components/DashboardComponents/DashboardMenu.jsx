@@ -11,7 +11,7 @@ export const DashboardMenu = ({ API_URL, showProfile, setShowGroupProfile }) => 
     const {showUser, clickOnProfile} = useDynamicStyles();
 
     return (
-        <nav className={`dashboard-header ${showUser ? '' : 'hide'}`}>
+        <nav className={`dashboard-header ${showUser ? '' : ''}`}>
             <div className="header-user-container">
 
                 <UserAvatar API_URL={API_URL} user={user.user} width={40} height={40} />

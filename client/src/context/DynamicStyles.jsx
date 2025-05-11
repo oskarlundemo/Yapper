@@ -13,6 +13,9 @@ export const DynamicContextProvider = ({ children }) => {
     const [showUser, setShowUser] = useState(true);
     const [showMinibar, setShowMinibar] = useState(false);
     const [phoneUI, setPhoneUI] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
+    const [isCenterScreen, setIsCenterScreen] = useState(false);
+
 
     useEffect(() => {
 
@@ -102,6 +105,8 @@ export const DynamicContextProvider = ({ children }) => {
             phoneUI,
             clickBackToChat,
             clickOnNewMessage,
+            setIsCenterScreen,
+            isCenterScreen,
         }}>
             {children}
         </DynamicContext.Provider>

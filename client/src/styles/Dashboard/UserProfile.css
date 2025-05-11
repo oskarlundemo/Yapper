@@ -13,7 +13,9 @@
     gap: 4rem;
     grid-area: 1 / 4 / 2 / 5;
     border-radius: 0 10px 10px 0;
-    box-shadow: var(--soft-boxshadow-no-left);
+    box-shadow: var(--boxshadow-right);
+
+
 }
 
 

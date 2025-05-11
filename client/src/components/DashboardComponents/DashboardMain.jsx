@@ -33,6 +33,11 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
 
     const {user} = useAuth();
 
+    useEffect(() => {
+
+        console.log(selectedUser);
+    }, [selectedUser]);
+
     const showUserInfo = async (inspectedUser = null) => {
 
         setMiniBar(true);
@@ -46,7 +51,6 @@ export const DashboardMain = ({API_URL, showChatWindow, receiver, setReceiver, s
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setSelectedUser(data);
                 setLoadingProfile(false);
             })

@@ -91,8 +91,22 @@
         flex-grow: 1;
     }
 
+
+
     .dashboard-header {
-        display: none !important;
+        background-color: transparent;
+        position: absolute !important;
+        pointer-events: none;
+
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
     }
+
+    .header-user-container {
+        pointer-events: all;
+    }
+
 
 }

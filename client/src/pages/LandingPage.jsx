@@ -6,9 +6,10 @@ import {LandingPageFooter} from "../components/LandingPageComponents/LandingPage
 
 import '../styles/LandingPage/LandingPage.css'
 import {DummyMessage} from "../components/LandingPageComponents/DummyMessageCard.jsx";
+import {useState} from "react";
 
 
-export const LandingPage = ({API_URL}) => {
+export const LandingPage = ({}) => {
 
 
     const groupChatConversations = [

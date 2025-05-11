@@ -6,9 +6,11 @@
     box-shadow: var(--default-boxshadow);
     border-radius: var(--border-radius);
     justify-self: center;
+    text-align: center;
 
     opacity: 0;
-    padding: 1rem 0rem;
+    padding: 1rem 0;
+    margin: 1rem;
 
 
     h3 {

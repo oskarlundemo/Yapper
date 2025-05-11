@@ -1,6 +1,7 @@
 import {LoginBox} from "../components/LoginPageComponents/LoginBox.jsx";
 import {YapperLogo} from "../components/YapperLogo.jsx";
 import {Link} from "react-router-dom";
+import '../styles/LoginPage/LoginPage.css'
 
 
 export const Login = ({URL}) => {
@@ -8,9 +9,10 @@ export const Login = ({URL}) => {
     return (
             <main className="login-page">
                 <YapperLogo
-                    titleSize={4}
-                    imageWitdh={50}
-                    imageHeight={50}
+                    fixedHeight={'3rem'}
+                    subTitleSize="clamp(3rem, 4vw, 5rem)"
+                    imageWidth="clamp(60px, 60px, 60px)"
+                    imageHeight="clamp(60px, 60px, 60px)"
                 />
                 <LoginBox URL={URL} />
 
