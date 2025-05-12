@@ -3,11 +3,14 @@ import {useEffect, useState} from "react";
 import '../../styles/LoginPage/LoginBox.css'
 import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
-export const LoginBox = ({showLogin, toggleLogin, URL}) => {
+export const LoginBox = ({showLogin, URL}) => {
 
-    const navigate = useNavigate(); // Use to navigate
-    const { login } = useAuth(); // Login user with authContext
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const {setFirstLogin} = useDynamicStyles();
+
 
     const [errors, setErrors] = useState([]);
     const [isDisabled, setIsDisabled] = useState(true);
@@ -53,6 +56,7 @@ export const LoginBox = ({showLogin, toggleLogin, URL}) => {
             } else {
                 login(result.token);
                 navigate('/dashboard');
+                setFirstLogin(true);
             }
         } catch (err) {
             console.error(err);

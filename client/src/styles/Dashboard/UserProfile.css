@@ -57,7 +57,7 @@
     justify-content: center;
     gap: 2rem;
     width: 100%;
-
+    text-align: center;
 }
 
 
@@ -215,6 +215,10 @@
 
     p:nth-of-type(1) {
         text-align: right;
+    }
+
+    svg:last-of-type {
+        align-self: flex-end;
     }
 
 

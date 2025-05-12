@@ -1,9 +1,8 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, use, useContext, useEffect, useState} from "react";
 
 
 
 const DynamicContext = createContext();
-
 
 
 export const DynamicContextProvider = ({ children }) => {
@@ -15,43 +14,53 @@ export const DynamicContextProvider = ({ children }) => {
     const [phoneUI, setPhoneUI] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isCenterScreen, setIsCenterScreen] = useState(false);
-
+    const [firstLogin, setFirstLogin] = useState(false);
 
     useEffect(() => {
-
         const mediaQuery = window.matchMedia("(max-width: 800px)");
 
         const handleResize = (e) => {
-            if (e.matches) {
+            const isMobile = e.matches;
+
+            if (isMobile && firstLogin) {
+                setShowConversations(true);
+                setShowChatWindow(false);
+                setShowUser(false);
+                setShowUserMenu(true);
+                setShowMinibar(false);
+                setPhoneUI(true);
+                setFirstLogin(false);
+            } else if (isMobile && !firstLogin) {
                 setShowConversations(false);
-                setShowChatWindow(true)
-                setShowUser(false)
-                setShowMinibar(false)
-                setPhoneUI(true)
+                setShowChatWindow(true);
+                setShowUser(false);
+                setShowUserMenu(false);
+                setShowMinibar(false);
+                setPhoneUI(true);
             } else {
                 setShowConversations(true);
                 setShowChatWindow(true);
                 setShowUser(true);
-                setPhoneUI(false)
+                setShowUserMenu(true);
+                setPhoneUI(false);
             }
-        }
+        };
 
         handleResize(mediaQuery);
 
         mediaQuery.addEventListener("change", handleResize);
 
-
         return () => {
             mediaQuery.removeEventListener("change", handleResize);
         };
-
-    }, [])
+    }, [firstLogin]);
 
 
     const clickOnChat = () => {
         const isPhone = window.matchMedia("(max-width: 800px)").matches;
 
         if (isPhone) {
+            setShowUserMenu(false)
             setShowConversations(false);
             setShowChatWindow(true);
         }
@@ -62,6 +71,7 @@ export const DynamicContextProvider = ({ children }) => {
         const isPhone = window.matchMedia("(max-width: 800px)").matches;
 
         if (isPhone) {
+            setShowUserMenu(false)
             setShowConversations(false);
             setShowChatWindow(true);
         }
@@ -70,6 +80,7 @@ export const DynamicContextProvider = ({ children }) => {
     const clickOnBack = () => {
         setShowChatWindow(false);
         setShowConversations(true);
+        setShowUserMenu(true)
     }
 
     const clickBackToChat = () => {
@@ -107,6 +118,9 @@ export const DynamicContextProvider = ({ children }) => {
             clickOnNewMessage,
             setIsCenterScreen,
             isCenterScreen,
+            firstLogin,
+            setFirstLogin,
+            showUserMenu,
         }}>
             {children}
         </DynamicContext.Provider>

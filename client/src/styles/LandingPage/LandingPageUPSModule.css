@@ -11,17 +11,27 @@
     opacity: 0;
     padding: 1rem 0;
     margin: 1rem;
+    width: 500px;
 
+
+    h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+    }
 
     h3 {
+        font-size: clamp(1rem, 2vw, 1.2rem);
         font-weight: 400;
     }
 
     span {
-        font-size: 1.8rem;
+        font-size: clamp(1.5rem, 2.5vw, 1.5rem);
         text-decoration: none;
     }
 }
+
+
+
+
 
 .mock-chat-window {
     display: flex;
@@ -44,6 +54,19 @@
     animation: landingPageAnimation 1s ease-out forwards;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
+@media screen and (max-width: 800px) {
+
+
+    .landing-page-module {
+        align-self: center !important;
+        justify-self: center !important;
+        width: 90%;
+    }
+
+}
+
+
 
 @keyframes landingPageAnimation {
     from {

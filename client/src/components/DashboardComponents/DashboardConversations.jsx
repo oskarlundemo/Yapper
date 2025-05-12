@@ -6,10 +6,10 @@ import {GroupConversationCard} from "./GroupConversationCard.jsx";
 import {LoadingExample} from "./LoadingExample.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardConversations = ({inspectPrivateConversation, setLoadingMessage, setMiniBar, inspectGroupChat, setShowNewMessage,
-                                           showNewMessages, showChatWindow, API_URL}) => {
+export const DashboardConversations = ({showNewMessages}) => {
 
     const {user} = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,8 +24,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
 
 
     const {showConversations,  clickOnNewMessage} = useDynamicStyles()
-
-
+    const {API_URL, setMiniBar, inspectGroupChat, inspectPrivateConversation, setShowNewMessage, setLoadingMessages} = useDashboardContext();
 
     useEffect(() => {
         setFilteredConversations(allConversations);
@@ -302,7 +301,7 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
                 setAllConversations(data)
                 inspectLatestChat(data[0])
                 setLoading(false)
-                setLoadingMessage(false)
+                setLoadingMessages(false)
             })
             .catch(error => console.log(error));
     }, [])
@@ -435,14 +434,11 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
                             conversation.group ? (
                                 <GroupConversationCard
                                     setAllConversations={setAllConversations}
-                                    API_URL={API_URL}
                                     latestGroupMessage={latestGroupMessage}
                                     key={index}
                                     group={conversation.group}
                                     groupId={conversation.group.id}
                                     latestMessage={conversation.latestMessage}
-                                    showChatWindow={showChatWindow}
-                                    inspectGroupChat={inspectGroupChat}
                                 />
                             ) : (
                                 <PrivateConversationCard
@@ -454,8 +450,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
                                     friend_id={conversation.user.id}
                                     username={conversation.user.username}
                                     latestMessage={conversation.latestMessage}
-                                    showChatWindow={showChatWindow}
-                                    inspectPrivateConversation={inspectPrivateConversation}
                                 />
                             )
                         )
@@ -467,14 +461,11 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
                         conversation.group ? (
                             <GroupConversationCard
                                 setAllConversations={setAllConversations}
-                                API_URL={API_URL}
                                 latestGroupMessage={latestGroupMessage}
                                 key={index}
                                 group={conversation.group}
                                 groupId={conversation.group.id}
                                 latestMessage={conversation.latestMessage}
-                                showChatWindow={showChatWindow}
-                                inspectGroupChat={inspectGroupChat}
                             />
                         ) : (
                             <PrivateConversationCard
@@ -486,8 +477,6 @@ export const DashboardConversations = ({inspectPrivateConversation, setLoadingMe
                                 friend_id={conversation.user.id}
                                 username={conversation.user.username}
                                 latestMessage={conversation.latestMessage}
-                                showChatWindow={showChatWindow}
-                                inspectPrivateConversation={inspectPrivateConversation}
                             />
                         )
                     )

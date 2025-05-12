@@ -5,8 +5,9 @@ import {use, useEffect, useState} from "react";
 import '../../styles/Dashboard/UserProfile.css'
 import {UserAvatar} from "../UserAvatar.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
-export const UserProfile = ({selectedUser = null, setBlockedUsers, loadingProfile, blockedUsers, loadingMessages, API_URL}) => {
+export const UserProfile = ({setBlockedUsers, blockedUsers}) => {
 
     const {user} = useAuth();
 
@@ -19,9 +20,7 @@ export const UserProfile = ({selectedUser = null, setBlockedUsers, loadingProfil
     const [show, setShow] = useState(false)
     const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
 
-
-
-    const {showUser} = useDynamicStyles();
+    const {API_URL, selectedUser, loadingMessages, loadingProfile} = useDashboardContext();
 
     useEffect(() => {
         setBio(selectedUser?.bio || '')
@@ -189,7 +188,7 @@ export const UserProfile = ({selectedUser = null, setBlockedUsers, loadingProfil
                         ) : (
                             <p
                                 style={{
-                                    textAlign: selectedUser?.bio ? 'left' : 'center',
+                                    textAlign: 'center',
                                 }}>
                                 {selectedUser?.bio || 'No bio'}
                             </p>

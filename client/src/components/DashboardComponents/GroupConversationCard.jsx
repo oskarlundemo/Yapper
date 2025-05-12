@@ -11,15 +11,15 @@ import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from 'moment-timezone';
 import {supabase} from "../../services/supabaseClient.js";
-import {parseLatestMessage} from "./PrivateConversationCard.jsx";
+import {parseLatestMessage, parseLatestTimestamp} from "./PrivateConversationCard.jsx";
 import {GroupAvatar} from "./GroupAvatar.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
 export const GroupConversationCard = ({
-                                          showChatWindow,
-                                          groupId = 0, API_URL,
-                                          inspectGroupChat, latestGroupMessage, setAllConversations,
+                                          groupId = 0, latestGroupMessage,
+                                          setAllConversations,
                                           latestMessage = null,
                                           group = null,
                                       }) => {
@@ -27,6 +27,10 @@ export const GroupConversationCard = ({
     const {user} = useAuth();
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState('');
+    const {showChatWindow} = useDashboardContext();
+
+
+    const {API_URL, inspectGroupChat} = useDashboardContext();
 
     useEffect(() => {
         setGroupName(group?.name);
@@ -117,7 +121,7 @@ export const GroupConversationCard = ({
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{groupName}
                     <span>
-                        {latestMessage?.created_at && moment.utc(latestMessage.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                        {parseLatestTimestamp(latestMessage)}
                     </span>
                 </h3>
                 <p className={'conversation-content'}>

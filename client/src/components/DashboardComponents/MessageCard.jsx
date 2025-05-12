@@ -4,15 +4,17 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
 import {Attachment} from "./Attachment.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
 
-export const MessageCard = ({content, files = null, setShowGroupProfile, API_URL, user_id, showUserInfo, sender, time, username = ''}) => {
+export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
 
     const {clickOnProfile} = useDynamicStyles();
+    const {setShowGroupProfile, API_URL} = useDashboardContext();
 
     useEffect(() => {
         content?.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);

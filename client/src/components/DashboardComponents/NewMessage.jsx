@@ -4,8 +4,12 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {ContactCard} from "./ContactCard.jsx";
 import {DropDownWithUsersComponent} from "./DropDownWithUsers.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 export const NewMessage = ({receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
+
+
+
 
     const [userSearchString, setUserSearchString] = useState("");
     const [inputFocused, setInputFocused] = useState(false);

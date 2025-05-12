@@ -7,11 +7,12 @@ import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import moment from "moment-timezone";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
 
-export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
-                                            inspectPrivateConversation, user, setAllConversations,
+export const PrivateConversationCard = ({friend_id = 0,
+                                            user, setAllConversations,
                                             API_URL, latestPrivateMessage = null,
                                             latestMessage = null, username = ''}) => {
 
@@ -19,6 +20,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
     const [channel, setChannel] = useState(null);
 
     const {clickOnChat} = useDynamicStyles();
+    const {showChatWindow, inspectPrivateConversation} = useDashboardContext();
 
     useEffect( () => {
         const fetchMessageData = async () => {
@@ -64,7 +66,7 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
             <div className="conversation-card-content">
                 <h3 className={'conversation-contact'}>{username}
                     <span>
-                        {moment(latestMessage?.created_at).tz("Europe/Stockholm").format("HH:mm")}
+                        {parseLatestTimestamp(latestMessage)}
                     </span>
                 </h3>
                 <p className={'conversation-content'}>
@@ -75,6 +77,19 @@ export const PrivateConversationCard = ({showChatWindow, friend_id = 0,
         </div>
     )
 }
+
+
+export const parseLatestTimestamp = (latestMessage) => {
+    if (!latestMessage?.created_at) return "";
+
+    const date = moment(latestMessage.created_at).tz("Europe/Stockholm");
+    const now = moment().tz("Europe/Stockholm");
+    const diffDays = now.diff(date, 'days');
+
+    if (diffDays === 0) return date.format("HH:mm");
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} d`;
+};
 
 
 export const parseLatestMessage = (message) => {

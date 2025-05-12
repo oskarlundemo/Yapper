@@ -1,5 +1,34 @@
 import {prisma} from "../prisma/index.js";
 
+
+/**
+ * 1. What does this function do, where is it called?
+ * (→ Describe the function’s purpose and trigger point in the app.)
+ * e.g., “This function fetches all posts for a specific user. It is triggered when the client navigates to the user's profile page.”
+ *
+ * 2. What data and method does it expect, and what does it return?
+ * (→ Summarize the key input(s) from the frontend or route params and what data is sent back.)
+ * e.g., “It expects a userId in the request parameters. It returns an array of posts with related user and comment data.”
+ *
+ * 3. What Prisma operations or logic does it perform?
+ * (→ Highlight any important database actions or conditions.)
+ * e.g., “It uses prisma.post.findMany() with a where clause filtering by userId. It includes nested relations for comments and likes.”
+ * @returns {Promise<void>}
+ */
+
+
+/**
+ * 1. This functions retrieves a list of blocked users that one has user specific user has blocked. It is called in the UserProfile.jsx
+ *
+ * 2. It expects the id of the user, which it takes in through the request parameter
+ *
+ * 3
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+
+
 export const getListOfBlockedUsers = async (req, res) => {
     try {
         const listOfBlockedUsers = await prisma.blocks.findMany({
@@ -22,15 +51,12 @@ export const unblockUser = async (req, res) => {
 
     try {
 
-        // Oskar 1
-        // Axa 2
 
         const unblockingUser = parseInt(req.params.unblocking_user); // 1
         const unblockedUser = parseInt(req.params.unblocked_user); // 2
         const loggedInUser = parseInt(req.params.user_id); // 2
 
 
-        // 2 ? 2 : 1 = 2
         const updatedList = loggedInUser ? unblockedUser : unblockingUser;
 
         const block = await prisma.blocks.delete({

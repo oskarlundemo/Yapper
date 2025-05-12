@@ -2,7 +2,6 @@ import '../../styles/Dashboard/DashBoardChatWindow.css';
 import {DashboardMessageArea} from "./DashboardMessageArea.jsx";
 import {MessageCard} from "./MessageCard.jsx";
 import {useEffect, useMemo, useRef, useState} from "react";
-import {UserProfile} from "./UserProfile.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
 import {supabase} from "../../services/supabaseClient.js";
@@ -10,19 +9,20 @@ import {MessageSplitter} from "./MessageSplitter.jsx";
 import {GroupMemberInfo} from "./GroupMemberInfo.jsx";
 import {ConversationHeader} from "./ConversationHeader.jsx";
 import moment from 'moment-timezone';
-import {GroupProfile} from "./GroupProfile.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUserInfo, chatName, setFriend,
-                                        selectedUser, groupChat, moreUsers, userFriends, loadingMessages,
-                                        setGroupChat, messages, setMessages, friend, showMessage, receiver, setShowGroupProfile}) => {
+export const DashboardChatWindow = ({setReceiver, setFriend,
+                                        moreUsers, userFriends, messages, setMessages, friend, showMessage, receiver}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
-    const {showMinibar, setShowMiniBar} = useDynamicStyles();
+    const {showMinibar, showUserInfo} = useDynamicStyles();
 
+
+    const {groupChat, API_URL, loadingMessages} = useDashboardContext();
 
     const messagesEndRef = useRef(null);
 
@@ -60,7 +60,6 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
                             })
                                 .then(res => res.json())
                                 .then(async data => {
-                                    console.log(data);
                                     setMessages((prevMessages) => [...prevMessages, data]);
                                     const audio = new Audio('notification.mp3');
                                     await audio.play();
@@ -103,7 +102,6 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
                         })
                             .then(res => res.json())
                             .then(async data => {
-                                console.log(data);
                                 setMessages((prevMessages) => [...prevMessages, data]);
                                 const audio = new Audio('notification.mp3');
                                 await audio.play();
@@ -153,7 +151,6 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
             rendered.push(
                 <MessageCard
                     key={message.id}
-                    API_URL={API_URL}
                     showUserInfo={showUserInfo}
                     message={message}
                     content={message.content}
@@ -162,7 +159,6 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
                     sender={message.sender}
                     username={message.sender?.username || message.Sender?.username || "Unknown"}
                     files={message.attachments || message.AttachedFile || []}
-                    setShowGroupProfile={setShowGroupProfile}
                 />
             );
         });
@@ -185,12 +181,12 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
                                         setReceivers={setReceivers} API_URL={API_URL} />
                         ) : (
 
-                            <ConversationHeader loadingMessages={loadingMessages} showGroupInfo={showGroupInfo} groupChat={groupChat} chatname={chatName} />
+                            <ConversationHeader />
                         )}
 
                         <div className="dashboard-message-content">
                             {showMessage ? (
-                                <GroupMemberInfo selectedUser={selectedUser} receivers={receivers}/>
+                                <GroupMemberInfo receivers={receivers}/>
                             ) : (
                                 <>
                                     {loadingMessages ? (
@@ -213,10 +209,9 @@ export const DashboardChatWindow = ({API_URL, setReceiver, showGroupInfo, showUs
                     </div>
 
                     <DashboardMessageArea
-                        setReceiver={setReceiver} setFriend={setFriend}
-                        groupChat={groupChat} friend={friend}
-                        setReceivers={setReceivers} receivers={receivers} loadingMessages={loadingMessages}
-                        API_URL={API_URL} receiver={receiver} />
+                        setReceiver={setReceiver} setFriend={setFriend} friend={friend}
+                        setReceivers={setReceivers} receivers={receivers}
+                        receiver={receiver} />
                 </>
         </section>
     );

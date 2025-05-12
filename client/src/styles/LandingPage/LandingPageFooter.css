@@ -3,10 +3,12 @@
 
 .landing-page-footer {
     margin-top: 4rem;
+    height: 10%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    text-align: center;
 
 
     h2 {

@@ -155,6 +155,7 @@
 
 .dashboard-chat-window {
     display: grid;
+    height: auto;
     grid-template-rows: 2fr 0.2fr;
     grid-template-columns: 1fr;
     border-radius: 10px 0px 0 10px;

@@ -6,11 +6,13 @@ import {EmailCheck} from "./EmailCheck.jsx";
 import {UsernameCheck} from "./UsernameCheck.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
+import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 
 export const CreateUserBox = ({URL}) => {
 
-    const navigate = useNavigate(); // Use to navigate
-    const { login } = useAuth(); // Login user with authContext
+    const navigate = useNavigate();
+    const {setFirstLogin} = useDynamicStyles();
+    const { login } = useAuth();
 
     const [isPasswordFocused, setPasswordFocused] = useState(false);
     const [isUsernameFocused, setUsernameFocused] = useState(false);
@@ -63,6 +65,7 @@ export const CreateUserBox = ({URL}) => {
             } else {
                 login(result.token);
                 navigate('/dashboard');
+                setFirstLogin(true);
             }
         } catch (err) {
             console.log(err);

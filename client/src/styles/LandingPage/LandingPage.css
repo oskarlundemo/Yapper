@@ -1,17 +1,21 @@
-
 .landing-page-wrapper {
+
+    min-width: 390px;
     display: flex;
     flex-direction: column;
     gap: 5rem;
-    height: 100%;
-    width: 100%;
-
     background-color: var(--background-color);
+}
+
+.App {
+    height: 100%;
 }
 
 
 .landing-page-main {
     width: 100%;
+    height: 100%;
+
     justify-self: center;
     display: flex;
     flex-direction: column;
@@ -138,11 +142,7 @@
 
 
 @media screen and (max-width: 1200px) {
-
-
     .landing-page-main {
         max-width: 1200px;
-        min-width: 520px;
     }
 }
-

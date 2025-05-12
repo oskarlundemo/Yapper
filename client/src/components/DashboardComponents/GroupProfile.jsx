@@ -10,8 +10,9 @@ import {GroupAvatar} from "./GroupAvatar.jsx";
 import '../../styles/Dashboard/GroupProfile.css'
 import {supabase} from "../../services/supabaseClient.js";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
-export const GroupProfile = ({group = null, API_URL, headerName, showGroupMembers}) => {
+export const GroupProfile = ({headerName}) => {
 
     const {user} = useAuth();
 
@@ -22,10 +23,11 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
     const [saveChanges, setSaveChanges] = useState(false)
     const [descriptionCharsCount, setDescriptionCharsCount] = useState(0)
     const [groupNameChannel, setGroupNameChannel] = useState(null);
-    const [groupName, setGroupName] = useState(group?.name);
+    const [groupName, setGroupName] = useState(currentGroupInfo?.name || '');
     const [groupNameCharCount, setGroupNameCharCount] = useState(0);
     const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
 
+    const {API_URL, currentGroupInfo, showGroupMembers} = useDashboardContext();
 
     useEffect(() => {
         setDescriptionCharsCount(description.length);
@@ -33,24 +35,24 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
 
 
     useEffect(() => {
-        if (group?.description && group.description !== 'null') {
-            setDescription(group.description);
+        if (currentGroupInfo?.description && currentGroupInfo.description !== 'null') {
+            setDescription(currentGroupInfo.description);
         } else {
             setDescription('No description');
         }
-        setGroupName(group?.name || '');
-    }, [group]);
+        setGroupName(currentGroupInfo?.name || '');
+    }, [currentGroupInfo]);
 
 
 
     useEffect(() => {
-        setGroupName(group?.name);
-    }, [group]);
+        setGroupName(currentGroupInfo?.name);
+    }, [currentGroupInfo]);
 
     useEffect(() => {
-        if (!user?.id || !group?.id) return;
+        if (!user?.id || !currentGroupInfo?.id) return;
 
-        const channelName = `updateGroupProfile-${user.id}-${group.id}`;
+        const channelName = `updateGroupProfile-${user.id}-${currentGroupInfo.id}`;
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -81,14 +83,14 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
         return () => {
             supabase.removeChannel(newChannel);
         };
-    }, [user.id, group]);
+    }, [user.id, currentGroupInfo]);
 
 
 
 
     useEffect(() => {
-        setDescription(group?.description || '')
-    }, [group])
+        setDescription(currentGroupInfo?.description || '')
+    }, [currentGroupInfo])
 
 
 
@@ -113,11 +115,8 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
         formData.append('description', description);
         formData.append('groupName', groupName);
 
-        console.log('Update group')
-        console.log(group)
-
         try {
-            await fetch(`${API_URL}/groups/update/${group.id}`, {
+            await fetch(`${API_URL}/groups/update/${currentGroupInfo.id}`, {
                 method: 'POST',
                 body: formData
             })
@@ -151,7 +150,7 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
             <div className="user-profile-info">
 
                 <div className={'user-avatar'}>
-                    <GroupAvatar user={user} group={group} width={100} height={100} setSaveChanges={setSaveChanges} setNewAvatar={setNewAvatar} selectPicture={true} setFile={setFile} file={file} />
+                    <GroupAvatar user={user} group={currentGroupInfo} width={100} height={100} setSaveChanges={setSaveChanges} setNewAvatar={setNewAvatar} selectPicture={true} setFile={setFile} file={file} />
                 </div>
 
                 <div className={'user-info'}>
@@ -173,7 +172,7 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
                             <p><span>{groupNameCharCount}</span>/15</p>
                         </>
                     )}
-                    {group?.admin_id === user.id ? (
+                    {currentGroupInfo?.admin_id === user.id ? (
                         <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
                             {disabledDescription ? (
@@ -215,7 +214,7 @@ export const GroupProfile = ({group = null, API_URL, headerName, showGroupMember
 
                     <div className={'group-settings-container'}>
                         <ul className={'group-settings'}>
-                            <li onClick={() => showGroupMembers(group)}>Chat members</li>
+                            <li onClick={() => showGroupMembers(currentGroupInfo)}>Chat members</li>
                         </ul>
 
                     </div>
