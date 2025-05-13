@@ -30,6 +30,9 @@ export const DashboardContextProvider = ({ children }) => {
     const [showRequests, setShowRequests] = useState(false);
     const [showNewMessage, setShowNewMessage] = useState(false);
 
+    const [messages, setMessages] = useState([]);
+    const [friend, setFriend] = useState(null);
+
     const {user} = useAuth();
 
     const hideNewMessage = () => {
@@ -101,17 +104,14 @@ export const DashboardContextProvider = ({ children }) => {
         if (!user)
             return
 
-
         if (!initialLoad) {
             setLoadingMessages(true);
         }
-
 
         setGroupChat(false);
         setReceiver(receiver_id);
         setChatName(chatname);
         showChatWindow();
-
 
         await fetch(`${API_URL}/friends/check/${receiver_id}/${user.id}`, {
             method: "GET",
@@ -139,7 +139,6 @@ export const DashboardContextProvider = ({ children }) => {
                 setLoadingProfile(false)
             })
             .catch(err => console.log(err));
-        toggleShowMessage(false);
     }
 
 
@@ -158,9 +157,6 @@ export const DashboardContextProvider = ({ children }) => {
         setMiniBar(true);
         setShowGroupProfile(true);
     }
-
-
-
 
 
     return (
@@ -194,6 +190,10 @@ export const DashboardContextProvider = ({ children }) => {
             showRequests,
             showNewMessage,
             setShowNewMessage,
+            messages,
+            setMessages,
+            friend,
+            setFriend,
 
 
             showUserInfo,
@@ -204,6 +204,7 @@ export const DashboardContextProvider = ({ children }) => {
             showNewMessages,
             hideNewMessage,
             inspectPrivateConversation,
+            showChatWindow,
         }}>
             {children}
         </DashboardContext.Provider>

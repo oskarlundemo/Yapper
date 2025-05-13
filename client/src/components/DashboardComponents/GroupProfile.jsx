@@ -15,6 +15,8 @@ import {useDashboardContext} from "../../context/DashboardContext.jsx";
 export const GroupProfile = ({headerName}) => {
 
     const {user} = useAuth();
+    const {API_URL, currentGroupInfo, showGroupMembers} = useDashboardContext();
+
 
     const [description, setDescription] = useState('');
     const [file, setFile] = useState(null)
@@ -27,7 +29,6 @@ export const GroupProfile = ({headerName}) => {
     const [groupNameCharCount, setGroupNameCharCount] = useState(0);
     const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
 
-    const {API_URL, currentGroupInfo, showGroupMembers} = useDashboardContext();
 
     useEffect(() => {
         setDescriptionCharsCount(description.length);

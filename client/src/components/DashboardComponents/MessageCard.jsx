@@ -8,13 +8,13 @@ import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
 
-export const MessageCard = ({content, files = null, user_id, showUserInfo, sender, time, username = ''}) => {
+export const MessageCard = ({content, files = null, user_id, sender, time, username = ''}) => {
 
     const {user} = useAuth();
     const [isGif, setIsGif] = useState(false);
 
     const {clickOnProfile} = useDynamicStyles();
-    const {setShowGroupProfile, API_URL} = useDashboardContext();
+    const {setShowGroupProfile, API_URL, showUserInfo} = useDashboardContext();
 
     useEffect(() => {
         content?.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);

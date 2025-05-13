@@ -9,7 +9,7 @@ import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardConversations = ({showNewMessages}) => {
+export const DashboardConversations = ({}) => {
 
     const {user} = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +24,8 @@ export const DashboardConversations = ({showNewMessages}) => {
 
 
     const {showConversations,  clickOnNewMessage} = useDynamicStyles()
-    const {API_URL, setMiniBar, inspectGroupChat, inspectPrivateConversation, setShowNewMessage, setLoadingMessages} = useDashboardContext();
+    const {API_URL, setMiniBar, inspectGroupChat, inspectPrivateConversation,
+        setShowNewMessage, setLoadingMessages, showNewMessages} = useDashboardContext();
 
     useEffect(() => {
         setFilteredConversations(allConversations);
@@ -152,8 +153,6 @@ export const DashboardConversations = ({showNewMessages}) => {
     }, [user?.id]);
 
 
-    // En för när nya chattar skapas
-
     useEffect(() => {
         if (!user?.id) return;
 
@@ -194,13 +193,11 @@ export const DashboardConversations = ({showNewMessages}) => {
     }, [user?.id]);
 
 
-    // En för när nya medlemmar läggs till
-
     useEffect(() => {
         if (!user?.id) return;
 
         const newChannel = supabase
-            .channel('realtime-conversation-group-invite')
+            .channel('realtime-conversation-group-invite-')
             .on(
                 'postgres_changes',
                 {
@@ -214,7 +211,7 @@ export const DashboardConversations = ({showNewMessages}) => {
 
                     if (groupMemberEntry.member_id !== user.id) return;
 
-                    const response = await fetch(`${API_URL}/conversations/new/group/invite/${groupMemberEntry.group_id}/${user.id}`, {
+                    await fetch(`${API_URL}/conversations/new/group/invite/${groupMemberEntry.group_id}/${user.id}`, {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -225,7 +222,6 @@ export const DashboardConversations = ({showNewMessages}) => {
                             setAllConversations(prev => [data, ...prev]);
                             const audio = new Audio('notification.mp3');
                             audio.play()
-                            console.log(data)
                         })
                         .catch(err => console.log(err));
                 }
@@ -245,7 +241,7 @@ export const DashboardConversations = ({showNewMessages}) => {
         if (!user?.id) return;
 
         const newChannel = supabase
-            .channel('realtime-conversation-private')
+            .channel(`realtime-conversation-private-${user.id}`)
             .on(
                 'postgres_changes',
                 {
@@ -256,10 +252,6 @@ export const DashboardConversations = ({showNewMessages}) => {
                 async (payload) => {
 
                     const pendingRequest = payload.new;
-                    console.log('Fetching pendingRequest');
-                    console.log(payload.new);
-
-
                     if (pendingRequest.receiver_id !== user.id && pendingRequest.sender_id !== user.id) return;
 
                     await fetch(`${API_URL}/conversations/new/${pendingRequest.sender_id}/${pendingRequest.receiver_id}/${user.id}/`, {
@@ -270,7 +262,7 @@ export const DashboardConversations = ({showNewMessages}) => {
                     })
                         .then(res => res.json())
                         .then(data => {
-                            setAllConversations(prev => [newConversation, ...prev]);
+                            setAllConversations(prev => [data, ...prev]);
                             const audio = new Audio('notification.mp3');
                             audio.play()
                         })
@@ -289,6 +281,9 @@ export const DashboardConversations = ({showNewMessages}) => {
 
 
     useEffect(() => {
+
+        setLoadingMessages(true);
+
         fetch(`${API_URL}/conversations/all/${user.id}`, {
             method: "GET",
             headers: {
@@ -297,7 +292,6 @@ export const DashboardConversations = ({showNewMessages}) => {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 setAllConversations(data)
                 inspectLatestChat(data[0])
                 setLoading(false)
@@ -346,7 +340,7 @@ export const DashboardConversations = ({showNewMessages}) => {
     useEffect(() => {
         if (!user?.id) return;
 
-        const channelName = `latestmessage-${user.id}}`;
+        const channelName = `latestMessage-${user.id}}`;
         const newChannel = supabase
             .channel(channelName)
             .on(
@@ -466,6 +460,7 @@ export const DashboardConversations = ({showNewMessages}) => {
                                 group={conversation.group}
                                 groupId={conversation.group.id}
                                 latestMessage={conversation.latestMessage}
+                                setLatestGroupMessage={setLatestGroupMessage}
                             />
                         ) : (
                             <PrivateConversationCard

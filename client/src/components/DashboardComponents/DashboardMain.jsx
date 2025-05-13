@@ -11,16 +11,9 @@ import {UserProfile} from "./UserProfile.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardMain = ({showNewMessages, setShowNewMessage, toggleShowMessage,
-                                  showRequests, showProfile, showMessage}) => {
+export const DashboardMain = ({}) => {
 
 
-
-
-
-    // Hämtar data
-    const [messages, setMessages] = useState([]);
-    const [friend, setFriend] = useState(false);
     const [userFriends, setUserFriends] = useState([]);
     const [moreUsers, setMoreUsers] = useState([]);
     const [blockedUsers, setBlockedUsers] = useState([]);
@@ -29,9 +22,8 @@ export const DashboardMain = ({showNewMessages, setShowNewMessage, toggleShowMes
     const {user} = useAuth();
     const {
         API_URL, groupChat,
-        setChatName, showGroupProfile, receiver, setReceiver,
-
-        showChatWindow, inspectPrivateConversation
+        setChatName, showGroupProfile,
+        receiver, setReceiver,
     } = useDashboardContext();
 
 
@@ -91,21 +83,15 @@ export const DashboardMain = ({showNewMessages, setShowNewMessage, toggleShowMes
                 <DashboardMenu/>
 
                 <DashboardConversations
-                    setReceiver={setReceiver} messages={messages}
-                    showNewMessages={showNewMessages} toggleShowMessage={toggleShowMessage}
-                    setShowNewMessage={setShowNewMessage}
-                    showProfile={showProfile}
+                    setReceiver={setReceiver}
                 />
 
 
                 <DashboardChatWindow
-                    setFriend={setFriend} setReceiver={setReceiver}
+                    setReceiver={setReceiver}
                     moreUsers={moreUsers} userFriends={userFriends}
-
-                    friend={friend} showMessage={showMessage} showChatWindow={showChatWindow}
-                    inspectConversation={inspectPrivateConversation} receiver={receiver} blockedUsers={blockedUsers} setBlockedUsers={setBlockedUsers}
-                    showRequests={showRequests} messages={messages} setMessages={setMessages}
-                    showProfile={showProfile}
+                    receiver={receiver} blockedUsers={blockedUsers}
+                    setBlockedUsers={setBlockedUsers}
                 />
 
 
@@ -122,8 +108,9 @@ export const DashboardMain = ({showNewMessages, setShowNewMessage, toggleShowMes
 
             </main>
 
-            <GroupMemberPopUp moreUsers={moreUsers}
-                              userFriends={userFriends}
+            <GroupMemberPopUp
+                moreUsers={moreUsers}
+                userFriends={userFriends}
             />
 
             <Overlay/>

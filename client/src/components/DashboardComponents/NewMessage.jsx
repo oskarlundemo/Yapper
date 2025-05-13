@@ -1,12 +1,10 @@
 import {useEffect, useState} from "react";
 import '../../styles/Dashboard/NewMessage.css'
-import {useAuth} from "../../context/AuthContext.jsx";
-import {ContactCard} from "./ContactCard.jsx";
 import {DropDownWithUsersComponent} from "./DropDownWithUsers.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
-export const NewMessage = ({receivers, setReceivers, setGroupChat, userFriends, moreUsers}) => {
+export const NewMessage = ({receivers, setReceivers, userFriends, moreUsers}) => {
 
 
 
@@ -18,6 +16,7 @@ export const NewMessage = ({receivers, setReceivers, setGroupChat, userFriends, 
     const {phoneUI} = useDynamicStyles();
 
     const {clickOnBack} = useDynamicStyles();
+    const {setGroupChat} = useDashboardContext();
 
     useEffect(() => {
         const filtered = userFriends.filter((entry) =>

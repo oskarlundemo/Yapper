@@ -5,6 +5,36 @@ import jwt from "jsonwebtoken";
 
 
 
+
+/**
+ * 1. What does this function do, where is it called?
+ * (→ Describe the function’s purpose and trigger point in the app.)
+ * e.g., “This function fetches all posts for a specific user. It is triggered when the client navigates to the user's profile page.”
+ *
+ * 2. What data and method does it expect, and what does it return?
+ * (→ Summarize the key input(s) from the frontend or route params and what data is sent back.)
+ * e.g., “It expects a userId in the request parameters. It returns an array of posts with related user and comment data.”
+ *
+ * 3. List the success and error responses. Example:
+ *  * 201: User was successfully banned.
+ *  * 400: An error occurred (e.g., invalid user ID or database issue).
+ * @returns {Promise<void>}
+ */
+
+
+/**
+ * 1. This function is used as middleware in the signUpRoute to check that the username is unique
+ *
+ * 2. It only expects the username to sent in as a paramter
+ *
+ * 3. Returns true if unique, else false
+ *
+ * @param username
+ * @returns {Promise<boolean>}
+ */
+
+
+
 export async function uniqueUsername(username) {
     try {
 
@@ -59,6 +89,24 @@ export async function uniqueEmail (email) {
 }
 
 
+
+
+/**
+ * 1. This functions is used for signing up users and assigning them with a jwt-token once they pass the
+ *    other middleware in the sing-up route
+ *
+ * 2. It expects the password, email and username sent through the request body, triggered in the
+ *    CreateUserBox.jsx component by the POST-request
+ *
+ * 3. 201: Successfully signed up, return the jwt-token
+ *    500: Server error, log it
+ *
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+
+
 export const signUpUser = async(req, res) => {
     try {
         const { username, password, email} = req.body;
@@ -81,7 +129,7 @@ export const signUpUser = async(req, res) => {
 
     } catch (e) {
         console.error(`Error while signing up user: ${e}`);
-        res.status(500).send({error: e});
+        res.status(500).send({error: 'Error while signing up'});
     }
 }
 

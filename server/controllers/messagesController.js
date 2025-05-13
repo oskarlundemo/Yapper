@@ -142,23 +142,16 @@ export const newPrivateMessage = async (req, res) => {
         const message = await prisma.privateMessages.findUnique({
             where: {
                 id: msgId
-            }, include: {
-                attachments: true,
-                sender: true
-            }
-        })
-
-        const files = await prisma.attachedFile.findMany({
-            where: {
-                private_message_id: msgId
             },
             include: {
-                file: true
+                sender: true,
+                attachments: {
+                    include: {
+                        file: true
+                    }
+                }
             }
-        })
-
-        if (files)
-            message.attachments = files;
+        });
 
         res.status(200).json(message);
 
@@ -188,8 +181,6 @@ export const newGroupMessage = async (req, res) => {
                 }
             }
         });
-
-        groupMessage.hasAttachments = !!groupMessage?.AttachedFile;
 
         res.status(200).json(groupMessage);
 

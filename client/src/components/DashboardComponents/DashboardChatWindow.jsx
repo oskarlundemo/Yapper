@@ -13,16 +13,17 @@ import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardChatWindow = ({setReceiver, setFriend,
-                                        moreUsers, userFriends, messages, setMessages, friend, showMessage, receiver}) => {
+export const DashboardChatWindow = ({setReceiver, moreUsers,
+                                        userFriends, receiver}) => {
 
     const [channel, setChannel] = useState(null);
     const [receivers, setReceivers] = useState([]);
     const {user} = useAuth();
-    const {showMinibar, showUserInfo} = useDynamicStyles();
+    const {showMinibar, showChatWindow} = useDynamicStyles();
 
-
-    const {groupChat, API_URL, loadingMessages} = useDashboardContext();
+    const {messages, setMessages, setFriend,
+        friend, loadingMessages,
+        API_URL, groupChat, showMessage, showNewMessage} = useDashboardContext();
 
     const messagesEndRef = useRef(null);
 
@@ -130,62 +131,57 @@ export const DashboardChatWindow = ({setReceiver, setFriend,
         const rendered = [];
         let lastDate = null;
 
-        messages.forEach((message) => {
-            const currDate = moment.utc(message.created_at).tz("Europe/Stockholm");
+            messages.forEach((message) => {
+                const currDate = moment.utc(message.created_at).tz("Europe/Stockholm");
 
-            const isNewDay =
-                !lastDate ||
-                currDate.year() !== lastDate.year() ||
-                currDate.month() !== lastDate.month() ||
-                currDate.date() !== lastDate.date();
+                const isNewDay =
+                    !lastDate ||
+                    currDate.year() !== lastDate.year() ||
+                    currDate.month() !== lastDate.month() ||
+                    currDate.date() !== lastDate.date();
 
-            if (isNewDay) {
-                const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY');
+                if (isNewDay) {
+                    const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY');
+
+                    rendered.push(
+                        <MessageSplitter key={`split-${message.id}`} date={formattedDate}/>
+                    );
+                    lastDate = currDate;
+                }
 
                 rendered.push(
-                    <MessageSplitter key={`split-${message.id}`} date={formattedDate} />
+                    <MessageCard
+                        key={message.id}
+                        message={message}
+                        content={message.content}
+                        time={message.created_at}
+                        user_id={message.sender_id}
+                        sender={message.sender}
+                        username={message.sender?.username || message.Sender?.username || "Unknown"}
+                        files={message.attachments || message.AttachedFile || []}
+                    />
                 );
-                lastDate = currDate;
-            }
-
-            rendered.push(
-                <MessageCard
-                    key={message.id}
-                    showUserInfo={showUserInfo}
-                    message={message}
-                    content={message.content}
-                    time={message.created_at}
-                    user_id={message.sender_id}
-                    sender={message.sender}
-                    username={message.sender?.username || message.Sender?.username || "Unknown"}
-                    files={message.attachments || message.AttachedFile || []}
-                />
-            );
-        });
-
-        return rendered;
+            });
+            return rendered;
     }, [messages]);
 
 
 
-    const {showChatWindow} = useDynamicStyles();
 
     return (
 
         <section className={`dashboard-chat-window ${showMinibar ? "" : "stretch"} ${showChatWindow ? '' : 'hide'} } `}>
                 <>
                     <div className={`dashboard-message-container`}>
-                        {showMessage ? (
+                        {showNewMessage ? (
                             <NewMessage moreUsers={moreUsers} userFriends={userFriends}
-                                        setGroupChat={setGroupChat} receivers={receivers}
-                                        setReceivers={setReceivers} API_URL={API_URL} />
-                        ) : (
-
-                            <ConversationHeader />
+                                        receivers={receivers} setReceivers={setReceivers} />
+                            ) : (
+                               <ConversationHeader />
                         )}
 
                         <div className="dashboard-message-content">
-                            {showMessage ? (
+                            {showNewMessage ? (
                                 <GroupMemberInfo receivers={receivers}/>
                             ) : (
                                 <>
@@ -209,9 +205,9 @@ export const DashboardChatWindow = ({setReceiver, setFriend,
                     </div>
 
                     <DashboardMessageArea
-                        setReceiver={setReceiver} setFriend={setFriend} friend={friend}
+                        setReceiver={setReceiver}
                         setReceivers={setReceivers} receivers={receivers}
-                        receiver={receiver} />
+                            receiver={receiver} />
                 </>
         </section>
     );

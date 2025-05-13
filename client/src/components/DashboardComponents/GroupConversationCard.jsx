@@ -9,9 +9,8 @@
 import '../../styles/Dashboard/ConversationCard.css'
 import {use, useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from 'moment-timezone';
 import {supabase} from "../../services/supabaseClient.js";
-import {parseLatestMessage, parseLatestTimestamp} from "./PrivateConversationCard.jsx";
+import  {parseLatestTimestamp} from "./PrivateConversationCard.jsx";
 import {GroupAvatar} from "./GroupAvatar.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
@@ -19,7 +18,7 @@ import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 export const GroupConversationCard = ({
                                           groupId = 0, latestGroupMessage,
-                                          setAllConversations,
+                                          setAllConversations, setLatestGroupMessage,
                                           latestMessage = null,
                                           group = null,
                                       }) => {
@@ -27,20 +26,15 @@ export const GroupConversationCard = ({
     const {user} = useAuth();
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState('');
-    const {showChatWindow} = useDashboardContext();
-
-
-    const {API_URL, inspectGroupChat} = useDashboardContext();
+    const {API_URL, inspectGroupChat, showChatWindow} = useDashboardContext();
+    const {clickOnChat} = useDynamicStyles();
 
     useEffect(() => {
         setGroupName(group?.name);
     }, [group]);
 
 
-    const {clickOnChat} = useDynamicStyles();
-
     useEffect(() => {
-
         const fetchMessageData = async () => {
             await fetch(`${API_URL}/groups/new/message/${latestGroupMessage.id}`, {
                 method: "GET",
@@ -50,7 +44,6 @@ export const GroupConversationCard = ({
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.group?.id !== data.group.id),
@@ -141,4 +134,18 @@ export const GroupConversationCard = ({
             </div>
         </div>
     )
+}
+
+
+export const parseLatestMessage = (message) => {
+    if (message.AttachedFile?.length > 0) {
+        return 'Sent a file'
+    } else if(message.content?.includes('giphy.com')) {
+        return 'Sent a GIF '
+    } else if (message.content?.length > 20 && message.content) {
+        const subString = message.content.substring(0, 20);
+        const lastSpace = subString.lastIndexOf(' ');
+        return message.content.substring(0, lastSpace) + '...';
+    }
+    return message.content;
 }

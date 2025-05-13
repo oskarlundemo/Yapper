@@ -7,14 +7,14 @@ import '../../styles/Dashboard/FileContainer.css'
 import {supabase} from "../../services/supabaseClient.js";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
-export const DashboardMessageArea = ({receiver, friend, setFriend, miniBar, setReceivers, receivers}) => {
+export const DashboardMessageArea = ({receiver, miniBar, setReceivers, receivers}) => {
 
     const {user} = useAuth();
     const [message, setMessage] = useState('');
     const [gifs, showGifs] = useState(false);
     const [files, setFiles] = useState([]);
 
-    const {groupChat, API_URL, loadingMessages} = useDashboardContext();
+    const {groupChat, API_URL, loadingMessages, friend, setFriend} = useDashboardContext();
 
     useEffect(() => {
         if (!user) return

@@ -6,16 +6,13 @@ import {Router} from 'express'
 import {
     fetchNewPrivateMessageInfo,
     getAllConversations,
-    getReceiverUsername, newGroupChat, newGroupInvite, newPendingNotification,
-    searchForConversations
-} from "../controllers/conversationsController.js";
+    newGroupChat, newGroupInvite, newPendingNotification,}
+    from "../controllers/conversationsController.js";
 
 const conversationRouter = Router();
 
 
-conversationRouter.get('/filter/:searchquery/:user_id', searchForConversations);
 
-conversationRouter.get('/receiver/username/:receiver', getReceiverUsername);
 
 conversationRouter.get('/all/:user_id', getAllConversations);
 

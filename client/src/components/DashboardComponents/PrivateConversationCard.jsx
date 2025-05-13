@@ -17,14 +17,14 @@ export const PrivateConversationCard = ({friend_id = 0,
                                             latestMessage = null, username = ''}) => {
 
     const {user: loggedIn} = useAuth();
-    const [channel, setChannel] = useState(null);
 
     const {clickOnChat} = useDynamicStyles();
     const {showChatWindow, inspectPrivateConversation} = useDashboardContext();
 
     useEffect( () => {
         const fetchMessageData = async () => {
-            await fetch(`${API_URL}/conversations/new/private/${latestPrivateMessage.id}/${latestPrivateMessage.receiver_id}/${latestPrivateMessage.sender_id}/${loggedIn.id}`, {
+            await fetch(`${API_URL}/conversations/new/private/${latestPrivateMessage.id}/${latestPrivateMessage.receiver_id}
+            /${latestPrivateMessage.sender_id}/${loggedIn.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,6 +32,7 @@ export const PrivateConversationCard = ({friend_id = 0,
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.user?.id !== data.user.id),
@@ -93,7 +94,6 @@ export const parseLatestTimestamp = (latestMessage) => {
 
 
 export const parseLatestMessage = (message) => {
-
     if (message.hasAttachments) {
         return 'Sent a file'
     } else if(message.content?.includes('giphy.com')) {
