@@ -4,7 +4,7 @@ import {Router} from 'express';
 import multer from 'multer';
 const upload = multer()
 import {
-    newPrivateMessage, newGroupMessage,
+    fetchNewPrivateMessage, fetchNewGroupMessage,
     createGroupChat,
     getMessagesFromGroupConversation,
     getMessagesFromPrivateConversation, sendGifGroupChat, sendGifPrivateConversation,
@@ -25,42 +25,49 @@ export const validateMessage = [
 
 const messagesRoute = Router();
 
-messagesRoute.get('/private/conversation/:sender_id/:receiver_id', getMessagesFromPrivateConversation);
+messagesRoute.get('/private/conversation/:inspector_id/:inspected_id', getMessagesFromPrivateConversation);
 
 messagesRoute.get('/group/conversation/:sender_id/:receiver_id', getMessagesFromGroupConversation);
 
-messagesRoute.post('/conversation/:sender_id/:receiver_id', upload.array('files'), validateMessage, (req, res) => {
+messagesRoute.post('/conversation/:sender_id/:receiver_id', upload.array('files'), validateMessage, async (req, res) => {
 
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         console.log(errors);
-        return res.status(400).json({ errors: errors.array()});
+        return res.status(400).json({errors: errors.array()});
     }
 
-    const receivers = JSON.parse(req.body?.receivers);
-    if (receivers.length > 1 && req.body.groupChat === 'true') {
-        createGroupChat(req, res);
-    } else if (req.body.groupChat === 'true')  {
-        sendGroupMessage(req, res);
-    } else {
-        sendPrivateMessage(req, res);
+    try {
+        const receivers = JSON.parse(req.body?.receivers);
+        const isGroup = req.body.groupChat === 'true';
+
+        if (isGroup && receivers.length > 1) {
+            await createGroupChat(req, res);
+        } else if (isGroup) {
+            await sendGroupMessage(req, res);
+        } else {
+            await sendPrivateMessage(req, res);
+        }
+    } catch (err) {
+        console.error('Error handling message route:', err);
+        res.status(500).json({error: 'Internal server error'});
     }
 });
 
 messagesRoute.post('/group/:sender_id', sendGroupMessage);
 
-messagesRoute.post('/gif/:sender_id/:receiver_id', (req, res) => {
+messagesRoute.post('/gif/:sender_id/:receiver_id', async (req, res) => {
     if (req.body.groupChat) {
-        sendGifGroupChat(req, res);
+        await sendGifGroupChat(req, res);
     } else {
-        sendGifPrivateConversation(req, res);
+        await sendGifPrivateConversation(req, res);
     }
 });
 
-messagesRoute.get('/new/private/:message_id', newPrivateMessage)
+messagesRoute.get('/new/private/:message_id', fetchNewPrivateMessage)
 
-messagesRoute.get('/new/group/:group_id/:message_id', newGroupMessage)
+messagesRoute.get('/new/group/:group_id/:message_id', fetchNewGroupMessage)
 
 
 export default messagesRoute;

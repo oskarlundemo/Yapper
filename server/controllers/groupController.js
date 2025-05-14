@@ -34,7 +34,7 @@ import {prisma} from "../prisma/index.js";
  */
 
 
-export const getNewGroupMessage = async (req, res) => {
+export const fetchNewGroupMessage = async (req, res) => {
 
     try {
         const message_id = parseInt(req.params.message_id); // ID of the message
@@ -47,7 +47,7 @@ export const getNewGroupMessage = async (req, res) => {
             include: {
                 sender: true,
                 group: true,
-                AttachedFile: true
+                attachments: true
             },
             orderBy: {
                 created_at: 'desc',
@@ -55,7 +55,7 @@ export const getNewGroupMessage = async (req, res) => {
         });
 
 
-        latestMessage.hasAttachments = !!latestMessage.AttachedFile; // If it has attachments, set true else false
+        latestMessage.hasAttachments = latestMessage.attachments.length > 0; // If it has attachments, set true else false
 
         // Format message
         const formattedGroupMessage = {

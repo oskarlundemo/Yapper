@@ -1,13 +1,8 @@
 
 
 
-
-
-
-
-
 import '../../styles/Dashboard/ConversationCard.css'
-import {use, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 import  {parseLatestTimestamp} from "./PrivateConversationCard.jsx";

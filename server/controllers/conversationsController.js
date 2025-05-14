@@ -369,7 +369,7 @@ export const getAllConversations = async (req, res) => {
                         GroupMessages: {
                             include: {
                                 sender: true,
-                                AttachedFile: true,
+                                attachments: true,
                             },
                             orderBy: {
                                 created_at: 'desc'
@@ -411,7 +411,7 @@ export const getAllConversations = async (req, res) => {
                     ? {
                         content: latestMessage.content,
                         created_at: latestMessage.created_at,
-                        hasAttachments: latestMessage.AttachedFile,
+                        hasAttachments: latestMessage.attachments.length > 0,
                         sender: {
                             id: latestMessage.sender.id,
                             username: latestMessage.sender.username,
@@ -461,7 +461,7 @@ export const getAllConversations = async (req, res) => {
 
 
 
-export const fetchNewPrivateMessageInfo = async (req, res) => {
+export const fetchNewPrivateMessage = async (req, res) => {
 
     try {
         const messageId = parseInt(req.params.message_id); // ID of the message
@@ -478,15 +478,12 @@ export const fetchNewPrivateMessageInfo = async (req, res) => {
             },
             include: {
                 sender: true, // Info about who sent it
+                attachments: true,
             }
         });
 
         // Include the attached files
-        const attachments = await prisma.attachedFile.findMany({
-            where: {
-                private_message_id: messageId
-            }
-        })
+
 
         // Find the opposite user
         const user = await prisma.users.findUnique({
@@ -496,7 +493,7 @@ export const fetchNewPrivateMessageInfo = async (req, res) => {
         })
 
         // If there are any files, true else false
-        message.hasAttachments = attachments.length > 0
+        message.hasAttachments = message.attachments.length > 0
 
         // Format message
         const formattedMessage = {

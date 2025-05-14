@@ -6,7 +6,6 @@ import {DashboardMenu} from "./DashboardMenu.jsx";
 import {Overlay} from "./Overlay.jsx";
 import {GroupMemberPopUp} from "./GroupMemberPopUp.jsx";
 import {GroupProfile} from "./GroupProfile.jsx";
-
 import {UserProfile} from "./UserProfile.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
@@ -23,7 +22,7 @@ export const DashboardMain = ({}) => {
     const {
         API_URL, groupChat,
         setChatName, showGroupProfile,
-        receiver, setReceiver,
+        receiver,
     } = useDashboardContext();
 
 
@@ -80,38 +79,28 @@ export const DashboardMain = ({}) => {
     return (
         <>
             <main className={'dashboard-main'}>
-                <DashboardMenu/>
+                     <DashboardMenu/>
 
-                <DashboardConversations
-                    setReceiver={setReceiver}
-                />
+                    <DashboardConversations/>
 
-
-                <DashboardChatWindow
-                    setReceiver={setReceiver}
-                    moreUsers={moreUsers} userFriends={userFriends}
-                    receiver={receiver} blockedUsers={blockedUsers}
-                    setBlockedUsers={setBlockedUsers}
-                />
-
-
-                {groupChat && showGroupProfile ? (
-                    <GroupProfile
-                        headerName={setChatName}
-
-                    />
-                ) : (
-                    <UserProfile
-                        blockedUsers={blockedUsers}
+                    <DashboardChatWindow
+                        moreUsers={moreUsers} userFriends={userFriends}
+                        receiver={receiver} blockedUsers={blockedUsers}
                         setBlockedUsers={setBlockedUsers} />
-                )}
+
+
+                     {groupChat && showGroupProfile ? (
+                         <GroupProfile
+                            headerName={setChatName}/>
+                        ) : (
+                            <UserProfile
+                            blockedUsers={blockedUsers}
+                            setBlockedUsers={setBlockedUsers} />
+                     )}
 
             </main>
 
-            <GroupMemberPopUp
-                moreUsers={moreUsers}
-                userFriends={userFriends}
-            />
+                    <GroupMemberPopUp moreUsers={moreUsers} userFriends={userFriends}/>
 
             <Overlay/>
         </>

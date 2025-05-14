@@ -33,98 +33,119 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
 
 
     useEffect(() => {
-
         if (!receiver) return;
 
-        if (!groupChat) {
-            const newChannel = supabase
-                .channel(`realtime-chat-${receiver}`)
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "INSERT",
-                        schema: "public",
-                        table: "messages"
-                    },
-                    async (payload) => {
-                        const newMessage = payload.new;
+        const channelName = groupChat
+            ? `realtime-group-chat-${receiver}`
+            : `realtime-private-chat-${receiver}`;
 
-                        if (
-                            (newMessage.sender_id === user.id && newMessage.receiver_id === receiver) ||
-                            (newMessage.sender_id === receiver && newMessage.receiver_id === user.id)
-                        ) {
-                            await fetch(`${API_URL}/messages/new/private/${newMessage.id}`, {
-                                method: "GET",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                }
-                            })
-                                .then(res => res.json())
-                                .then(async data => {
-                                    setMessages((prevMessages) => [...prevMessages, data]);
-                                    const audio = new Audio('notification.mp3');
-                                    await audio.play();
-                                })
-                                .catch(err => console.log(err));
-                        }
-                    }
-                )
-                .subscribe();
+        const newChannel = supabase.channel(channelName);
 
-            setChannel((prevChannel) => {
-                if (prevChannel) {
-                    supabase.removeChannel(prevChannel);
-                }
-                return newChannel;
-            });
+        if (groupChat) {
+            newChannel.on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "GroupMessages"
+                },
+                async (payload) => {
+                    const newMessage = payload.new;
 
-            return () => {
-                supabase.removeChannel(newChannel);
-            };
+                    try {
+                        const res = await fetch(`${API_URL}/messages/new/group/${newMessage.group_id}/${newMessage.id}`);
+                        const data = await res.json();
 
-        } else {
-            const newChannel = supabase
-                .channel(`realtime-chat-${receiver}`)
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "INSERT",
-                        schema: "public",
-                        table: "GroupMessages"
-                    },
-                    async (payload) => {
-                        const newMessage = payload.new;
-
-                        await fetch(`${API_URL}/messages/new/group/${newMessage.group_id}/${newMessage.id}`, {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json"
+                        setMessages(prev => {
+                            const exists = prev.some(msg => msg.id === data.id);
+                            if (exists) {
+                                console.log("Message already exists, skipping:", data.id);
+                                return prev;
                             }
-                        })
-                            .then(res => res.json())
-                            .then(async data => {
-                                setMessages((prevMessages) => [...prevMessages, data]);
-                                const audio = new Audio('notification.mp3');
-                                await audio.play();
-                            })
-                            .catch(err => console.log(err));
+
+                            const updated = [...prev, data];
+                            updated.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                            console.log("Updating messages with:", data);
+                            return updated;
+                        });
+                        const audio = new Audio('notification.mp3');
+                        await audio.play();
+                    } catch (err) {
+                        console.error("Error fetching group message:", err);
                     }
-                )
-                .subscribe();
-
-            setChannel((prevChannel) => {
-                if (prevChannel) {
-                    supabase.removeChannel(prevChannel);
                 }
-                return newChannel;
-            });
+            );
+        } else {
+            newChannel.on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages"
+                },
+                async (payload) => {
+                    const newMessage = payload.new;
 
-            return () => {
-                supabase.removeChannel(newChannel);
-            };
+                    const isRelevant =
+                        (newMessage.sender_id === user.id && newMessage.receiver_id === receiver) ||
+                        (newMessage.sender_id === receiver && newMessage.receiver_id === user.id);
+
+                    if (!isRelevant) return;
+
+                    try {
+                        // Fetch enriched message directly from Supabase
+                        const { data, error } = await supabase
+                            .from("messages")
+                            .select(`
+                                *,
+                             sender:users!messages_sender_id_fkey (*),
+                             attachments:PrivateMessagesAttachment(*)
+                                `)
+                            .eq("id", newMessage.id)
+                            .single();
+
+                        if (error) {
+                            console.error("Error fetching message:", error);
+                        } else {
+                            console.log("Fetched message with attachments:", data);
+                        }
+
+                        setMessages(prev => {
+                            const exists = prev.some(msg => msg.id === data.id);
+                            if (exists) {
+                                console.log("Message already exists, skipping:", data.id);
+                                return prev;
+                            }
+
+                            const updated = [...prev, data];
+                            updated.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                            console.log("Message added:", data);
+                            return updated;
+                        });
+
+                        const audio = new Audio('notification.mp3');
+                        await audio.play();
+
+                    } catch (err) {
+                        console.error("Error fetching private message via Supabase:", err);
+                    }
+                }
+            );
         }
 
-    }, [receiver]);
+        newChannel.subscribe();
+        setChannel(prevChannel => {
+            if (prevChannel) {
+                supabase.removeChannel(prevChannel);
+            }
+            return newChannel;
+        });
+
+        return () => {
+            supabase.removeChannel(newChannel);
+        };
+
+    }, [groupChat, receiver]);
 
 
     const renderedMessages = useMemo(() => {
@@ -205,9 +226,9 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
                     </div>
 
                     <DashboardMessageArea
-                        setReceiver={setReceiver}
-                        setReceivers={setReceivers} receivers={receivers}
-                            receiver={receiver} />
+                        setReceiver={setReceiver} setReceivers={setReceivers}
+                        receivers={receivers} receiver={receiver}
+                    />
                 </>
         </section>
     );

@@ -4,7 +4,7 @@
 import {Router} from 'express'
 import multer from 'multer';
 import {
-    addUserToGroup, deleteGroupChat, getNewGroupMessage, leaveGroupChat,
+    addUserToGroup, deleteGroupChat, fetchNewGroupMessage, leaveGroupChat,
     removeUserFromGroup,
     updateGroupAvatar,
     updateGroupDescription,
@@ -23,7 +23,7 @@ groupRoute.delete('/remove/:groupMemberId/:groupId', removeUserFromGroup)
 
 groupRoute.post('/add/:newUserId/:groupId', addUserToGroup)
 
-groupRoute.get('/new/message/:message_id', getNewGroupMessage)
+groupRoute.get('/new/message/:message_id', fetchNewGroupMessage)
 
 groupRoute.delete('/leave/:groupMemberId/:groupId', leaveGroupChat)
 
