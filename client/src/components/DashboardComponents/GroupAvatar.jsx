@@ -22,7 +22,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
             }
             const { data, error } = supabase.storage
                 .from("yapper")
-                .getPublicUrl(`groupavatars/${group.avatar}`);
+                .getPublicUrl(`groupAvatars/${group.avatar}`);
             if (error) {
                 console.error("Error getting public URL:", error);
             } else {

@@ -128,40 +128,39 @@ export const sendGifPrivateConversation = async (req, res) => {
  * @returns {Promise<void>}
  */
 
-
 export const sendPrivateMessage = async (req, res) => {
+    const senderId = parseInt(req.params.sender_id);
+    let receiverArray = JSON.parse(req.body.receivers);
+    const receiverIdParams = parseInt(req.params.receiver_id);
+    const receiverBody = receiverArray[0]?.id;
+
+    const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
+
     try {
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Create message
+            const message = await tx.privateMessages.create({
+                data: {
+                    sender_id: senderId,
+                    receiver_id: receiverId,
+                    content: req.body.message
+                }
+            });
 
+            // 2. Save files to Supabase storage, collect metadata
+            const attachments = req.files ? await saveFilesFromConversations(req, message.id) : [];
 
-        const senderId = parseInt(req.params.sender_id); // Parse sender ID
-        let receiverArray = JSON.parse(req.body.receivers); // Parse the recipient of the message, this is when there is a new conversation
-        const receiverIdParams = parseInt(req.params.receiver_id); // Parse the ID of the receipt
-        const receiverBody = receiverArray[0]?.id;
-
-
-        // If there is a new conversation, then the recipient is in the array, otherwise use the id sent through the request parameter
-        const receiverId = isNaN(receiverIdParams) ? parseInt(receiverBody) : parseInt(receiverIdParams);
-
-
-
-        // Create message
-        const message = await prisma.privateMessages.create({
-            data: {
-                sender_id: senderId,
-                receiver_id: receiverId,
-                content: req.body.message
+            // 3. Save metadata to DB
+            if (attachments.length > 0) {
+                await tx.privateMessagesAttachment.createMany({
+                    data: attachments
+                });
             }
+
+            return message;
         });
 
-        req.messageID = message.id;
-
-        // If there are any files attached to the message, parse and upload them
-        if (req.files) {
-            await saveFilesFromConversations(req, res); // Upload to Supabase
-        }
-
-
-        // Check if there is a pending friend request between the users
+        // Friend request logic can be outside the transaction if not essential
         const pendingFriendRequest = await prisma.pendingFriendRequests.findFirst({
             where: {
                 OR: [
@@ -171,7 +170,6 @@ export const sendPrivateMessage = async (req, res) => {
             }
         });
 
-        // Check if the users are friends
         const friendShip = await prisma.friends.findFirst({
             where: {
                 OR: [
@@ -181,7 +179,6 @@ export const sendPrivateMessage = async (req, res) => {
             }
         });
 
-        // If they are neither friends or have a pending request, create one
         if (!pendingFriendRequest && !friendShip) {
             await prisma.pendingFriendRequests.create({
                 data: {
@@ -191,13 +188,12 @@ export const sendPrivateMessage = async (req, res) => {
             });
         }
 
-
         res.status(200).json('Successfully sent message');
     } catch (err) {
-        console.log(err);
-        res.status(500).json({error: 'Internal Server Error'});
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
 
 /**
  * 1. This function is used for fetching the data associated with a new private message between two
@@ -220,8 +216,6 @@ export const fetchNewPrivateMessage = async (req, res) => {
     try {
         const messageID = parseInt(req.params.message_id); // Parse the ID of the message
 
-        console.log("Fetching message with ID:", messageID); // Ensure you're getting the correct ID.
-
         const message = await prisma.privateMessages.findUnique({
             where: { id: messageID },  // Ensure you're fetching based on the message ID
             include: {
@@ -233,13 +227,6 @@ export const fetchNewPrivateMessage = async (req, res) => {
         if (!message) {
             return res.status(404).json({ error: 'Message not found' });
         }
-
-        const attachments = await prisma.privateMessagesAttachment.findMany({
-            where: { message_id: messageID }
-        });
-        console.log(attachments);
-
-        console.log(message);  // Check the message and attachments
 
         res.status(200).json(message); // Successful, send message
 
@@ -284,9 +271,6 @@ export const fetchNewGroupMessage = async (req, res) => {
             }
         });
 
-        console.log('Fetched new group message');
-        console.log(groupMessage);
-
         res.status(200).json(groupMessage); // Successful, send it to the front end
     } catch (err) {
         console.log(err);
@@ -310,9 +294,6 @@ export const fetchNewGroupMessage = async (req, res) => {
  * @param res
  * @returns {Promise<void>}
  */
-
-
-
 
 
 export const createGroupChat = async (req, res) => {
@@ -417,21 +398,31 @@ export const sendGroupMessage = async (req, res) => {
         const senderID = parseInt(req.params.sender_id); // Sender
         const groupID = parseInt(req.params.receiver_id) // Group
 
-
         // Insert the new message
-        const message = await prisma.groupMessages.create({
-            data: {
-                sender_id: senderID,
-                group_id: groupID,
-                content: req.body.message, // Message
+
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Create message
+            const message = await tx.groupMessages.create({
+                data: {
+                    sender_id: senderID,
+                    group_id: groupID,
+                    content: req.body.message
+                }
+            });
+
+            // Save files to Supabase storage, collect metadata
+            const attachments = req.files ? await saveFilesFromConversations(req, message.id) : [];
+
+            // Save metadata to DB
+            if (attachments.length > 0) {
+                await tx.groupMessagesAttachment.createMany({
+                    data: attachments
+                });
             }
+
+            return message;
         });
 
-        req.messageID = message.id;
-        // If there are any files
-        if (req.files) {
-            await saveFilesFromConversations(req, res); // Upload to Supabase, see supabaseController.js
-        }
 
         res.status(200).json('Successfully sent message'); // Succuesfull
     } catch (err) {

@@ -3,11 +3,11 @@
 
 import '../../styles/Dashboard/ConversationCard.css'
 import {UserAvatar} from "../UserAvatar.jsx";
-import {use, useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import moment from "moment-timezone";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
+import {parseLatestMessage, parseLatestTimestamp} from "../../services/helperFunctions.js";
 
 
 
@@ -32,7 +32,6 @@ export const PrivateConversationCard = ({friend_id = 0,
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     setAllConversations(prev =>
                         [
                             ...prev.filter(conv => conv.user?.id !== data.user.id),
@@ -80,28 +79,3 @@ export const PrivateConversationCard = ({friend_id = 0,
 }
 
 
-export const parseLatestTimestamp = (latestMessage) => {
-    if (!latestMessage?.created_at) return "";
-
-    const date = moment(latestMessage.created_at).tz("Europe/Stockholm");
-    const now = moment().tz("Europe/Stockholm");
-    const diffDays = now.diff(date, 'days');
-
-    if (diffDays === 0) return date.format("HH:mm");
-    if (diffDays === 1) return 'Yesterday';
-    return `${diffDays} d`;
-};
-
-
-export const parseLatestMessage = (message) => {
-    if (message.hasAttachments) {
-        return 'Sent a file'
-    } else if(message.content?.includes('giphy.com')) {
-        return 'Sent a GIF '
-    } else if (message.content?.length > 20 && message.content) {
-        const subString = message.content.substring(0, 20);
-        const lastSpace = subString.lastIndexOf(' ');
-        return message.content.substring(0, lastSpace) + '...';
-    }
-    return message.content;
-}

@@ -1,7 +1,7 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 
 
-export const GroupMemberInfo = ({receivers}) => {
+export const RecipientsOfNewMessage = ({receivers}) => {
 
 
     return (

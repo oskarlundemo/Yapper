@@ -1,5 +1,5 @@
 import {prisma} from '../prisma/index.js';
-import {saveAvatar} from "./supabaseController.js";
+import {deleteOldAvatar, saveNewAvatar} from "./supabaseController.js";
 
 
 
@@ -149,20 +149,34 @@ export const updateUserAvatar = async (req, res, next) => {
     try {
 
         if (req.file) { // If there is no file uploaded, skip this
-            await saveAvatar(req, res); // Else save the avatar to Supabase (call to supabaseController.js)
+
             const user_id = parseInt(req.params.user_id); // Parse the ID
+
+            const oldAvatar = await prisma.users.findUnique({
+                where: {
+                    id: user_id
+                }
+            })
+
+            await deleteOldAvatar(req, res, oldAvatar.avatar);
+
+            const uniqueFileName = await saveNewAvatar(req, res); // Else save the avatar to Supabase (call to supabaseController.js)
+
             const newAvatar = await prisma.users.update({
                 data: {
-                    avatar: req.file.originalname, // Update the reference to the new path
+                    avatar: uniqueFileName, // Update the reference to the new path
                 },
                 where: {
                     id: user_id,
                 }
             })
+
             req.avatarUrl = newAvatar.avatar; // Amend the path to the request parameters
+
             next();
         }
         next(); // Next middleware
+
     } catch (err) {
         console.error('Error updating avatar:', err);
         res.status(500).json('Error updating avatar');

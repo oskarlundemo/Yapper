@@ -10,6 +10,8 @@
     width: 200px;
     height: 200px;
     gap: 1rem;
+
+    box-shadow: var(--default-boxshadow)
 }
 
 

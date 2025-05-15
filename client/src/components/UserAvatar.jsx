@@ -6,21 +6,16 @@ import {useDynamicStyles} from "../context/DynamicStyles.jsx";
 
 
 
-export const UserAvatar = ({height, width, user = null, API_URL = '',
+export const UserAvatar = ({height, width, user = null,
                                setSaveChanges = null, setNewAvatar = null,
                                selectPicture = false, file = null, setFile = null}) => {
     const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
     const [loadingAvatar, setLoadingAvatar] = useState(true);
 
-
     useEffect(() => {
         fetchImage(user);
     }, [user?.id]);
-
-
-    const {clickOnProfile} = useDynamicStyles();
-
 
     const fetchImage = async (user) => {
         setLoadingAvatar(true);
@@ -31,7 +26,7 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
         }
         const { data, error } = supabase.storage
             .from("yapper")
-            .getPublicUrl(`avatars/${user.avatar}`);
+            .getPublicUrl(`userAvatars/${user.avatar}`);
         if (error) {
             console.error("Error getting public URL:", error);
         } else {
@@ -121,7 +116,11 @@ export const UserAvatar = ({height, width, user = null, API_URL = '',
                         className="user-avatar-select-picture-default"
                         src={currentAvatar || "/default.jpg"}
                         alt="user-avatar"
-                        style={{ height, width }}
+                        style={{ height,
+                            width,
+                            objectFit: "cover",
+                            objectPosition: "center",
+                        }}
                         onError={() => console.error("Failed to load avatar:", currentAvatar)}
                     />
                 ))

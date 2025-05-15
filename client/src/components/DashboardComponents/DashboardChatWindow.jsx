@@ -6,29 +6,44 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {NewMessage} from "./NewMessage.jsx";
 import {supabase} from "../../services/supabaseClient.js";
 import {MessageSplitter} from "./MessageSplitter.jsx";
-import {GroupMemberInfo} from "./GroupMemberInfo.jsx";
+import {RecipientsOfNewMessage} from "./RecipientsOfNewMessage.jsx";
 import {ConversationHeader} from "./ConversationHeader.jsx";
 import moment from 'moment-timezone';
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
+import {soundEffect} from "../../services/helperFunctions.js";
+
+
+/**
+ * This is the chat window where users can see the chat and the messages sent in the conversation.
+ *
+ * @param setReceiver // Recipients of the message
+ * @param moreUsers // Users that are not friends
+ * @param userFriends // Friends to the user
+ * @param receiver // Recipient of the message
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
 
 
 export const DashboardChatWindow = ({setReceiver, moreUsers,
-                                        userFriends, receiver}) => {
+                                        userFriends}) => {
 
-    const [channel, setChannel] = useState(null);
-    const [receivers, setReceivers] = useState([]);
-    const {user} = useAuth();
-    const {showMinibar, showChatWindow} = useDynamicStyles();
+    const [channel, setChannel] = useState(null); // Channel for Supabase
+    const [receivers, setReceivers] = useState([]); // Set the recipient of new message
+    const {user} = useAuth(); // Get the jwt token form the context
+    const {showMinibar, showChatWindow} = useDynamicStyles(); // These bools are used for updating the UI
 
-    const {messages, setMessages, setFriend,
-        friend, loadingMessages,
-        API_URL, groupChat, showMessage, showNewMessage} = useDashboardContext();
+    const {messages, setMessages, loadingMessages, receiver,
+        API_URL, groupChat, showNewMessage} = useDashboardContext();
 
-    const messagesEndRef = useRef(null);
+    const messagesEndRef = useRef(null); // Used to automatically always scroll down once a new message is added
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }); // Listen for new messages and scroll down automatically
     }, [messages]);
 
 
@@ -36,12 +51,12 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
         if (!receiver) return;
 
         const channelName = groupChat
-            ? `realtime-group-chat-${receiver}`
-            : `realtime-private-chat-${receiver}`;
+            ? `realtime-group-chat-${receiver}`  // channel for group message
+            : `realtime-private-chat-${[user.id, receiver].sort().join("-")}`; // joined channel for private channels
 
-        const newChannel = supabase.channel(channelName);
+        const newChannel = supabase.channel(channelName); // Create channel
 
-        if (groupChat) {
+        if (groupChat) { // If this is a group chat, create this channel
             newChannel.on(
                 "postgres_changes",
                 {
@@ -50,32 +65,26 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
                     table: "GroupMessages"
                 },
                 async (payload) => {
-                    const newMessage = payload.new;
+                    const newMessage = payload.new; // New group message
 
                     try {
-                        const res = await fetch(`${API_URL}/messages/new/group/${newMessage.group_id}/${newMessage.id}`);
+                        const res = await fetch(`${API_URL}/messages/new/group/${newMessage.group_id}/${newMessage.id}`); // Fetch the enirched message from backend
                         const data = await res.json();
 
+                        // Add it to the messages displayed in the chat window
                         setMessages(prev => {
-                            const exists = prev.some(msg => msg.id === data.id);
-                            if (exists) {
-                                console.log("Message already exists, skipping:", data.id);
-                                return prev;
-                            }
+                            const alreadyExists = prev.some(msg => msg.id === data.id);
+                            if (alreadyExists) return prev;
 
-                            const updated = [...prev, data];
-                            updated.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                            console.log("Updating messages with:", data);
-                            return updated;
+                            return [...prev, data];
                         });
-                        const audio = new Audio('notification.mp3');
-                        await audio.play();
+                        await soundEffect(); // Play sound effect
                     } catch (err) {
                         console.error("Error fetching group message:", err);
                     }
                 }
             );
-        } else {
+        } else { // Create this channel for private conversations
             newChannel.on(
                 "postgres_changes",
                 {
@@ -86,61 +95,50 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
                 async (payload) => {
                     const newMessage = payload.new;
 
+                    // If user is either sender or receiver of the latest message inserted into the messages table, fetch enriched message
                     const isRelevant =
                         (newMessage.sender_id === user.id && newMessage.receiver_id === receiver) ||
                         (newMessage.sender_id === receiver && newMessage.receiver_id === user.id);
 
+                    // Neither recipient or sender, return
                     if (!isRelevant) return;
 
                     try {
-                        // Fetch enriched message directly from Supabase
-                        const { data, error } = await supabase
-                            .from("messages")
-                            .select(`
-                                *,
-                             sender:users!messages_sender_id_fkey (*),
-                             attachments:PrivateMessagesAttachment(*)
-                                `)
-                            .eq("id", newMessage.id)
-                            .single();
+                        // Recipient or sender, fetch enriched message
+                        const res = await fetch(`${API_URL}/messages/new/private/${newMessage.id}`);
+                        const data = await res.json();
 
-                        if (error) {
-                            console.error("Error fetching message:", error);
-                        } else {
-                            console.log("Fetched message with attachments:", data);
-                        }
-
+                        // Add message to conversation
                         setMessages(prev => {
-                            const exists = prev.some(msg => msg.id === data.id);
-                            if (exists) {
-                                console.log("Message already exists, skipping:", data.id);
-                                return prev;
-                            }
-
-                            const updated = [...prev, data];
-                            updated.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                            console.log("Message added:", data);
-                            return updated;
+                            const alreadyExists = prev.some(msg => msg.id === data.id);
+                            if (alreadyExists) return prev;
+                            return [...prev, data];
                         });
 
-                        const audio = new Audio('notification.mp3');
-                        await audio.play();
-
+                        await soundEffect(); // Play sound effect
                     } catch (err) {
-                        console.error("Error fetching private message via Supabase:", err);
+                        console.error("Error fetching private message:", err);
                     }
                 }
             );
         }
 
+        // Subscribe to the new real-time channel to start listening for events (like new messages)
         newChannel.subscribe();
+
         setChannel(prevChannel => {
+            // If there's an existing channel (from a previous conversation), remove it to prevent duplicate listeners
             if (prevChannel) {
                 supabase.removeChannel(prevChannel);
             }
+
+            // Set the new channel as the active one
             return newChannel;
         });
 
+
+        // Cleanup function for when the component unmounts or dependencies (like groupChat or receiver) change
+        // This ensures that the old channel is properly unsubscribed from to avoid memory leaks or duplicate event
         return () => {
             supabase.removeChannel(newChannel);
         };
@@ -148,45 +146,46 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
     }, [groupChat, receiver]);
 
 
+    // Parse the messages into an array of messages to be displayed
     const renderedMessages = useMemo(() => {
-        const rendered = [];
-        let lastDate = null;
+        const rendered = []; // Array of rendered messages
+        let lastDate = null; // Track the date of the messages
 
-            messages.forEach((message) => {
-                const currDate = moment.utc(message.created_at).tz("Europe/Stockholm");
+        // Loop through the message
+        messages.forEach((message) => {
 
-                const isNewDay =
-                    !lastDate ||
-                    currDate.year() !== lastDate.year() ||
-                    currDate.month() !== lastDate.month() ||
-                    currDate.date() !== lastDate.date();
+            const currDate = moment.utc(message.created_at).tz("Europe/Stockholm"); // Set the current time to now
 
-                if (isNewDay) {
-                    const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY');
+            // This is used for checking if the message was sent during the same day or not, if so content, else add a MessageSplitter
+            const isNewDay =
+                !lastDate ||
+                currDate.year() !== lastDate.year() ||
+                currDate.month() !== lastDate.month() ||
+                currDate.date() !== lastDate.date();
 
-                    rendered.push(
-                        <MessageSplitter key={`split-${message.id}`} date={formattedDate}/>
-                    );
-                    lastDate = currDate;
-                }
 
+            if (isNewDay) { // New day, insert a MessageSplitter component in the chat window
+                const formattedDate = currDate.locale('sv').format('dddd D MMMM YYYY');
                 rendered.push(
-                    <MessageCard
-                        key={message.id}
-                        message={message}
-                        content={message.content}
-                        time={message.created_at}
-                        user_id={message.sender_id}
-                        sender={message.sender}
-                        username={message.sender?.username || message.Sender?.username || "Unknown"}
-                        files={message.attachments || message.AttachedFile || []}
-                    />
+                    <MessageSplitter key={`split-${message.id}`} date={formattedDate}/>
                 );
+                lastDate = currDate; //
+            }
+
+            rendered.push(
+                <MessageCard
+                    key={message.id}
+                    message={message}
+                    content={message.content}
+                    time={message.created_at}
+                    user_id={message.sender_id}
+                    sender={message.sender}
+                    username={message.sender?.username || message.Sender?.username || "Unknown"}
+                    files={message.attachments || message.AttachedFile || []}/>);
             });
+
             return rendered;
     }, [messages]);
-
-
 
 
     return (
@@ -194,41 +193,48 @@ export const DashboardChatWindow = ({setReceiver, moreUsers,
         <section className={`dashboard-chat-window ${showMinibar ? "" : "stretch"} ${showChatWindow ? '' : 'hide'} } `}>
                 <>
                     <div className={`dashboard-message-container`}>
-                        {showNewMessage ? (
+
+                        {showNewMessage ? ( // If users click on write a new message, display that component instead
                             <NewMessage moreUsers={moreUsers} userFriends={userFriends}
                                         receivers={receivers} setReceivers={setReceivers} />
                             ) : (
-                               <ConversationHeader />
-                        )}
+                               <ConversationHeader/>
+                            )
+                        }
 
                         <div className="dashboard-message-content">
-                            {showNewMessage ? (
-                                <GroupMemberInfo receivers={receivers}/>
+                            {showNewMessage ? ( // If users wants to write a new message, show the recipients that are updated in realtime
+                                <RecipientsOfNewMessage receivers={receivers}/>
                             ) : (
                                 <>
-                                    {loadingMessages ? (
+                                    {loadingMessages ? ( // Are messages done loading, if not show loading animation
                                         <>
+                                            {/* Mock up grey squares */}
                                             <div className="loading-messages-card"/>
                                             <div className="loading-messages-card"/>
+
                                             <div className="loading-messages-card"/>
                                             <div className="loading-messages-card"/>
                                         </>
                                     ) : (
+                                        // Messages done loading, display in chat
                                         <>
-                                        {renderedMessages}
-                                        <div ref={messagesEndRef} />
+                                            {/* Messages from in the conversation */}
+                                            {renderedMessages}
+
+                                            {/* This is used for automatically scrolling down for new message */}
+                                            <div ref={messagesEndRef} />
                                         </>
                                     )}
                                 </>
                             )}
                         </div>
-
                     </div>
 
+                    {/* This is the component where the enters the message, the input area */}
                     <DashboardMessageArea
                         setReceiver={setReceiver} setReceivers={setReceivers}
-                        receivers={receivers} receiver={receiver}
-                    />
+                        receivers={receivers} receiver={receiver}/>
                 </>
         </section>
     );

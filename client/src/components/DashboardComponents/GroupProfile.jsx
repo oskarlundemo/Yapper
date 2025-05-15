@@ -15,7 +15,7 @@ import {useDashboardContext} from "../../context/DashboardContext.jsx";
 export const GroupProfile = ({headerName}) => {
 
     const {user} = useAuth();
-    const {API_URL, currentGroupInfo, showGroupMembers} = useDashboardContext();
+    const {API_URL, currentGroupInfo, groupChat, showGroupMembers} = useDashboardContext();
 
 
     const [description, setDescription] = useState('');
@@ -27,7 +27,7 @@ export const GroupProfile = ({headerName}) => {
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState(currentGroupInfo?.name || '');
     const [groupNameCharCount, setGroupNameCharCount] = useState(0);
-    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
+    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat, setChatName} = useDynamicStyles();
 
 
     useEffect(() => {
@@ -115,6 +115,7 @@ export const GroupProfile = ({headerName}) => {
         formData.append('avatar', newAvatar);
         formData.append('description', description);
         formData.append('groupName', groupName);
+        formData.append('groupChat', groupChat);
 
         try {
             await fetch(`${API_URL}/groups/update/${currentGroupInfo.id}`, {

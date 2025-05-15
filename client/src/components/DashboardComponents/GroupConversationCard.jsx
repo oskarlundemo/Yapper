@@ -5,7 +5,7 @@ import '../../styles/Dashboard/ConversationCard.css'
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {supabase} from "../../services/supabaseClient.js";
-import  {parseLatestTimestamp} from "./PrivateConversationCard.jsx";
+import {parseLatestMessage, parseLatestTimestamp} from "../../services/helperFunctions.js";
 import {GroupAvatar} from "./GroupAvatar.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
@@ -13,8 +13,7 @@ import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 export const GroupConversationCard = ({
                                           groupId = 0, latestGroupMessage,
-                                          setAllConversations, setLatestGroupMessage,
-                                          latestMessage = null,
+                                          setAllConversations, latestMessage = null,
                                           group = null,
                                       }) => {
 
@@ -100,8 +99,9 @@ export const GroupConversationCard = ({
         <div onClick={() => {
             showChatWindow();
             inspectGroupChat(groupId, groupName);
-            clickOnChat();
-        }}  className="conversation-card">
+            clickOnChat();}}
+             className="conversation-card">
+
             <div className="conversation-card-avatar">
                 <GroupAvatar group={group} height={40} width={40} />
             </div>
@@ -132,15 +132,4 @@ export const GroupConversationCard = ({
 }
 
 
-export const parseLatestMessage = (message) => {
-    if (message.AttachedFile?.length > 0) {
-        return 'Sent a file'
-    } else if(message.content?.includes('giphy.com')) {
-        return 'Sent a GIF '
-    } else if (message.content?.length > 20 && message.content) {
-        const subString = message.content.substring(0, 20);
-        const lastSpace = subString.lastIndexOf(' ');
-        return message.content.substring(0, lastSpace) + '...';
-    }
-    return message.content;
-}
+

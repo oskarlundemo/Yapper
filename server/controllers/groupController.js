@@ -1,4 +1,5 @@
 import {prisma} from "../prisma/index.js";
+import {deleteOldAvatar, saveNewAvatar} from "./supabaseController.js";
 
 
 
@@ -380,12 +381,25 @@ export const updateGroupAvatar = async (req,res, next) => {
 
         // If there is no file, continue
         if (req.file) {
+
+            const groupID = parseInt(req.params.groupId);
+
+            const oldAvatar = await prisma.groupChats.findUnique({
+                where: {
+                    id: groupID
+                }
+            })
+
+            await deleteOldAvatar(req, res, oldAvatar.avatar);
+
+            const uniqueFileName = await saveNewAvatar(req, res); // Else save the avatar to Supabase (call to supabaseController.js)
+
             await prisma.groupChats.update({
                 data: {
-                    avatar: req.file.originalname,
+                    avatar: uniqueFileName,
                 },
                 where: {
-                    id: parseInt(req.params.groupId),
+                    id: groupID,
                 }
             })
             res.status(200).json({message: "Group updated successfully"});

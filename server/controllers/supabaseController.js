@@ -26,10 +26,6 @@ import {prisma} from "../prisma/index.js";
  */
 
 
-
-
-
-
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_KEY
@@ -38,6 +34,45 @@ const supabase = createClient(
 export { supabase };
 
 
+
+/**
+ *
+ * 1. This function is used for deleting old avatars from group and user pictures on Supabase, triggered
+ *    in the updateUserAvatar and updateGroupAvatar functions in usersController.js respectively groupController
+ *
+ * 2. It expects that the path to the old avatar is sent through the parameter, since it that we are deleting
+ *
+ * @param req
+ * @param res
+ * @returns {Promise<*|{message: string}>}
+ */
+
+
+
+
+export const deleteOldAvatar = async (req, res, oldAvatar) => {
+
+    // No old avatar? Return
+    if (!oldAvatar) {
+        return;
+    }
+
+    const folderSelector = req.body.groupChat === 'true' ? 'groupAvatars' : 'userAvatars'; // Is it a group avatar or user avatar
+    const filePath = `${folderSelector}/${oldAvatar}`; // Path to the old file in Supabase
+
+
+    const { data, error } = await supabase
+        .storage
+        .from('yapper')
+        .remove([filePath]); // Delete at this path
+
+    if (error) {
+        console.error("Delete Error:", error.message); // If any errors, display then
+        return { message: 'Error deleting avatar' };
+    }
+
+    return { message: 'Successfully deleted old avatar' };
+};
 
 /**
  *
@@ -55,134 +90,33 @@ export { supabase };
 
 
 
-export const saveAvatar = async (req, res) => {
+export const saveNewAvatar = async (req, res) => {
+
     if (!req.file) {  // If there is no file, return
-        return res.status(400).json({ message: "No file uploaded" });
+        return {message: 'No file uploaded.'};
     }
 
-    const filePath = `avatars/${req.file.originalname}`; // Parse the path
+    const uniqueFileName = `${uuidv4()}-${slugify(req.file.originalname, { lower: true, strict: true })}`;
+    const folderSelector = req.body.groupChat === 'true' ? 'groupAvatars' : 'userAvatars';
+
+    const filePath = `${folderSelector}/${uniqueFileName}`; // Parse the path
     const fileMimeType = req.file.mimetype; // Parse the type
 
-    try {
-        const { data, error } = await supabase
-            .storage
-            .from('yapper') // Update to bucket yapper
-            .upload(filePath, req.file.buffer, {
-                contentType: fileMimeType,
-                cacheControl: '3600',
-                upsert: true,
-            });
-
-        if (error) {
-            console.error("Upload Error:", error.message);
-            return { message: 'Error saving image' };
-        }
-
-        return { message: 'Thumbnail saved successfully' };
-    } catch (err) {
-        console.error("Unexpected Error Uploading File:", err);
-        return res.status(500).json({ error: "Internal server error while uploading file" });
-    }
-};
-
-
-/**
- * 1. This function is used for updating the avatar of a group chat. Which is triggered in the
- *    updateGroupAvatar function in the groupController.js
- *
- * 2. It only expects that the file itself is passed down through multer in the request parameter
- *
- * 3. 500: Server error, log it and display
- *    400: No files uploaded
- *
- * @param req
- * @param res
- * @param next
- * @returns {Promise<*|{message: string}>}
- */
-
-export const saveGroupAvatar = async (req, res, next) => {
-
-    if (!req.file) { // If there is no file, return
-        return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const filePath = `groupavatars/${req.file.originalname}`; // Parse the path
-    const fileMimeType = req.file.mimetype; // Parse the type
-
-    try {
-        const {data, error} = await supabase
-            .storage
-            .from('yapper') // To bucket
-            .upload(filePath, req.file.buffer, {
-                contentType: fileMimeType,
-                cacheControl: '3600',
-                upsert: true,
-            });
-
-        if (error) {
-            console.error("Upload Error:", error.message);
-        }
-
-        next()
-        return { message: 'Group avatar successfully updated' };
-
-    } catch (err) {
-        console.error("Unexpected Error Uploading File:", err);
-        return res.status(500).json({ error: "Internal server error while uploading file" });
-    }
-
-}
-
-
-/**
- *
- *
- *
- *
- *
- *
- *
- */
-
-
-export const saveFilesFromConversations = async (req) => {
-    if (!req.files || req.files.length === 0) return;
-
-    const folderSelector = req.body.group ? 'groupConversations' : 'privateConversations';
-
-    // Process each file
-    for (const file of req.files) {
-        const uniqueFileName = `${uuidv4()}-${slugify(file.originalname, { lower: true, strict: true })}`;
-        const filePath = `${folderSelector}/${uniqueFileName}`;
-
-        // Upload file to Supabase storage
-        const { error } = await supabase.storage.from('yapper').upload(filePath, file.buffer, {
-            contentType: file.mimetype,
+    const { data, error } = await supabase
+        .storage
+        .from('yapper') // Update to bucket yapper
+        .upload(filePath, req.file.buffer, {
+            contentType: fileMimeType,
             cacheControl: '3600',
             upsert: true,
         });
 
-        if (error) {
-            console.error("Upload Error:", error.message);
-            throw new Error('Error saving file to storage');
-        }
-
-        const baseData = {
-            message_id: req.messageID,
-            path: filePath,
-            originalName: file.originalname,
-            uniqueFileName: uniqueFileName,
-            size: file.size,
-        };
-
-        // Save attachments to the database
-        if (req.body.group) {
-            await prisma.groupMessagesAttachment.create({ data: baseData });
-        } else {
-            await prisma.privateMessagesAttachment.create({ data: baseData });
-        }
+    if (error) {
+        console.error("Upload Error:", error.message);
+        return { message: 'Error saving avatar' };
     }
+
+    return uniqueFileName;
 };
 
 
@@ -198,44 +132,49 @@ export const saveFilesFromConversations = async (req) => {
  *    400: No files uploaded
  *
  * @param req
- * @param res
+ * @param messageId
  * @returns {Promise<*|{message: string}>}
  */
 
 
-export const saveFiles = async (req, res) => {
+export const saveFilesFromConversations = async (req, messageId) => {
+    if (!req.files || req.files.length === 0) return [];
 
-    try {
-        if (!req.files) { // If there are no files, return
-            return res.status(400).json({ message: "No file uploaded" });
+    const isGroupChat = req.body.groupChat === 'true';
+
+    const folderSelector = isGroupChat ? 'groupConversations' : 'privateConversations';
+    const fileEntries = [];
+
+    for (const file of req.files) {
+        const uniqueFileName = `${uuidv4()}-${slugify(file.originalname, { lower: true, strict: true })}`;
+        const filePath = `${folderSelector}/${uniqueFileName}`;
+
+        const { error } = await supabase.storage.from('yapper').upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+            cacheControl: '3600',
+            upsert: true,
+        });
+
+        if (error) {
+            console.error("Upload Error:", error.message);
+            throw new Error('Error saving file to storage');
         }
 
-        const files = req.files; // Get files
-
-        for (const file of files) { // Upload each file
-
-            const filePath = `files/${file.originalname}`;  // Destination
-            const fileMimeType = file.mimetype; // Type
-
-            const {data, error} = await supabase
-                .storage
-                .from('yapper') // To bucket
-                .upload(filePath, file.buffer, {
-                    contentType: fileMimeType,
-                    cacheControl: '3600',
-                    upsert: true,
-                })
-
-            if (error) {
-                console.error("Upload Error:", error.message);
-                return { message: 'Error saving file' };
-            }
-        }
-    }  catch (err) {
-        console.error("Unexpected Error Uploading File:", err);
-        return res.status(500).json({ error: "Internal server error while uploading file" });
+        fileEntries.push({
+            message_id: messageId,
+            path: filePath,
+            originalName: file.originalname,
+            uniqueFileName: uniqueFileName,
+            size: file.size,
+        });
     }
-}
+
+    return fileEntries;
+};
+
+
+
+
 
 
 

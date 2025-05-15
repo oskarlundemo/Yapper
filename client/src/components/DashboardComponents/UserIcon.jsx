@@ -6,7 +6,7 @@ import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
 
-export const DashboardMenu = ({ }) => {
+export const UserIcon = ({ }) => {
     const { logout, user } = useAuth();
 
     const {showUserMenu, clickOnProfile}= useDynamicStyles();

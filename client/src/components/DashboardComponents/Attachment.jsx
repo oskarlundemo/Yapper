@@ -4,21 +4,37 @@
 import '../../styles/Dashboard/Attachments.css'
 import {supabase} from "../../services/supabaseClient.js";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
-import {useEffect} from "react";
+
+
+/**
+ * This components is used for rendering attachments inside the DashboardChatwindow.jsx component
+ * once a user sends a message with files attached, so users also can download down from the chat
+ *
+ * @param file The file that will be rendered
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const Attachment = ({file}) => {
 
+
+    const {groupChat} = useDashboardContext(); // Check if the file was sent in a group chat or private conversation
+
+
+    // Function for downloading files from the chat
     const downloadFile = async (path) => {
 
-        const folderSelector = groupChat ? 'groupConversations' : 'privateConversations'
 
+        const folderSelector = groupChat ? 'groupConversations' : 'privateConversations'; // Selects the endpoint where to fetch the files from in Supabase
+
+        // Supabase client
         const {data, error} = await supabase
             .storage
             .from('yapper')
             .download(`${folderSelector}/${path}`)
 
-        const url = URL.createObjectURL(data)
+        const url = URL.createObjectURL(data) // Create a temporary URL for the blob so it can be downloaded like a normal file
         const a = document.createElement('a');
         a.href = url;
         a.download = path;
@@ -28,10 +44,6 @@ export const Attachment = ({file}) => {
 
         URL.revokeObjectURL(url);
     }
-
-
-
-    const {groupChat} = useDashboardContext();
 
     return (
         <div className="attachment">
