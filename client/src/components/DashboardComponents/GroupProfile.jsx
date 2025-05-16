@@ -27,7 +27,7 @@ export const GroupProfile = ({headerName}) => {
     const [groupNameChannel, setGroupNameChannel] = useState(null);
     const [groupName, setGroupName] = useState(currentGroupInfo?.name || '');
     const [groupNameCharCount, setGroupNameCharCount] = useState(0);
-    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat, setChatName} = useDynamicStyles();
+    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
 
 
     useEffect(() => {

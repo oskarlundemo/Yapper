@@ -1,61 +1,95 @@
 import {useEffect, useState} from "react";
 import '../../styles/Dashboard/GifContainer.css'
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
+import {useAuth} from "../../context/AuthContext.jsx";
 
-export const GifContainer = ({ showGifs, setShowGifs, groupChat, API_URL, setReceivers, receivers, sender, receiver }) => {
-    const [gifs, setGifs] = useState([]);
-    const [gifSearch, setGifSearch] = useState("");
-    const [loading, setLoading] = useState(false);
 
-    const apiKey = import.meta.env.VITE_GIPHY_API_KEY;
-    const limit = 10;
+/**
+ * This component is used for showing the Gif container where users
+ * can send gifs to each other
+ *
+ *
+ * @param showGifs  // State to toggle the pop-up window
+ * @param setShowGifs // Set the state to toggle the pop-up window
+ * @param setReceivers // Set the recipients of the message
+ * @param receivers   // Recipients of a new message
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
+
+
+
+export const GifContainer = ({ showGifs, setShowGifs,
+                                 setReceivers, receivers}) => {
+
+
+    const {groupChat, API_URL, receiver} = useDashboardContext();
+    const {user} = useAuth();
+
+    const [gifs, setGifs] = useState([]);  // Array to hold the gifs
+    const [gifSearch, setGifSearch] = useState("");  // Search string for gifs
+    const [loading, setLoading] = useState(false);  // Set loading state for gifs
+
+    const apiKey = import.meta.env.VITE_GIPHY_API_KEY;  // Get API key from .env
+    const limit = 10;  // Limit the gifs to 10
+
+    // This hook is triggered on mount, popularising the gif array with some trending gifs
     useEffect( () => {
+
+        // Set array of gifs to trending
         const setTrendingGifs = async () => {
+            // Set loading of gifs
             setLoading(true);
             try {
-                const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=${limit}`);
+                const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=${limit}`); // Fetch from GiphyAPI
                 const data = await response.json();
-                setGifs(data.data);
-                setLoading(false);
+                setGifs(data.data); // Set the array with the data
+                setLoading(false); // Set loading false
             } catch (err) {
-                console.log(err);
-                setLoading(false);
+                console.log(err); // If error log it
+                setLoading(false); // Also set false
             }
         }
-        setTrendingGifs();
+        setTrendingGifs();  // Call on mount
     }, [])
 
 
+    // This function is used for fetching new gifs the user hits enter
     const fetchGifs = async (query) => {
         try {
-            setLoading(true);
-            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${query}&limit=${limit}`);
+            setLoading(true); // Set to loading
+            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${query}&limit=${limit}`); // Fetch grom GiphyAPI
             const data = await response.json();
-            setGifs(data.data);
-            setLoading(false);
+            setGifs(data.data); // Set array with new gifs
+            setLoading(false); // Set loading to false
         } catch (error) {
             console.error("Failed to fetch gifs", error);
         }
     };
 
 
+    // This function is used for handeling new submits
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Make sure the users does not send empty strings before fetching
         if (gifSearch.trim().length > 0)
             fetchGifs(gifSearch);
     }
 
+    // This function is used for sending GIFs to other users
     const sendGif = async (gif) => {
-        setShowGifs(false);
+        setShowGifs(false); // Toggle the gif container
         try {
-            await fetch(`${API_URL}/messages/gif/${sender}/${receiver}`, {
+            await fetch(`${API_URL}/messages/gif/${user.id}/${receiver}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ gif, groupChat, receivers}),
             });
-            setReceivers([]);
+            setReceivers([]); // Set the recipients of the message to null, since GIF was sent
         } catch (err) {
             console.error("Message send error:", err);
         }

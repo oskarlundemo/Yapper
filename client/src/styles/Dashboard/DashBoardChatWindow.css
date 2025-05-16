@@ -99,7 +99,7 @@
     border: none;
 }
 
-.message-card {
+.message-inputarea {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -108,7 +108,7 @@
     margin: 1rem;
 }
 
-.message-card-body {
+.message-inputarea-body {
     display: flex;
     width: 50%;
     justify-content: space-between;
@@ -142,11 +142,11 @@
     }
 }
 
-.message-card-body:has(input:focus-within) {
+.message-inputarea-body:has(input:focus-within) {
     border: 1px solid var(--accent-color);
 }
 
-.message-area-icons {
+.message-inputarea-icons {
     display: flex;
     justify-content: center;
     position: relative;

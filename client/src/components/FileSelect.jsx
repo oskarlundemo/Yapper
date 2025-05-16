@@ -1,15 +1,17 @@
 import {useRef, useState} from "react";
 import '../styles/Dashboard/FileSelect.css'
 
-export const FileSelect = ({handleFileAdd}) => {
+export const FileSelect = ({files, setFiles}) => {
 
-    const [file, setFile] = useState(null);
     const fileInputRef = useRef(null);
 
-    const handleFileChange = (event) => {
-        const selectedFile = event.target.files[0];
-        setFile(selectedFile);
-    };
+    // This function is used for adding files to the array that will be sent to the DB
+    const handleFileAdd = (e) => {
+        if (e.target.files[0].name) {
+            const selectedFile = e.target.files[0];
+            setFiles([...files, selectedFile]); // Append file to array
+        }
+    }
 
     const handleButtonClick = () => {
         fileInputRef.current.click();

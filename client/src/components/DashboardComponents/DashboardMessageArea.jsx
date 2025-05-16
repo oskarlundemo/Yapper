@@ -6,18 +6,38 @@ import {FileContainer} from "./FileContainer.jsx";
 import '../../styles/Dashboard/FileContainer.css'
 import {supabase} from "../../services/supabaseClient.js";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
+import {MessageInputArea} from "./DashboardMessageAreaComponents/MessageInputArea.jsx";
+import {MessageIconArea} from "./DashboardMessageAreaComponents/MessageIconArea.jsx";
+
+
+/**
+ *
+ * This component is the input area where the user interact with the conversation,
+ * sending messages, gifs or files
+ *
+ * @param receiver // The recipient of the message
+ * @param miniBar // Bool that toggles information about the opposite user / or group in the conversation
+ * @param setReceivers // Set array of recipient that is used when a user entities a new group or private conversation
+ * @param receivers // Array of recipient that is used when a user entities a new group or private conversation
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 export const DashboardMessageArea = ({receiver, miniBar, setReceivers, receivers}) => {
 
-    const {user} = useAuth();
-    const [message, setMessage] = useState('');
-    const [gifs, showGifs] = useState(false);
-    const [files, setFiles] = useState([]);
+
+    const {user} = useAuth(); // Get user token from context
+    const [message, setMessage] = useState('');  // The message user is sending
+    const [gifs, showGifs] = useState(false);  // Toggle the GIF pop-up container
+    const [files, setFiles] = useState([]); // Array of attached files in message
 
     const {groupChat, API_URL, loadingMessages, friend, setFriend} = useDashboardContext();
 
+    // This hook is used for updating the friendship once a user answers a new user, automatically becoming friend and removing the hint
     useEffect(() => {
         if (!user) return
+
+        // Listen for new friendships
         const newChannel = supabase
             .channel('friendship-chanel')
             .on(
@@ -29,6 +49,8 @@ export const DashboardMessageArea = ({receiver, miniBar, setReceivers, receivers
                 },
                 async (payload) => {
                     const friendship = payload.new;
+
+                    // If the user either sent the request or received the request, add them as a friend
                     if (friendship.user_id === user.id || friendship.friend_id === user.id) {
                         setFriend(true);
                     }
@@ -36,12 +58,14 @@ export const DashboardMessageArea = ({receiver, miniBar, setReceivers, receivers
             )
             .subscribe();
 
+        // Close channel and clean up
         return () => {
             supabase.removeChannel(newChannel);
         };
     }, [user?.id])
 
 
+    // This function triggers once a user answers a message from a contact that is not their friend
     const acceptFriendRequest = async () => {
         if (!receiver) return;
         await fetch(`${API_URL}/friends/accept/request/${receiver}/${user.id}`, {
@@ -52,99 +76,89 @@ export const DashboardMessageArea = ({receiver, miniBar, setReceivers, receivers
         })
     }
 
+    // This function handles the submit once user hits enter or send
     const handleSubmit = async (e) => {
         e.preventDefault();
 
 
-        if (!receiver && receivers.length === 0) {
+        if (!receiver && receivers.length === 0) { // If there is no set receiver, prevent send
             return;
         }
 
-        const formData = new FormData();
+        const formData = new FormData(); // Create formdata so we can attach files instead of JSON.string
 
+        // For all the files in the message, add them to the formdata
         files.forEach(file => {
             formData.append('files', file);
         });
 
-        formData.append('receivers', JSON.stringify(receivers));
-        formData.append('groupChat', groupChat);
-        formData.append('message', message);
+        formData.append('receivers', JSON.stringify(receivers)); // Add the array or receivers
+        formData.append('groupChat', groupChat); // Add the check whether the conversation is a group chat or not
+        formData.append('message', message); // Append the message written by the user
 
         try {
+            // POST the new message to DB
             await fetch(`${API_URL}/messages/conversation/${user.id}/${receiver}`, {
                 method: "POST",
                 body: formData
             });
 
-            setMessage("");
-            setFiles([]);
-            setReceivers([]);
+            setMessage(""); // Clear message box
+            setFiles([]);   // Empty the files
+            setReceivers([]);     // Empty the receivers
         } catch (err) {
             console.error("Message send error:", err);
         }
 
+        // If the user is not a friend and the conversation is not a groupchat, then accept their friend request once they answer
         if (!friend && !groupChat) {
             await acceptFriendRequest();
         }
-        setMessage("");
-        setReceivers([]);
+        setMessage("");  // Safety set message to empty
+        setReceivers([]); // Safety set array to empty
     };
 
 
-    const handleFileAdd = (e) => {
-        if (e.target.files[0].name) {
-            const selectedFile = e.target.files[0];
-            setFiles([...files, selectedFile]);
-        }
-    }
-
-    const handleFileRemove = (name) => {
-        setFiles(files.filter((f) => f.name !== name));
-    }
 
     return (
-        <div className={`dashboard-message-input ${miniBar ? '' : 'mini'}`}>
-            <div className="message-card">
 
+        <div className={`dashboard-message-input ${miniBar ? '' : 'mini'}`}> {/* If the minibar is shown, minimize the message area*/}
+
+            <div className="message-inputarea">
+
+                {/* Friends, groupchat and loading message, dont show */}
                 {(!friend && !groupChat && !loadingMessages) && (
                     <div className="friend-request-alert">
                         <p>By answering to a message you automatically become friends</p>
                     </div>
                 )}
 
+                {/* No files? Dont show the container */}
                 {files.length > 0 && (
-                    <FileContainer removeFile={handleFileRemove} files={files}/>
+                    <FileContainer setFiles={setFiles} files={files}/>
                 )}
 
-                <div className="message-card-body">
 
+                <div className="message-inputarea-body">
 
-                    <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            id="message"
-                            name="message"
-                            onChange={e => setMessage(e.target.value)}
-                            value={message}
-                            placeholder="Aa"
-                            autoComplete="off"
-                            spellCheck={true}
-                            autoCorrect="on"
-                        />
-                    </form>
+                    {/* The input field where they write their message */}
+                    <MessageInputArea
+                        handleSubmit={handleSubmit}
+                        message={message}
+                        setMessage={setMessage}
+                    />
 
-                    <div className={'message-area-icons'}>
+                    {/* Icons where they can send files or gifs */}
+                    <MessageIconArea
+                        receivers={receivers}
+                        handleSubmit={handleSubmit}
+                        files={files}
+                        setFiles={setFiles}
+                        gifs={gifs}
+                        setReceivers={setReceivers}
+                        showGifs={showGifs}
+                    />
 
-                        <svg onClick={(e) => handleSubmit(e)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
-
-                        <GifContainer receivers={receivers} setReceivers={setReceivers} groupChat={groupChat} API_URL={API_URL} receiver={receiver} sender={user.id} showGifs={gifs} setShowGifs={showGifs} />
-
-                        <FileSelect handleFileAdd={handleFileAdd} />
-
-                        <svg onClick={() => showGifs(!gifs)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm240-160h60v-240h-60v240Zm-160 0h80q17 0 28.5-11.5T400-400v-80h-60v60h-40v-120h100v-20q0-17-11.5-28.5T360-600h-80q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm280 0h60v-80h80v-60h-80v-40h120v-60H560v240ZM200-200v-560 560Z"/>
-                        </svg>
-                    </div>
                 </div>
             </div>
         </div>
