@@ -46,7 +46,6 @@ export const DashboardConversations = ({}) => {
         setFilteredConversations(allConversations);
     }, [allConversations]);
 
-
     // This function is triggered once the user first loggs in, basically inspecting the latest conversions they interacted with
     const inspectLatestChat = (latestChat) => {
         if (latestChat?.group) {   // If the latest chat is a group chat, inspect it

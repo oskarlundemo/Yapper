@@ -1,8 +1,6 @@
 import {GifContainer} from "../GifContainer.jsx";
 import {FileSelect} from "../../FileSelect.jsx";
 
-import {useAuth} from "../../../context/AuthContext.jsx";
-
 
 export const MessageIconArea = ({receivers, handleSubmit, files, setFiles, showGifs, gifs, setReceivers}) => {
 

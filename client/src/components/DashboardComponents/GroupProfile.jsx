@@ -11,6 +11,20 @@ import '../../styles/Dashboard/GroupProfile.css'
 import {supabase} from "../../services/supabaseClient.js";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
 import {useDashboardContext} from "../../context/DashboardContext.jsx";
+import {subscribeToChannel} from "../../services/helperFunctions.js";
+import {GroupNameInput} from "./GroupProfileComponents/GroupNameInput.jsx";
+import {DescriptionForm} from "./GroupProfileComponents/DescriptionForm.jsx";
+
+
+/**
+ * This component is used for showing the info of a group chat, its name, members
+ * and description
+ *
+ * @param headerName
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 export const GroupProfile = ({headerName}) => {
 
@@ -18,23 +32,17 @@ export const GroupProfile = ({headerName}) => {
     const {API_URL, currentGroupInfo, groupChat, showGroupMembers} = useDashboardContext();
 
 
-    const [description, setDescription] = useState('');
-    const [file, setFile] = useState(null)
-    const [newAvatar, setNewAvatar] = useState(null)
-    const [disabledDescription, setDisabledDescription] = useState(true)
-    const [saveChanges, setSaveChanges] = useState(false)
-    const [descriptionCharsCount, setDescriptionCharsCount] = useState(0)
-    const [groupNameChannel, setGroupNameChannel] = useState(null);
-    const [groupName, setGroupName] = useState(currentGroupInfo?.name || '');
-    const [groupNameCharCount, setGroupNameCharCount] = useState(0);
-    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();
+    const [description, setDescription] = useState('');                      // The description / bio of the group chat
+    const [file, setFile] = useState(null)                                          // Set the file of the group chat avatar
+    const [newAvatar, setNewAvatar] = useState(null)                                // Set and update the new avatar
+    const [disabledDescription, setDisabledDescription] = useState(true)   // Disable the description for new input
+    const [saveChanges, setSaveChanges] = useState(false)                  // State for setting saved changes
+    const [descriptionCharsCount, setDescriptionCharsCount] = useState(0)  // Updating the number of chars in the description
+    const [groupName, setGroupName] = useState(currentGroupInfo?.name || '');       // This is used for setting the name of the group
+    const [groupNameCharCount, setGroupNameCharCount] = useState(0);       // This is used for keeping track of group name
+    const {showMinibar, setShowMinibar, phoneUI, clickBackToChat} = useDynamicStyles();       // These are bools used for updating the UI based on device
 
-
-    useEffect(() => {
-        setDescriptionCharsCount(description.length);
-    }, [description]);
-
-
+    // This hook sets the group description if there is one, else just 'No description'
     useEffect(() => {
         if (currentGroupInfo?.description && currentGroupInfo.description !== 'null') {
             setDescription(currentGroupInfo.description);
@@ -44,67 +52,56 @@ export const GroupProfile = ({headerName}) => {
         setGroupName(currentGroupInfo?.name || '');
     }, [currentGroupInfo]);
 
-
-
+    // This hook is used for setting the name of the group chat
     useEffect(() => {
         setGroupName(currentGroupInfo?.name);
     }, [currentGroupInfo]);
 
+    // This hook is used for listening to updated description of group chats, so they are seen in realtime
     useEffect(() => {
         if (!user?.id || !currentGroupInfo?.id) return;
 
-        const channelName = `updateGroupProfile-${user.id}-${currentGroupInfo.id}`;
-        const newChannel = supabase
-            .channel(channelName)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'GroupChats',
-                },
-                async (payload) => {
+        const updatedGroupDescription = subscribeToChannel(
+            `updatedGroupDescription-${currentGroupInfo?.id}`,
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'GroupChats'
+            },
+            async (payload) => {
+                const group = payload.new;
 
-                    const group = payload.new;
-
-                    if (group.id === group.id) {
-                        setDescription(group.description);
-                        headerName(group.name)
-                    }
+                if (group.id === group.id) {
+                    setDescription(group.description);
+                    headerName(group.name)
                 }
-            )
-            .subscribe();
-
-        setGroupNameChannel((prevChannel) => {
-            if (prevChannel) {
-                supabase.removeChannel(prevChannel);
             }
-            return newChannel;
-        });
+        )
+
         return () => {
-            supabase.removeChannel(newChannel);
+            supabase.removeChannel(updatedGroupDescription);
         };
     }, [user.id, currentGroupInfo]);
 
 
-
-
+    // This hook is used for setting the description
     useEffect(() => {
         setDescription(currentGroupInfo?.description || '')
     }, [currentGroupInfo])
 
 
-
+    // This hook keeps tracks of the length of the description so it does not proceed 50 chars
     useEffect(() => {
         setDescriptionCharsCount(description?.length)
     }, [description])
 
-
+    // This hook keeps tracks of the length of the group name so it does not proceed 15 chars
     useEffect(() => {
         setGroupNameCharCount(groupName?.length)
     }, [groupName])
 
 
+    // This function is used for submitting new changes
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -123,22 +120,30 @@ export const GroupProfile = ({headerName}) => {
                 body: formData
             })
         } catch (err) {
-            console.log(err)
+            console.log('Error updating group profile');
         }
     }
 
+    // This function is used for updating state of the group name
     const handleGroupNameChange = (e) => {
         setGroupName(e.target.value);
     };
 
-
+    // This function is used for updating the state of the description
     const handleDescriptionInputChange = (e) => {
-        if (description.length > 50) {
+        if (description.length > 50) { // If the description is longer than 50 chars, prevent further input
             e.preventDefault();
             return
         }
         setDescription(e.target.value);
     }
+
+
+    useEffect(() => {
+        if (disabledDescription) {
+            setDescription(currentGroupInfo?.description || '');
+        }
+    }, [currentGroupInfo]);
 
 
     return (
@@ -149,79 +154,55 @@ export const GroupProfile = ({headerName}) => {
             ) : (
                 <svg className={'cross-icon'} onClick={() => setShowMinibar(false)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
             )}
-            <div className="user-profile-info">
 
-                <div className={'user-avatar'}>
-                    <GroupAvatar user={user} group={currentGroupInfo} width={100} height={100} setSaveChanges={setSaveChanges} setNewAvatar={setNewAvatar} selectPicture={true} setFile={setFile} file={file} />
+            <div className="chat-info">
+
+                <div className='chat-avatar'>
+                    <GroupAvatar user={user}
+                                 group={currentGroupInfo} width={100} height={100}
+                                 setSaveChanges={setSaveChanges} setNewAvatar={setNewAvatar}
+                                 selectPicture={true} setFile={setFile} file={file}/>
                 </div>
 
-                <div className={'user-info'}>
+                <div className='user-info'>
 
                     {disabledDescription ? (
                         <h2>{groupName || ''}</h2>
                     ) : (
-                        <>
-                        <input className={'group-name-input'}
-                               type={'text'}
-                               value={groupName}
-                               onChange={e => handleGroupNameChange(e)}
-                               onKeyDown={(e) => {
-                                   if (groupName.length >= 15 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                                       e.preventDefault();
-                                   }
-                               }}
-                        />
-                            <p><span>{groupNameCharCount}</span>/15</p>
-                        </>
+                        <GroupNameInput
+                            groupName={groupName}
+                            groupNameCharCount={groupNameCharCount}
+                            handleGroupNameChange={handleGroupNameChange}/>
                     )}
+
+                    {/* The logged-in user is admin, show the input fields to update the description */}
                     {currentGroupInfo?.admin_id === user.id ? (
-                        <form className={'edit-user-info'} onSubmit={(e) => handleSubmit(e)}>
 
-                            {disabledDescription ? (
-                                <p className={'user-bio'}>{description}</p>
-                            ) : (
-                                <>
-                                <textarea value={description}
-                                          placeholder={description}
-                                          disabled={disabledDescription}
-                                          onKeyDown={(e) => {
-                                              if (description.length >= 50 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                                                  e.preventDefault();
-                                              }
-                                          }}
-                                          onChange={(e) => handleDescriptionInputChange(e)}
-                                />
-                                    <p><span>{descriptionCharsCount}</span>/50</p>
-                                </>
-                            )}
+                        <DescriptionForm
+                            saveChanges={saveChanges}
+                            setSaveChanges={setSaveChanges}
+                            setDisabledDescription={setDisabledDescription}
+                            handleDescriptionInputChange={handleDescriptionInputChange}
+                            disabledDescription={disabledDescription}
+                            description={description}
+                            handleSubmit={handleSubmit}
+                            descriptionCharsCount={descriptionCharsCount}
+                        />
 
-                            {disabledDescription ? (
-                                <svg onClick={() => {
-                                    setDisabledDescription(!disabledDescription);
-                                    setSaveChanges(true);
-                                }} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>
-                            ): null}
-
-                            {saveChanges && (
-                                <button
-                                    type="submit">
-                                    Save changes
-                                </button>
-                            )}
-                        </form>
                     ) : (
+                        // Else just show the description
                         <p>{description}</p>
                     )}
 
 
+                    {/* This is just a button to toggle the pop-up window*/}
                     <div className={'group-settings-container'}>
-                        <ul className={'group-settings'}>
-                            <li onClick={() => showGroupMembers(currentGroupInfo)}>Chat members</li>
-                        </ul>
-
+                        <button onClick={() => showGroupMembers(currentGroupInfo)}>
+                            Chat members
+                        </button>
                     </div>
-
                 </div>
+
             </div>
 
         </div>

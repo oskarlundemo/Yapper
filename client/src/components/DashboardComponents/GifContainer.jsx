@@ -95,8 +95,12 @@ export const GifContainer = ({ showGifs, setShowGifs,
         }
     }
 
+
     return (
+
         <div className={`gifContainer-wrapper ${showGifs ? 'show' : ''}`}>
+            {/* Toggle the GIF container based on state */}
+
             <div className="gifContainer-search">
                 <form onSubmit={handleSubmit}>
                     <input
@@ -107,13 +111,17 @@ export const GifContainer = ({ showGifs, setShowGifs,
                     />
                 </form>
 
-                <svg onClick={() => setShowGifs(false)} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
-
+                {/* Click on X icon then close */}
+                <svg onClick={() => setShowGifs(false)}
+                     xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+                     width="24px" fill="#e3e3e3">
+                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
             </div>
 
             <div className="gifContainer-search-result">
 
 
+                {/* If the gifs are loading, show loading animation */}
                 {loading ? (
                     <>
                         <div  className="loading-gif"/>
@@ -121,9 +129,9 @@ export const GifContainer = ({ showGifs, setShowGifs,
                         <div  className="loading-gif"/>
                         <div  className="loading-gif"/>
                         <div  className="loading-gif"/>
-
                     </>
                 ) : (
+                    // For each GIF, print and show
                     (gifs.length > 0 ? (
                             gifs.map((gif, index) => (
                                 <img
@@ -134,8 +142,8 @@ export const GifContainer = ({ showGifs, setShowGifs,
                                 />
                             ))
                         ) : (
-                            <p>No gifs found 😔</p>
-                        ))
+                            <p>No gifs found</p>
+                    ))
                 )}
             </div>
         </div>

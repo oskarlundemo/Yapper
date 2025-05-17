@@ -4,7 +4,14 @@
 import '../../styles/Dashboard/LoadingExample.css'
 
 
-
+/**
+ * This component is just used for loading animations, so it acts like a
+ * grey pulsating square
+ *
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const LoadingExample = () => {

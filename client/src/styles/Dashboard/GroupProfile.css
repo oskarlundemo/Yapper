@@ -1,24 +1,23 @@
 
 
-
-.group-settings {
-    list-style: none;
+.group-settings-container {
     display: flex;
     flex-direction: column;
-    padding: 0;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
 
-    li {
-        list-style: none;
-        padding: 1rem;
-        transition: var(--default-transition);
-        border-radius: var(--border-radius);
-    }
-
-    li:hover {
-        cursor: pointer;
+    button {
         background-color: var(--secondary-color);
+        color: var(--text-color);
+        transition: var(--default-transition);
+
+        &:hover {
+            scale: 1.1;
+        }
     }
 }
+
 
 .group-name-input {
     border: none;

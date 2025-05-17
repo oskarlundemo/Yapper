@@ -1,11 +1,23 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 
+/**
+ * This component is used for displaying the username and avatars
+ * of the users who are receiving the new message
+ *
+ *
+ * @param receivers of the new message
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
 
 export const RecipientsOfNewMessage = ({receivers}) => {
 
-
     return (
         <div className="new-conversation-info">
+            {/* Show all the receivers avatars so it is clear who are in the new conversation*/}
             <div className="avatar-section-new-convo">
                 {receivers.length > 0 &&
                     receivers.map((receiver) => (
@@ -18,6 +30,7 @@ export const RecipientsOfNewMessage = ({receivers}) => {
                 }
             </div>
 
+            {/* Add all their usernames so it is clear who are in the chat */}
             <div className="new-convo-section-username">
                     {receivers.length > 0 &&
                         <h2>
@@ -27,6 +40,4 @@ export const RecipientsOfNewMessage = ({receivers}) => {
             </div>
         </div>
     )
-
-
 }

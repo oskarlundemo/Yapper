@@ -7,13 +7,25 @@ import {YapperLogo} from "../YapperLogo.jsx";
 import {LandingPageNav} from "./LandingPageNav.jsx";
 
 
+/**
+ * This component is just the header of the landing page
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
 export const LandingPageHeader = () => {
 
 
-    const logoRef = useRef(null);
-    const [hasScrolledPast, setHasScrolledPast] = useState(false);
+    const logoRef = useRef(null);  // Reference where to div that decides if user has scrolled past
+    const [hasScrolledPast, setHasScrolledPast] = useState(false); // Set state of scroll
 
+
+    // This hook is used for listening to the scrolls, watching if the logoRef has been intersected or scrolled past and automatically updating the state
     useEffect(() => {
+        // Create a new IntersectionObserver to monitor visibility of an element
         const observer = new IntersectionObserver(
             ([entry]) => {
                 setHasScrolledPast(!entry.isIntersecting);
@@ -25,8 +37,11 @@ export const LandingPageHeader = () => {
         );
 
         const currentRef = logoRef.current;
+
+        // Start observing if the ref exists
         if (currentRef) observer.observe(currentRef);
 
+        // Cleanup: stop observing when the component unmounts or ref changes
         return () => {
             if (currentRef) observer.unobserve(currentRef);
         };
@@ -35,6 +50,7 @@ export const LandingPageHeader = () => {
 
     return (
         <>
+            {/* If the user has scrolled past, show the sticky header */}
             {hasScrolledPast && (
                 <header className={'landing-page-header sticky'}>
                     <LandingPageNav
@@ -48,7 +64,8 @@ export const LandingPageHeader = () => {
                     />
                 </header>
             )}
-                <header className={`landing-page-header ${hasScrolledPast ? 'hide-header' : ''}  `}>
+            {/* If the user has not scrolled past, show the normal header */}
+            <header className={`landing-page-header ${hasScrolledPast ? 'hide-header' : ''}  `}>
                     <LandingPageNav/>
                     <YapperLogo
                         titleSize="clamp(5rem, 6vw, 8rem)"
@@ -59,7 +76,6 @@ export const LandingPageHeader = () => {
                         typeWriterAnimation={true}
                     />
                 </header>
-
             <div ref={logoRef} style={{ position: 'absolute', top: '250px' }} />
         </>
     )
