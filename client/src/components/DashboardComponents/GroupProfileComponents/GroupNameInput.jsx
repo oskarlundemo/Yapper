@@ -8,7 +8,7 @@ export const GroupNameInput = ({groupNameCharCount, groupName, handleGroupNameCh
 
 
     return (
-        <>
+        <div className="groupNameInput">
             <input className={'group-name-input'}
                    type={'text'}
                    value={groupName}
@@ -20,6 +20,6 @@ export const GroupNameInput = ({groupNameCharCount, groupName, handleGroupNameCh
                    }}
             />
             <p><span>{groupNameCharCount}</span>/15</p>
-        </>
+        </div>
     )
 }

@@ -1,5 +1,16 @@
-import {useRef, useState} from "react";
+import {useRef} from "react";
 import '../styles/Dashboard/FileSelect.css'
+
+
+/**
+ * This component is used when users are attaching files to a message
+ *
+ * @param files array of files
+ * @param setFiles state to update the array of files
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 export const FileSelect = ({files, setFiles}) => {
 
@@ -13,6 +24,7 @@ export const FileSelect = ({files, setFiles}) => {
         }
     }
 
+    // This is used for opening the file picker
     const handleButtonClick = () => {
         fileInputRef.current.click();
     };

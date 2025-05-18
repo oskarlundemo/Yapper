@@ -1,3 +1,14 @@
+/**
+ * This function is used for displaying the users blocked users
+ *
+ *
+ * @param toggleDropdown function to toggle dropdown
+ * @param blockedUsers list of blocked users
+ * @param showDropDown state to show drop down
+ * @param unblockUser function to unblock users
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 
@@ -15,8 +26,7 @@ export const BlockedUsersDropDown = ({toggleDropdown, blockedUsers, showDropDown
                         height="24px"
                         viewBox="0 -960 960 960"
                         width="24px"
-                        fill="#e3e3e3"
-                    >
+                        fill="#e3e3e3">
                         <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
                     </svg>
                 </button>
@@ -25,6 +35,9 @@ export const BlockedUsersDropDown = ({toggleDropdown, blockedUsers, showDropDown
                     <div>
                         {blockedUsers.map((blockedUser, index) => (
                             <li key={index} className="blocked-user-card">
+
+                                {/* Render each blocked users and their username */}
+
                                 <span>{blockedUser.BlockedUser.username || 'Blocked User'}</span>
                                 <svg
                                     onClick={() => unblockUser(blockedUser.BlockedUser.id)}

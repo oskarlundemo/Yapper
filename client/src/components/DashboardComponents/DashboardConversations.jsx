@@ -180,7 +180,7 @@ export const DashboardConversations = ({}) => {
 
         // Listen for deletes on the GroupMembers table
         const groupchatKicks = subscribeToChannel(
-            `group-chat-kicked`,
+            `new-group-member-kick-${user.id}`,
             {
                 event: 'DELETE',
                 schema: 'public',
@@ -188,6 +188,8 @@ export const DashboardConversations = ({}) => {
             },
             (payload) => {
                 const removedUser = payload.old;
+
+                console.log('Removed user', removedUser);
 
                 // If the newly removed group member is the current logged-in user, remove conversation
                 if (removedUser.member_id === user.id) {
@@ -253,13 +255,17 @@ export const DashboardConversations = ({}) => {
 
         // Listen for insert on the GroupMembers table
         const newGroupMembersChannel = subscribeToChannel(
-            'new-group-member-channel',
+            `new-group-member-channel-${user.id}`,
             {
                 event: 'INSERT',
                 schema: 'public',
                 table: 'GroupMembers',
             }, async (payload) => {
                 const groupMemberEntry = payload.new;
+
+
+                console.log('New group member', groupMemberEntry);
+
 
                 // If the newly inserted group member is not the logged in user, return
                 if (groupMemberEntry.member_id !== user.id) return;

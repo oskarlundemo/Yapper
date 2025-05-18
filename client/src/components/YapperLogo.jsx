@@ -1,5 +1,23 @@
+/**
+ * This component is used everytime the app logo is
+ * shown
+ *
+ *
+ * @param titleSize
+ * @param margin
+ * @param fixedHeight if you dont want clamp
+ * @param subTitleSize
+ * @param imageWidth
+ * @param typeWriterAnimation animation in css or not
+ * @param imageHeight
+ * @param subTitle
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
-export const YapperLogo = ({titleSize = '', margin = 0, fixedHeight = '', fixedImage = '',
+
+
+export const YapperLogo = ({titleSize = '', margin = 0, fixedHeight = '',
                                subTitleSize = '', imageWidth = 0,
                                typeWriterAnimation = false, imageHeight = 0,
                                subTitle = ''}) => {

@@ -1,12 +1,27 @@
 import {Link} from "react-router-dom";
 
 
+/**
+ * This component is used as the navigation menu in the header of the
+ * landing page
+ *
+ *
+ * @param sticky state to check if the header is position: sticky
+ * @param hasScrolledPast check if the normal header has been scrolled past
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
+
 export const LandingPageNav = ({sticky, hasScrolledPast}) => {
     return (
         <nav style={{
             gap: hasScrolledPast ? '1rem' : '0',
         }} className={`landing-page-nav ${sticky ? `sticky` : ``}`}>
 
+            {/* Has scrolled past, only show icons */}
             {hasScrolledPast ? (
                 <>
                     <Link to='/login'>

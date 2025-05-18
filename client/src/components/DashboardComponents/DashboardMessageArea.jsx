@@ -1,7 +1,5 @@
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
-import {GifContainer} from "./GifContainer.jsx";
-import {FileSelect} from "../FileSelect.jsx";
 import {FileContainer} from "./FileContainer.jsx";
 import '../../styles/Dashboard/FileContainer.css'
 import {supabase} from "../../services/supabaseClient.js";

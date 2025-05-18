@@ -7,30 +7,46 @@ import {UsernameCheck} from "./UsernameCheck.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useDynamicStyles} from "../../context/DynamicStyles.jsx";
+import {useDashboardContext} from "../../context/DashboardContext.jsx";
 
-export const CreateUserBox = ({URL}) => {
 
-    const navigate = useNavigate();
-    const {setFirstLogin} = useDynamicStyles();
-    const { login } = useAuth();
+/**
+ * This component is the create user account page
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
-    const [isPasswordFocused, setPasswordFocused] = useState(false);
-    const [isUsernameFocused, setUsernameFocused] = useState(false);
-    const [isEmailFocused, setEmailFocused] = useState(false);
 
-    const [acceptedPassword, setAcceptedPassword] = useState(false);
-    const [acceptedUsername, setAcceptedUsername] = useState(false);
-    const [acceptedEmail, setAcceptedEmail] = useState(false);
 
-    const [isDisabled, setIsDisabled] = useState(true);
-    const [errors, setErrors] = useState([]);
-    const [formData , setFormData] = useState({
+
+export const CreateUserBox = ({}) => {
+
+    const navigate = useNavigate();  // Used to navigate to chats after creation is successful
+    const {setFirstLogin} = useDynamicStyles();    // Check if it is their first time logging-in, then show conversations first, else chats
+    const { login } = useAuth(); // Get login function from context
+    const {API_URL} = useDashboardContext(); // Preface the API call with this
+
+    const [isPasswordFocused, setPasswordFocused] = useState(false);  // State to check if password is focused
+    const [isUsernameFocused, setUsernameFocused] = useState(false); // State to check if username input is focus
+    const [isEmailFocused, setEmailFocused] = useState(false); // State to check if email input is focused
+
+    const [acceptedPassword, setAcceptedPassword] = useState(false); // State to check if password meets requirements
+    const [acceptedUsername, setAcceptedUsername] = useState(false); // State to check if username meets requirements
+    const [acceptedEmail, setAcceptedEmail] = useState(false);  // State to check if email meets requirements
+
+    const [isDisabled, setIsDisabled] = useState(true);  // Prevent submission until all fields are accepted
+    const [errors, setErrors] = useState([]);   // Set errors in this array
+
+
+    const [formData , setFormData] = useState({ // Used for updating the state of the form
         email: "",
         password: "",
         username: "",
     })
 
-    const handleInputChange = (e) => {
+
+    const handleInputChange = (e) => { // Function to update state of form
         const { name, value } = e.target;
 
         setFormData((prevData) => {
@@ -42,17 +58,19 @@ export const CreateUserBox = ({URL}) => {
         });
     };
 
+    // This hook is used for keeping track if all the requirements are valid
     useEffect(() => {
         setIsDisabled(!(acceptedEmail && acceptedPassword && acceptedUsername));
     }, [acceptedEmail, acceptedPassword, acceptedUsername]);
 
 
+    // Function that handles submit
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         try {
-            const response = await fetch(`${URL}/sign-up`, {
+            const response = await fetch(`${API_URL}/sign-up`, {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {
@@ -61,8 +79,10 @@ export const CreateUserBox = ({URL}) => {
             })
             const result = await response.json();
             if (!response.ok && result.errors.length > 0) {
+                // Show errors if not ok
                 setErrors(result.errors);
             } else {
+                // Else login and set their token in the context
                 login(result.token);
                 navigate('/dashboard');
                 setFirstLogin(true);

@@ -2,7 +2,7 @@
 
 /**
  * This component is used in the App.jsx to protect routes from unauthorised users,
- * so only admins can access theese pages
+ * so only admins can access these pages
  */
 
 

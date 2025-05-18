@@ -1,9 +1,34 @@
 import {useEffect, useState} from "react";
 import '../styles/Inputfield.css'
 
+
+/**
+ * This component is used for standardising the input fields
+ * in both the LoginBox.jsx and CreateUserBox.jsx components
+ *
+ *
+ * @param title of the input
+ * @param type ex text, password etc
+ * @param id of the input
+ * @param name used for updating the state of the input
+ * @param onChange function to update the state
+ * @param value of the input
+ * @param example placeholder
+ * @param svg icon
+ * @param errors on input
+ * @param onFocus function on input clicked
+ * @param onBlur function on input unfocused
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
 export const Inputfield = ({ title, type, id, name, onChange, value, example, svg = null,  errors = [], onFocus = null, onBlur = null, }) => {
+
     const [errorMessage, setErrorMessage] = useState(''); // Set error message
 
+    // Runs through the error array and appends the correct error message to the appropriate input fields
     useEffect(() => {
         if (Array.isArray(errors)) {
             const error = errors.find(err => err.path === name);

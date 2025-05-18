@@ -1,73 +1,104 @@
 import {useEffect, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {supabase} from "../services/supabaseClient.js";
-import {useDynamicStyles} from "../context/DynamicStyles.jsx";
+import {subscribeToChannel} from "../services/helperFunctions.js";
 
+/**
+ * This component is used everytime the app renders a users
+ * avatar
+ *
+ *
+ * @param height of the avatar
+ * @param width of the avatar
+ * @param user object
+ * @param setSaveChanges state to set changes
+ * @param setNewAvatar state to update avatar
+ * @param selectPicture function to select picture
+ * @param file the file / avatar
+ * @param setFile set the file to avatar
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 
 export const UserAvatar = ({height, width, user = null,
                                setSaveChanges = null, setNewAvatar = null,
                                selectPicture = false, file = null, setFile = null}) => {
+
     const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
     const [loadingAvatar, setLoadingAvatar] = useState(true);
+    const [avatarFilename, setAvatarFilename] = useState(null);
+
+
+    // This hook is used to fetch the avatar from Supabase once the component mounts
 
     useEffect(() => {
+        if (!user) return;
         fetchImage(user);
-    }, [user?.id]);
+    }, [user?.avatar]);
 
+    // This is the function that fetches avatars from Supabase
     const fetchImage = async (user) => {
         setLoadingAvatar(true);
+
         if (!user?.avatar) {
             setCurrentAvatar(null);
+            setAvatarFilename(null);
             setLoadingAvatar(false);
             return;
         }
+
+        setAvatarFilename(user.avatar);
+
         const { data, error } = supabase.storage
             .from("yapper")
             .getPublicUrl(`userAvatars/${user.avatar}`);
+
         if (error) {
             console.error("Error getting public URL:", error);
         } else {
-            setLoadingAvatar(false);
             setCurrentAvatar(data.publicUrl);
         }
+
+        setLoadingAvatar(false);
     };
 
 
+    // This hook is used for listening to updates on the users table
     useEffect(() => {
         if (!user?.id) return;
 
-        const newChannel = supabase
-            .channel(`realtime-user-avatar-update-${Math.random()}`)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'users',
-                },
-                async (payload) => {
-                    const updatedUser = payload.new;
-                    if (updatedUser.id === user.id) {
-                        await fetchImage(payload.new);
-                    }
+        const userAvatarUpdate = subscribeToChannel(
+            'userAvatarUpdate',
+            {
+                event: "UPDATE",
+                schema: 'public',
+                table: 'users',
+            }, async (payload) => {
+                const updatedUser = payload.new;
+
+                if (updatedUser.id === user.id) {
+                    await fetchImage(updatedUser);
                 }
-            )
-            .subscribe();
+            }
+        );
 
         return () => {
-            supabase.removeChannel(newChannel);
+            supabase.removeChannel(userAvatarUpdate);
         };
-    }, [user?.id ?? null]);
+    }, [user?.id]);
+
 
     const fileInputRef = useRef(null);
 
+    // This function handels the selection of the files
     const handleButtonClick = () => {
         fileInputRef.current.click();
     };
 
+    // This function sets the states of the files and display the selected one
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         setSaveChanges(true)
@@ -82,6 +113,7 @@ export const UserAvatar = ({height, width, user = null,
     return (
         <>
             {selectPicture && user?.id === loggedInUser?.id ? (
+                /* With select picture == true, users can click on their avatar and change the picture */
                 <div className="user-avatar-select-picture"
                      style={{
                          backgroundImage: `url(${file || currentAvatar || '/default.jpg'})`,
@@ -107,12 +139,11 @@ export const UserAvatar = ({height, width, user = null,
 
                 </div>
             ) : (
-
+                /* Show looading animation */
                 (loadingAvatar ? (
                     <div style={{height: height, width: width}} className="loading-avatar"></div>
                 ) : (
                     <img
-                        key={user?.id || 'default'}
                         className="user-avatar-select-picture-default"
                         src={currentAvatar || "/default.jpg"}
                         alt="user-avatar"
