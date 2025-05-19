@@ -169,7 +169,18 @@ export const CreateUserBox = ({}) => {
                 <button className={`${isDisabled ? 'disabled' : ''}`} type="submit" disabled={isDisabled}>Sign Up</button>
 
             </form>
-            <p>Already have an account? <Link to='/login'>Sign in</Link></p>
+
+
+            <p className={'bottom-text'}>Already have an account?
+                <Link
+                    style={{
+                        cursor: 'pointer',
+                        color: "#535bf2"
+                    }}
+
+                    to='/login'><b>Sign in</b>
+                </Link>
+            </p>
         </section>
 
 

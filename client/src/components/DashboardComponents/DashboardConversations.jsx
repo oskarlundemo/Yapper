@@ -165,7 +165,6 @@ export const DashboardConversations = ({}) => {
                 }
             })
 
-
         // Clean up and remove the channel
         return () => {
             supabase.removeChannel(unBlockChannel);

@@ -73,3 +73,52 @@ export const login = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+
+/**
+ * 1. This function is used when users want to log in with the guest account, which is triggered in
+ *    the Login.jsx component
+ *
+ * 2. The functions only expects the req and res object to be sent down from the router since
+ *    username and password is gathered from the .env file
+ *
+ *
+ * 3. 200: Successful login, create and assign token
+ *    500: Server error
+ *
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+
+export const loginGuestAccount = async (req, res) => {
+
+    try {
+
+        const guestUsername = process.env.GUEST_USERNAME;
+        const guestPassword = process.env.GUEST_PASSWORD;
+
+        const guestAccount = await prisma.users.findUnique({
+            where: {username: guestUsername}
+        })
+
+        const match = await bcrypt.compare(guestPassword, guestAccount.password)
+
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
+        const token = jwt.sign(
+            { id: guestAccount.id, username: guestAccount.username, user: guestAccount },
+            process.env.JWT_SECRET,
+            { expiresIn: '30min' }
+        );
+
+        console.log('Signed in guest');
+        return res.status(200).json({ message: 'Login guest successful', token});
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}

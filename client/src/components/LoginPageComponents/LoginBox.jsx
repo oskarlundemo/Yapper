@@ -81,6 +81,37 @@ export const LoginBox = ({}) => {
     };
 
 
+    const loginAsGuest = async () => {
+
+        try {
+
+            const response = await fetch(`${API_URL}/sign-in/guest`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.log(result.errors || result.error);
+            } else {
+                login(result.token);
+                navigate('/dashboard');
+                setFirstLogin(true);
+            }
+
+        } catch (err) {
+            console.log('An error occurred while logging in guest');
+        }
+    }
+
+
+
+
+
+
     return (
         <section className={`login-box`}>
 
@@ -124,8 +155,28 @@ export const LoginBox = ({}) => {
 
             </form>
 
-            <p>Don't have an account?
-                <Link to='/signup'>Create one</Link>
+            <p className={'bottom-text'}>Don't have an account?
+                <Link
+                    style={{
+                        cursor: 'pointer',
+                        color: "#535bf2"
+                    }}
+                    to='/signup'><b>Create one</b></Link>
+            </p>
+
+
+            <div className="message-splitter">
+                <h4>or</h4>
+            </div>
+
+
+            <p className='login-guest'>
+                Continue as <b
+                style={{
+                    cursor: 'pointer',
+                    color: "#535bf2"
+                }}
+                onClick={() => loginAsGuest()} >guest</b>
             </p>
 
         </section>

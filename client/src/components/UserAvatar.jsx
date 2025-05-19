@@ -29,7 +29,7 @@ export const UserAvatar = ({height, width, user = null,
     const [currentAvatar, setCurrentAvatar] = useState(null);
     const {user: loggedInUser} = useAuth();
     const [loadingAvatar, setLoadingAvatar] = useState(true);
-    const [avatarFilename, setAvatarFilename] = useState(null);
+
 
 
     // This hook is used to fetch the avatar from Supabase once the component mounts
@@ -37,29 +37,30 @@ export const UserAvatar = ({height, width, user = null,
     useEffect(() => {
         if (!user) return;
         fetchImage(user);
-    }, [user?.avatar]);
+    }, [user?.id]);
 
     // This is the function that fetches avatars from Supabase
     const fetchImage = async (user) => {
         setLoadingAvatar(true);
 
         if (!user?.avatar) {
-            setCurrentAvatar(null);
-            setAvatarFilename(null);
+            console.log("No avatar set for user");
+            setCurrentAvatar("/default.jpg");
             setLoadingAvatar(false);
             return;
         }
 
-        setAvatarFilename(user.avatar);
+        console.log("Fetching avatar for:", user.avatar);
 
         const { data, error } = supabase.storage
             .from("yapper")
             .getPublicUrl(`userAvatars/${user.avatar}`);
 
         if (error) {
-            console.error("Error getting public URL:", error);
+            console.error("Error getting public URL:", error.message);
         } else {
-            setCurrentAvatar(data.publicUrl);
+            console.log("Avatar URL:", data.publicUrl);
+            setCurrentAvatar(`${data.publicUrl}?t=${Date.now()}`); // bust cache
         }
 
         setLoadingAvatar(false);
@@ -71,7 +72,7 @@ export const UserAvatar = ({height, width, user = null,
         if (!user?.id) return;
 
         const userAvatarUpdate = subscribeToChannel(
-            'userAvatarUpdate',
+            `userAvatarUpdate-${user.id}`,
             {
                 event: "UPDATE",
                 schema: 'public',
@@ -88,7 +89,7 @@ export const UserAvatar = ({height, width, user = null,
         return () => {
             supabase.removeChannel(userAvatarUpdate);
         };
-    }, [user?.id]);
+    }, [user?.id ?? null]);
 
 
     const fileInputRef = useRef(null);
@@ -144,8 +145,9 @@ export const UserAvatar = ({height, width, user = null,
                     <div style={{height: height, width: width}} className="loading-avatar"></div>
                 ) : (
                     <img
+                        key={Date.now()}
                         className="user-avatar-select-picture-default"
-                        src={currentAvatar || "/default.jpg"}
+                        src={currentAvatar}
                         alt="user-avatar"
                         style={{ height,
                             width,

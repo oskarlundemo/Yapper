@@ -33,4 +33,15 @@
 }
 
 
+.login-guest {
+    margin: 0;
+}
 
+.bottom-text {
+
+    margin: 0;
+
+    a {
+        margin-left: 0.2rem;
+    }
+}
