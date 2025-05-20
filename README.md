@@ -44,24 +44,24 @@ Built with a fast React + Vite frontend and a robust Node.js + PostgreSQL backen
 ## 📌 Features
 
 #### Users
-Users can send direct messages to each other
+- Users can send direct messages to each other
 
-Users can create group chats  
+- Users can create group chats  
 
-Users can block other users they wish not to communicate with
+- Users can block other users they wish not to communicate with
 
-Users can set and update their on avatar 
+- Users can set and update their on avatar 
 
-Users can set and update their own bio
+- Users can set and update their own bio
 
-User can send GIF's in chats (GIPHY API) 
+- User can send GIF's in chats (GIPHY API) 
 
-Users can send files in chats
+- Users can send files in chats
 
 #### Group chats
-The admin of the group chat can kick members and delete the whole group chat
+- Group admin can kick members and delete the whole group chat
 
-The admin of the group chat can update and set an avatar and description for the group chat 
+- Group admin can can update and set avatar and description for the group chat 
 
 ## 📧 Contact
 
