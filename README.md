@@ -72,6 +72,9 @@ Email: oskarlundemo@gmail.com
 ## Screenshots 
 
 ### Homepage
+![Skärmavbild 2025-05-20 kl  21 48 16 (2)](https://github.com/user-attachments/assets/46d4a862-6e61-4e7f-9f49-6e575cfc0c1c)
+<img width="1800" alt="Skärmavbild 2![Skärmavbild 2025-05-20 kl  21 48 16 (3)](https://github.com/user-attachments/assets/853b698c-8725-41dc-b071-f457734846d9)
+025-05-20 kl  21 48 16" src="https://github.com/user-attachments/assets/2a30a943-670d-4e97-8724-225d1d746155" />
 
 
 ### Book review
