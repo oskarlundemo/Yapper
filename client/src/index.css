@@ -1,0 +1,98 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --background-color: hsl(0, 0%, 100%);
+  --text-color: hsl(0, 0%, 0%);
+  --accent-color: hsl(210, 100%, 55%);
+  --notification-color: hsl(0, 75%, 45%);
+  --success-color: hsl(140, 65%, 40%);
+  --secondary-color: hsl(0, 0%, 92%);
+  --disabled-color: hsl(210, 10%, 65%);
+  --golden-yellow: hsl(50, 100%, 60%);
+  --dark-grey: hsl(0, 0%, 50%);
+
+
+
+  --border-radius: 10px;
+  --default-transition: 200ms ease-in-out;
+  --soft-boxshadow: rgba(0, 0, 0, 0.05) 0px 4px 12px, rgba(0, 0, 0, 0.08) 0px 2px 6px;
+  --boxshadow-right: rgba(0, 0, 0, 0.05) 4px 0px 12px, rgba(0, 0, 0, 0.08) 2px 0px 6px;
+
+  --boxshadow-left: rgba(0, 0, 0, 0.05) -4px 0px 12px, rgba(0, 0, 0, 0.08) -2px 0px 6px;
+
+
+  --default-boxshadow: rgba(0, 0, 0, 0.1) 0px 8px 24px, rgba(0, 0, 0, 0.15) 0px 4px 12px;
+  --error-color: hsl(0, 100%, 50%);
+  --approved-color: hsl(113, 62%, 46%);
+}
+
+
+
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+
+a:hover {
+  color: #535bf2;
+}
+
+html, body, #root, .App {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+
+
+
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  background-color: var(--accent-color);
+  transition: var(--default-transition);
+  color: var(--background-color);
+}
+
+
+
+button:hover {
+  cursor: pointer;
+  scale: 1.05;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+  cursor: default;
+  background-color: var(--disabled-color);
+  scale: none;
+}
