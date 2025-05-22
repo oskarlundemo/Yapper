@@ -1,5 +1,5 @@
 import {prisma} from '../prisma/index.js';
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 
@@ -53,7 +53,7 @@ export const login = async (req, res) => {
         }
 
         // Username was found in the db, try matching the provided password with db using bcrypt
-        const match = await bcrypt.compare(password, user.password)
+        const match = await bcryptjs.compare(password, user.password)
 
         // If the password is incorrect the return error
         if (!match) {
@@ -102,7 +102,7 @@ export const loginGuestAccount = async (req, res) => {
             where: {username: guestUsername}
         })
 
-        const match = await bcrypt.compare(guestPassword, guestAccount.password)
+        const match = await bcryptjs.compare(guestPassword, guestAccount.password)
 
         if (!match) {
             return res.status(401).json({ error: 'Invalid username or password' });

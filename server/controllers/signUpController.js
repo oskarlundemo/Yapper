@@ -1,5 +1,5 @@
 import {prisma} from '../prisma/index.js';
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 
@@ -110,7 +110,7 @@ export async function uniqueEmail (email) {
 export const signUpUser = async(req, res) => {
     try {
         const { username, password, email} = req.body;
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedPassword = await bcryptjs.hash(password, 12);
         const user  = await prisma.users.create({
             data: {
                 username: username,
