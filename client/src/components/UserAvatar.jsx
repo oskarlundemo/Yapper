@@ -50,14 +50,13 @@ export const UserAvatar = ({height, width, user = null,
             return;
         }
 
-        console.log("Fetching avatar for:", user.avatar);
-
         const { data, error } = supabase.storage
             .from("yapper")
             .getPublicUrl(`userAvatars/${user.avatar}`);
 
         if (error) {
             console.error("Error getting public URL:", error.message);
+            setCurrentAvatar("/default.jpg");
         } else {
             console.log("Avatar URL:", data.publicUrl);
             setCurrentAvatar(`${data.publicUrl}?t=${Date.now()}`); // bust cache
@@ -154,7 +153,10 @@ export const UserAvatar = ({height, width, user = null,
                             objectFit: "cover",
                             objectPosition: "center",
                         }}
-                        onError={() => console.error("Failed to load avatar:", currentAvatar)}
+                        onError={() => {
+                            setCurrentAvatar("/default.jpg");
+                            console.error("Failed to load avatar:", currentAvatar)
+                        }}
                     />
                 ))
             )}

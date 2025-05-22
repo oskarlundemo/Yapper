@@ -41,7 +41,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
 
             // If the group does not have an avatar, set it to null and show default img
             if (!group?.avatar) {
-                setCurrentAvatar(null);
+                setCurrentAvatar("/default.jpg");
                 return;
             }
 
@@ -51,6 +51,7 @@ export const GroupAvatar = ({height, width, user = null, group = null,
                 .getPublicUrl(`groupAvatars/${group.avatar}`);
             if (error) {
                 console.error("Error getting public URL:", error);
+                setCurrentAvatar("/default.jpg");
             } else {
                 setCurrentAvatar(data.publicUrl);
             }
@@ -114,6 +115,10 @@ export const GroupAvatar = ({height, width, user = null, group = null,
                     src={currentAvatar || "/default.jpg"}
                     alt="user-avatar"
                     style={{ height, width }}
+                    onError={() => {
+                        setCurrentAvatar("/default.jpg");
+                        console.error("Failed to load avatar:", currentAvatar)
+                    }}
                 />
             )}
         </>
