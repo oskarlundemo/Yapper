@@ -40,11 +40,12 @@ function App() {
             />
 
             <Route
-                path="/"
+                path="*"
                 element={
                 <LandingPage API_URL={API_BASE_URL} />
-                }
-                />
+                 }
+            />
+
         </Routes>
     </div>
   )
