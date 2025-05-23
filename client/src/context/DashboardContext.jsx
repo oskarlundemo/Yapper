@@ -20,8 +20,9 @@ export const DashboardContextProvider = ({ children }) => {
     const [inspectedUser, setInspectedUser] = useState(null); // Set the inspected user in a conversation
 
     const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
-    const API_URL = import.meta.env.PROD ? PRODUCTION_URL : "/api"; // Preface API with this depending on development or production
-
+    const API_URL = import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_API_BASE_URL
+        : "/api";
 
     const [receiver, setReceiver] = useState(null);                         // Set receiver of a message
     const [groupChat, setGroupChat] = useState(false);             // Set group chat to either true or false
