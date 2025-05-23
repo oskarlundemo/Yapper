@@ -68,6 +68,7 @@ export const LoginBox = ({}) => {
             if (!response.ok) {
                 // Log errors
                 console.log(result.errors || result.error);
+                console.log(result.err)
                 setErrors(result.errors || result.error);
             } else {
                 // Else login and set jwt token
