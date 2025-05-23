@@ -44,7 +44,6 @@ export const UserAvatar = ({height, width, user = null,
         setLoadingAvatar(true);
 
         if (!user?.avatar) {
-            console.log("No avatar set for user");
             setCurrentAvatar("/default.jpg");
             setLoadingAvatar(false);
             return;
@@ -58,7 +57,6 @@ export const UserAvatar = ({height, width, user = null,
             console.error("Error getting public URL:", error.message);
             setCurrentAvatar("/default.jpg");
         } else {
-            console.log("Avatar URL:", data.publicUrl);
             setCurrentAvatar(`${data.publicUrl}?t=${Date.now()}`); // bust cache
         }
 

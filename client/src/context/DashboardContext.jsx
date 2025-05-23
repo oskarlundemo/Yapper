@@ -19,7 +19,9 @@ export const DashboardContextProvider = ({ children }) => {
 
     const [inspectedUser, setInspectedUser] = useState(null); // Set the inspected user in a conversation
 
-    const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
+    console.log("VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
+
+
     const API_URL = import.meta.env.MODE === "production"
         ? import.meta.env.VITE_API_BASE_URL
         : "/api";
